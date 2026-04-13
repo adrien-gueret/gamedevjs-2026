@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Serve existing files and directories as-is
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # SPA fallback: internally rewrite everything else to index.html
+  # Keep this internal (no redirect) so the browser URL stays the same.
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Prevent directory listings
+Options -Indexes
