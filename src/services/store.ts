@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/types";
 
-// TODO: define storage key
+// Local storage key
 const STORAGE_KEY = "TMP_STORAGE_KEY";
 
 type Store = {

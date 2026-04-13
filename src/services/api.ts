@@ -1,4 +1,4 @@
-// TODO: set ROOT_URL when API is ready
+// API root URL placeholder
 const ROOT_URL = "API ROOT URL";
 
 function getHeaders({
