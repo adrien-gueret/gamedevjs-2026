@@ -1,0 +1,15 @@
+{
+  "require": {
+    "symfony/http-client": "^8.0",
+    "nyholm/psr7": "^1.8",
+    "guzzlehttp/guzzle": "^7.10"
+  },
+  "config": {
+    "platform": {
+      "php": "8.4.0"
+    },
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
+}
