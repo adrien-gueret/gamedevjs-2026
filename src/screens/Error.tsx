@@ -1,4 +1,4 @@
 export default function Error() {
-  // Error screen fallback
+  // TODO: implement error screen
   return <p>An error occurred</p>;
 }

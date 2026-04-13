@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/types";
 
-// Local storage key
-const STORAGE_KEY = "THE_WIZARD_MACHINE_STORAGE_KEY";
+// TODO: define storage key
+const STORAGE_KEY = "TMP_STORAGE_KEY";
 
 type Store = {
   locale?: Locale;
