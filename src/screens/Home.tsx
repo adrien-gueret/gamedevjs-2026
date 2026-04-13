@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type SymbolType =
   | "SWORD"
@@ -192,11 +192,7 @@ function resolveLine(lineSymbols: SymbolType[]): {
     }
 
     if (symbol === "TRIGGER") {
-      summaries.push(
-        triggerCount > 0
-          ? `⚡ Trigger x${count}: boosts other symbols on this line`
-          : "⚡ Trigger: no effect",
-      );
+      summaries.push(`⚡ Trigger x${count}: boosts other symbols on this line`);
       continue;
     }
 
@@ -370,17 +366,36 @@ export default function Home() {
   const [enemy, setEnemy] = useState(() => createEnemy(1));
   const [reels, setReels] = useState<SymbolType[][]>(STARTING_REELS);
   const [grid, setGrid] = useState<SymbolType[][]>(() => spinReels(STARTING_REELS).grid);
-  const [battleLog, setBattleLog] = useState<string[]>([
-    "Spin to resolve the middle row only, all rows, or all rows + diagonals.",
-  ]);
+  const [battleLogState, setBattleLogState] = useState<{
+    nextId: number;
+    entries: Array<{ id: number; text: string }>;
+  }>({
+    nextId: 2,
+    entries: [
+      {
+        id: 1,
+        text: "Spin to resolve the middle row only, all rows, or all rows + diagonals.",
+      },
+    ],
+  });
   const [phase, setPhase] = useState<"BATTLE" | "PROGRESSION" | "DEFEAT">("BATTLE");
 
-  const activeEnemy = useMemo(() => enemy, [enemy]);
-
-  const canSpin = phase === "BATTLE" && playerHp > 0 && activeEnemy.hp > 0;
+  const canSpin = phase === "BATTLE" && playerHp > 0 && enemy.hp > 0;
 
   function pushLog(entries: string[]): void {
-    setBattleLog((previous) => [...entries, ...previous].slice(0, 14));
+    setBattleLogState((previous) => {
+      let nextId = previous.nextId;
+      const nextEntries = entries.map((text) => {
+        const entry = { id: nextId, text };
+        nextId += 1;
+        return entry;
+      });
+
+      return {
+        nextId,
+        entries: [...nextEntries, ...previous.entries].slice(0, 14),
+      };
+    });
   }
 
   function startNextCombat(updatedReels: SymbolType[][]): void {
@@ -403,9 +418,15 @@ export default function Home() {
     setReels(STARTING_REELS);
     setGrid(resetGrid);
     setPhase("BATTLE");
-    setBattleLog([
-      "Run restarted. Spend HP to spin, resolve effects line by line, survive the machine.",
-    ]);
+    setBattleLogState((previous) => ({
+      nextId: previous.nextId + 1,
+      entries: [
+        {
+          id: previous.nextId,
+          text: "Run restarted. Spend HP to spin, resolve effects line by line, survive the machine.",
+        },
+      ],
+    }));
   }
 
   function handleSpin(hpSpent: number): void {
@@ -423,7 +444,7 @@ export default function Home() {
       hpAfterSpin - resolved.playerDamage + resolved.playerHealing,
     );
 
-    const enemyHpAfterEffects = Math.max(0, activeEnemy.hp - resolved.enemyDamage);
+    const enemyHpAfterEffects = Math.max(0, enemy.hp - resolved.enemyDamage);
     const shieldAfterEffects = playerShield + resolved.shieldGained;
 
     const lineLogs = resolved.linesResolved.map(
@@ -433,38 +454,31 @@ export default function Home() {
     if (enemyHpAfterEffects <= 0) {
       setPlayerHp(hpAfterEffects);
       setPlayerShield(shieldAfterEffects);
-      setEnemy({ ...activeEnemy, hp: 0 });
+      setEnemy({ ...enemy, hp: 0 });
       setPhase("PROGRESSION");
       pushLog([
-        `You spent ${hpSpent} HP and defeated ${activeEnemy.name}.`,
+        `You spent ${hpSpent} HP and defeated ${enemy.name}.`,
         ...lineLogs,
       ]);
       return;
     }
 
-    const enemyAttack = activeEnemy.attack;
+    const enemyAttack = enemy.attack;
     const mitigated = Math.min(shieldAfterEffects, enemyAttack);
     const damageTaken = enemyAttack - mitigated;
     const hpAfterEnemyTurn = hpAfterEffects - damageTaken;
     const shieldAfterEnemy = Math.max(0, shieldAfterEffects - enemyAttack);
 
-    const shouldCorruptReel = combatIndex >= 1;
-    const enemyCorruptionNow = shouldCorruptReel;
-    let updatedReels = reels;
+    setReels(applyEnemyCorruption(reels));
 
-    if (enemyCorruptionNow) {
-      updatedReels = applyEnemyCorruption(reels);
-      setReels(updatedReels);
-    }
-
-    setEnemy({ ...activeEnemy, hp: enemyHpAfterEffects });
+    setEnemy({ ...enemy, hp: enemyHpAfterEffects });
     setPlayerShield(shieldAfterEnemy);
 
     if (hpAfterEnemyTurn <= 0) {
       setPlayerHp(0);
       setPhase("DEFEAT");
       pushLog([
-        `You spent ${hpSpent} HP. ${activeEnemy.name} retaliated for ${damageTaken}.`,
+        `You spent ${hpSpent} HP. ${enemy.name} retaliated for ${damageTaken}.`,
         ...lineLogs,
       ]);
       return;
@@ -472,10 +486,8 @@ export default function Home() {
 
     setPlayerHp(hpAfterEnemyTurn);
     pushLog([
-      `You spent ${hpSpent} HP. ${activeEnemy.name} dealt ${damageTaken} damage after block.`,
-      enemyCorruptionNow
-        ? `${activeEnemy.name} corrupted one reel with a negative symbol.`
-        : `${activeEnemy.name} holds position.`,
+      `You spent ${hpSpent} HP. ${enemy.name} dealt ${damageTaken} damage after block.`,
+      `${enemy.name} corrupted one reel with a negative symbol.`,
       ...lineLogs,
     ]);
   }
@@ -497,8 +509,8 @@ export default function Home() {
         <div className="status-grid">
           <p>Player HP: {playerHp}</p>
           <p>Block: {playerShield}</p>
-          <p>Enemy: {activeEnemy.name}</p>
-          <p>Enemy HP: {activeEnemy.hp}</p>
+          <p>Enemy: {enemy.name}</p>
+          <p>Enemy HP: {enemy.hp}</p>
           <p>Combat: {combatIndex}</p>
           <p>Reel size: {reels.map((reel) => reel.length).join(" / ")}</p>
         </div>
@@ -566,8 +578,8 @@ export default function Home() {
       <section className="panel">
         <h2>Combat log</h2>
         <ul className="log">
-          {battleLog.map((entry, index) => (
-            <li key={`${entry}-${index}`}>{entry}</li>
+          {battleLogState.entries.map((entry) => (
+            <li key={entry.id}>{entry.text}</li>
           ))}
         </ul>
       </section>
