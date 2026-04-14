@@ -17,6 +17,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: #111;
+  image-rendering: pixelated;
 }
 
 p {

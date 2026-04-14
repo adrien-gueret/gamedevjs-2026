@@ -1,0 +1,74 @@
+.slot-machine {
+  border: 32px solid transparent;
+  border-image-source: url(./images/borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+  display: inline-block;
+  position: relative;
+}
+
+.slot-machine-reels {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.slot-machine-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slot-machine-line {
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  width: 100%;
+  position: absolute;
+}
+
+.slot-machine-line.disabled {
+  filter: grayscale(100%) opacity(50%);
+}
+
+.slot-machine-line-1 {
+  border-top-color: #3bce43;
+  border-bottom-color: #238c29;
+  top: calc(50% - 3px);
+}
+
+.slot-machine-line-2 {
+  border-top-color: #00d6f0;
+  border-bottom-color: #0086f0;
+  top: 27%;
+}
+
+.slot-machine-line-1 + .slot-machine-line-2 {
+  top: 70%;
+}
+
+.slot-machine-line-3 {
+  border-top-color: #faf100;
+  border-bottom-color: #a6a000;
+  width: 120%;
+  transform-origin: left center;
+}
+
+.slot-machine-line-3:first-child {
+  transform: rotate(42deg);
+  top: 16px;
+  left: 16px;
+}
+
+.slot-machine-line-3:last-child {
+  transform: rotate(-42deg);
+  bottom: 16px;
+  left: 16px;
+}

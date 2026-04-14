@@ -1,0 +1,32 @@
+.machine-hearts {
+  width: 45px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.machine-heart {
+  --position-y: top;
+  width: 45px;
+  height: 45px;
+  background-image: url(./images/hearts.png);
+  background-repeat: no-repeat;
+  background-position: var(--position-x) var(--position-y);
+}
+
+.machine-heart.disabled {
+  --position-y: bottom;
+}
+
+.machine-heart-1 {
+  --position-x: left;
+}
+
+.machine-heart-2 {
+  --position-x: center;
+}
+
+.machine-heart-3 {
+  --position-x: right;
+}

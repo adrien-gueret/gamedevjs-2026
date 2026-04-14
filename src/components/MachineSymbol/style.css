@@ -1,0 +1,46 @@
+.machine-symbol {
+  width: 66px;
+  height: 66px;
+  text-align: center;
+  line-height: 66px;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent;
+  user-select: none;
+  transform-origin: center;
+}
+
+.machine-symbol.is-active {
+  animation: machine-symbol-activate 420ms ease-out;
+}
+
+.machine-symbol-sword {
+  background-image: url(./images/slots/sword.png);
+}
+
+.machine-symbol-shield {
+  background-image: url(./images/slots/shield.png);
+}
+
+.machine-symbol-heart {
+  background-image: url(./images/slots/heart.png);
+}
+
+.machine-symbol-coin {
+  background-image: url(./images/slots/coin.png);
+}
+
+@keyframes machine-symbol-activate {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(1.22);
+    filter: brightness(1.6);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}

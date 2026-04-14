@@ -1,0 +1,94 @@
+.machine-reel {
+  --symbol-size: 66px;
+  --visible-symbols: 3;
+  --reel-spin-duration: 0.32s;
+  --reel-cycle-distance: 660px;
+
+  position: relative;
+  width: 66px;
+  height: calc(var(--symbol-size) * var(--visible-symbols));
+  overflow: hidden;
+  background-image: url(./images/reel.png);
+}
+
+.machine-reel::before,
+.machine-reel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 16px;
+  width: 100%;
+  display: block;
+  pointer-events: none;
+  background-image: url(./images/reel.png);
+  background-position: top;
+  z-index: 1;
+}
+
+.machine-reel::after {
+  top: auto;
+  bottom: 0;
+  background-position: bottom;
+}
+
+.machine-reel-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.machine-reel-strip.is-static {
+  transform: translateY(0);
+}
+
+.machine-reel-symbol {
+  width: 66px;
+  height: var(--symbol-size);
+  flex-shrink: 0;
+}
+
+.machine-reel.is-spinning .machine-reel-strip {
+  animation: reel-scroll var(--reel-spin-duration) linear infinite;
+}
+
+.machine-reel.is-stopping .machine-reel-strip.is-static {
+  animation: reel-stop 420ms cubic-bezier(0.14, 0.8, 0.2, 1) both;
+}
+
+.machine-reel.is-stopping .machine-symbol {
+  animation: reel-stop-symbol 420ms ease-out both;
+}
+
+@keyframes reel-scroll {
+  from {
+    transform: translateY(calc(-1 * var(--reel-cycle-distance)));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes reel-stop {
+  0% {
+    transform: translateY(22px) scaleY(1.02);
+  }
+  62% {
+    transform: translateY(-4px) scaleY(0.992);
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes reel-stop-symbol {
+  0% {
+    filter: blur(1.4px);
+    opacity: 0.82;
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
