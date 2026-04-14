@@ -13,6 +13,7 @@ type Props = {
   activeSymbolPositions: Array<{
     reelIndex: number;
     rowIndex: number;
+    celebrationLevel: "normal" | "double" | "triple";
   }>;
 };
 
@@ -34,9 +35,12 @@ export default function SlotMachine({
             startIndex={startIndexes[index]}
             isSpinning={spinningReels[index] ?? false}
             reelIndex={index}
-            activeRowIndexes={activeSymbolPositions
+            activeRows={activeSymbolPositions
               .filter((position) => position.reelIndex === index)
-              .map((position) => position.rowIndex)}
+              .map((position) => ({
+                rowIndex: position.rowIndex,
+                celebrationLevel: position.celebrationLevel,
+              }))}
           />
         ))}
         <MachineHearts betCost={betCost} />

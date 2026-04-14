@@ -52,6 +52,7 @@ type Payline = {
 type ActiveSymbolPosition = {
   reelIndex: number;
   rowIndex: number;
+  celebrationLevel: "normal" | "double" | "triple";
 };
 
 export default function Play() {
@@ -91,6 +92,10 @@ export default function Play() {
     activationTimeoutRefs.current = [];
   };
 
+  const onActivate = (symbol: ReelSymbol) => {
+    console.log("onActivate", symbol);
+  };
+
   useEffect(() => {
     return () => {
       clearSpinTimers();
@@ -113,6 +118,9 @@ export default function Play() {
       activationTimeoutRefs.current.push(
         window.setTimeout(() => {
           setActiveSymbolPositions(getActiveSymbolPositionsForPayline(payline));
+          payline.symbols.forEach((symbol) => {
+            onActivate(symbol);
+          });
         }, paylineIndex * activationStepDelay),
       );
 
@@ -195,36 +203,73 @@ export default function Play() {
   const getActiveSymbolPositionsForPayline = (
     payline: Payline,
   ): ActiveSymbolPosition[] => {
+    const nonEmptySymbols = payline.symbols.filter(
+      (symbol) => symbol !== "Empty",
+    );
+
+    const occurrences = nonEmptySymbols.reduce<Record<string, number>>(
+      (accumulator, symbol) => {
+        accumulator[symbol] = (accumulator[symbol] ?? 0) + 1;
+        return accumulator;
+      },
+      {},
+    );
+
+    const getCelebrationLevelForSymbol = (
+      symbol: ReelSymbol,
+    ): ActiveSymbolPosition["celebrationLevel"] => {
+      if (symbol === "Empty") {
+        return "normal";
+      }
+
+      const count = occurrences[symbol] ?? 0;
+
+      if (count >= 3) {
+        return "triple";
+      }
+
+      if (count >= 2) {
+        return "double";
+      }
+
+      return "normal";
+    };
+
     switch (payline.name) {
       case "middle":
-        return payline.symbols.map((_, reelIndex) => ({
+        return payline.symbols.map((symbol, reelIndex) => ({
           reelIndex,
           rowIndex: 1,
+          celebrationLevel: getCelebrationLevelForSymbol(symbol),
         }));
       case "top":
-        return payline.symbols.map((_, reelIndex) => ({
+        return payline.symbols.map((symbol, reelIndex) => ({
           reelIndex,
           rowIndex: 0,
+          celebrationLevel: getCelebrationLevelForSymbol(symbol),
         }));
       case "bottom":
-        return payline.symbols.map((_, reelIndex) => ({
+        return payline.symbols.map((symbol, reelIndex) => ({
           reelIndex,
           rowIndex: 2,
+          celebrationLevel: getCelebrationLevelForSymbol(symbol),
         }));
       case "diagonal-down":
-        return payline.symbols.map((_, reelIndex) => ({
+        return payline.symbols.map((symbol, reelIndex) => ({
           reelIndex,
           rowIndex: Math.min(reelIndex, 2),
+          celebrationLevel: getCelebrationLevelForSymbol(symbol),
         }));
       case "diagonal-up":
-        return payline.symbols.map((_, reelIndex) => ({
+        return payline.symbols.map((symbol, reelIndex) => ({
           reelIndex,
           rowIndex: Math.max(2 - reelIndex, 0),
+          celebrationLevel: getCelebrationLevelForSymbol(symbol),
         }));
     }
   };
 
-  const handleGo = () => {
+  const handleSpin = () => {
     if (isSpinning) {
       return;
     }
@@ -323,10 +368,10 @@ export default function Play() {
         <button
           type="button"
           className="slot-machine-go"
-          onClick={handleGo}
+          onClick={handleSpin}
           disabled={isSpinning || lifePoints < betCost}
         >
-          {isSpinning ? "Rolling..." : `Go (-${betCost} PV)`}
+          {isSpinning ? "Rolling..." : `Spin (-${betCost} PV)`}
         </button>
       </div>
 

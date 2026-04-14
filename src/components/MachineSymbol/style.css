@@ -14,6 +14,14 @@
   animation: machine-symbol-activate 420ms ease-out;
 }
 
+.machine-symbol.is-active.is-double {
+  animation: machine-symbol-activate-double 520ms ease-out;
+}
+
+.machine-symbol.is-active.is-triple {
+  animation: machine-symbol-activate-triple 700ms ease-out;
+}
+
 .machine-symbol-sword {
   background-image: url(./images/slots/sword.png);
 }
@@ -41,6 +49,48 @@
   }
   100% {
     transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes machine-symbol-activate-double {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.28) rotate(5deg);
+    filter: brightness(1.85);
+  }
+  55% {
+    transform: scale(1.1) rotate(-3deg);
+    filter: brightness(1.45);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+@keyframes machine-symbol-activate-triple {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.35) rotate(-10deg);
+    filter: brightness(2.1) saturate(1.2);
+  }
+  45% {
+    transform: scale(1.08) rotate(8deg);
+    filter: brightness(1.6);
+  }
+  62% {
+    transform: scale(1.25) rotate(-7deg);
+    filter: brightness(1.9) saturate(1.15);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
     filter: brightness(1);
   }
 }

@@ -11,7 +11,10 @@ type Props = {
   startIndex?: number;
   isSpinning?: boolean;
   reelIndex?: number;
-  activeRowIndexes?: number[];
+  activeRows?: Array<{
+    rowIndex: number;
+    celebrationLevel: "normal" | "double" | "triple";
+  }>;
 };
 
 export default function MachineReel({
@@ -19,7 +22,7 @@ export default function MachineReel({
   startIndex = 0,
   isSpinning = false,
   reelIndex = 0,
-  activeRowIndexes = [],
+  activeRows = [],
 }: Props) {
   const visibleCount = 3;
   const reelSize = symbols.length;
@@ -95,17 +98,22 @@ export default function MachineReel({
         </div>
       ) : (
         <div className="machine-reel-strip is-static">
-          {visibleSymbols.map((symbol, index) => (
-            <div
-              key={`${normalizedStartIndex}-${index}`}
-              className="machine-reel-symbol"
-            >
-              <MachineSymbol
-                symbol={symbol}
-                isActive={activeRowIndexes.includes(index)}
-              />
-            </div>
-          ))}
+          {visibleSymbols.map((symbol, index) => {
+            const activeRow = activeRows.find((row) => row.rowIndex === index);
+
+            return (
+              <div
+                key={`${normalizedStartIndex}-${index}`}
+                className="machine-reel-symbol"
+              >
+                <MachineSymbol
+                  symbol={symbol}
+                  isActive={Boolean(activeRow)}
+                  celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
