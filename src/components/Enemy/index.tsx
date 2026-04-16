@@ -6,6 +6,7 @@ import Sprite, { type SpriteHandle } from "@/components/Sprite";
 import type { EnnemyType, EnemyNextAction, ReelSymbol } from "@/types/game";
 
 import "./style.css";
+import Tooltip from "../Tooltip";
 
 const BASE_ANIMATION_IDLE = [0, 1];
 const BASE_POSE_ATTACKED = 2;
@@ -60,15 +61,39 @@ export default function Enemy({ ref, type, nextActions }: Props) {
           > = {
             attack: "Sword",
             defend: "Shield",
+            none: "Empty",
+          };
+
+          const actionTypeToLabel: Record<
+            EnemyNextAction["type"],
+            React.ReactNode
+          > = {
+            attack: (
+              <>
+                Will <b style={{ color: "red" }}>attack</b> for{" "}
+                <b style={{ color: "cyan" }}>{action.value}</b> damage
+              </>
+            ),
+            defend: (
+              <>
+                Will <b style={{ color: "yellow" }}>block</b> next{" "}
+                <b style={{ color: "cyan" }}>{action.value}</b> damage
+              </>
+            ),
+            none: <>Will do nothing</>,
           };
 
           return (
-            <div key={index} className="enemy-next-action">
-              <div className="enemy-next-action-type">
-                <MachineSymbol symbol={actionTypeToSymboleType[action.type]} />
+            <Tooltip key={index} label={actionTypeToLabel[action.type]}>
+              <div className="enemy-next-action">
+                <div className="enemy-next-action-type">
+                  <MachineSymbol
+                    symbol={actionTypeToSymboleType[action.type]}
+                  />
+                </div>
+                <div className="enemy-next-action-value">{action.value}</div>
               </div>
-              <div className="enemy-next-action-value">{action.value}</div>
-            </div>
+            </Tooltip>
           );
         })}
       </div>
