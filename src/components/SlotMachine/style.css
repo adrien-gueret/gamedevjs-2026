@@ -1,6 +1,6 @@
 .slot-machine {
   border: 32px solid transparent;
-  border-image-source: url(./images/borders.png);
+  border-image-source: url(./images/machine-borders.png);
   border-image-slice: 32 fill;
   border-image-width: 32px;
   border-image-repeat: round;
@@ -71,4 +71,39 @@
   transform: rotate(-42deg);
   bottom: 16px;
   left: 16px;
+}
+
+.spin-button {
+  position: absolute;
+  bottom: -10px;
+  left: calc(50%);
+  z-index: 10;
+}
+
+.helper-text {
+  position: absolute;
+  font-size: 18px;
+  color: #716d6f;
+  text-shadow: 1px 1px 0 #382f35;
+}
+
+.helper-text.text-1 {
+  top: -10px;
+  left: 55px;
+}
+
+.helper-text.text-1 img {
+  position: relative;
+  bottom: 5px;
+  right: 5px;
+}
+
+.helper-text.text-2 {
+  bottom: -10px;
+  left: 100px;
+}
+
+.helper-text.text-2 img {
+  position: relative;
+  left: 35px;
 }

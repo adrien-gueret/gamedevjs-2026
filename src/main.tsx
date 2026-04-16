@@ -1,8 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { TranslationsProvider } from "@/i18n";
-
 import "./index.css";
 import Router from "./Router";
 
@@ -24,8 +22,6 @@ if (!document.startViewTransition) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <TranslationsProvider>
-      <Router />
-    </TranslationsProvider>
+    <Router />
   </StrictMode>,
 );

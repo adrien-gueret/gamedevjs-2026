@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { ReelSymbol } from "@/types/game";
+import type { ReelSymbol, BetCost } from "@/types/game";
 import SlotMachine from "@/components/SlotMachine";
+import Screen from "@/components/Screen";
+import Scene from "@/components/Scene";
 
 const SYMBOLS: ReelSymbol[][] = [
   [
@@ -41,8 +43,6 @@ const SYMBOLS: ReelSymbol[][] = [
     "Shield",
   ],
 ];
-
-type BetCost = 1 | 2 | 3;
 
 type Payline = {
   name: "middle" | "top" | "bottom" | "diagonal-down" | "diagonal-up";
@@ -344,44 +344,27 @@ export default function Play() {
   };
 
   return (
-    <div className="slot-machine-panel">
-      <div className="slot-machine-controls">
-        <p className="slot-machine-life-points">PV: {lifePoints}</p>
-        <div
-          className="slot-machine-bet-buttons"
-          role="group"
-          aria-label="Mise en points de vie"
-        >
-          {[1, 2, 3].map((cost) => (
-            <button
-              key={cost}
-              type="button"
-              className={`slot-machine-bet ${betCost === cost ? "is-selected" : ""}`}
-              onClick={() => setBetCost(cost as BetCost)}
-              disabled={isSpinning}
-            >
-              {cost} PV
-            </button>
-          ))}
+    <Screen>
+      <Scene
+        heroLife={{ value: lifePoints, maxValue: 50 }}
+        enemyLife={{ value: 8, maxValue: 8 }}
+      />
+      <hr />
+      <div className="slot-machine-panel">
+        <div className="slot-machine-controls" style={{ display: "none" }}>
+          <p className="slot-machine-life-points">PV: {lifePoints}</p>
         </div>
 
-        <button
-          type="button"
-          className="slot-machine-go"
-          onClick={handleSpin}
-          disabled={isSpinning || lifePoints < betCost}
-        >
-          {isSpinning ? "Rolling..." : `Spin (-${betCost} PV)`}
-        </button>
+        <SlotMachine
+          symbols={SYMBOLS}
+          startIndexes={startIndexes}
+          spinningReels={spinningReels}
+          betCost={betCost}
+          activeSymbolPositions={activeSymbolPositions}
+          onSpin={handleSpin}
+          onBetCostChange={setBetCost}
+        />
       </div>
-
-      <SlotMachine
-        symbols={SYMBOLS}
-        startIndexes={startIndexes}
-        spinningReels={spinningReels}
-        betCost={betCost}
-        activeSymbolPositions={activeSymbolPositions}
-      />
-    </div>
+    </Screen>
   );
 }

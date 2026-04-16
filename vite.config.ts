@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
 export default defineConfig({
-  base: "/the-wizard-machine/",
+  base: "/the-devil-machine/",
   plugins: [react()],
   resolve: {
     alias: {

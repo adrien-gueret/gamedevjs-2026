@@ -1,26 +1,39 @@
+import type { BetCost } from "@/types/game";
+
 import "./style.css";
 
 type Props = {
   betCost: number;
+  onClick: (newBetCost: BetCost) => void;
 };
 
-export default function MachineHearts({ betCost }: Props) {
+export default function MachineHearts({ betCost, onClick }: Props) {
   return (
     <div className="machine-hearts">
-      <div
-        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "is-active" : "disabled"}`}
+      <button
+        type="button"
+        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"}`}
+        onClick={() => onClick(betCost === 3 ? 2 : 3)}
       />
-      <div
-        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "is-active" : "disabled"}`}
+      <button
+        type="button"
+        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"}`}
+        onClick={() => onClick(betCost === 2 ? 1 : 2)}
       />
-      <div
-        className={`machine-heart machine-heart-1 ${betCost >= 1 ? "is-active" : "disabled"}`}
+      <button
+        type="button"
+        className={`machine-heart machine-heart-1 active ${betCost === 1 ? "disabled" : ""}`}
+        onClick={() => onClick(1)}
       />
-      <div
-        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "is-active" : "disabled"}`}
+      <button
+        type="button"
+        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"}`}
+        onClick={() => onClick(betCost === 2 ? 1 : 2)}
       />
-      <div
-        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "is-active" : "disabled"}`}
+      <button
+        type="button"
+        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"}`}
+        onClick={() => onClick(betCost === 3 ? 2 : 3)}
       />
     </div>
   );

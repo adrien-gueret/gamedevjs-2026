@@ -1,0 +1,20 @@
+.button-base {
+  appearance: none;
+  color: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  background-position: top;
+  cursor: pointer;
+}
+
+.button-base:disabled {
+  cursor: not-allowed;
+  background-position: bottom;
+}
+
+.button-base:hover:not(:disabled),
+.button-base:focus-visible:not(:disabled) {
+  background-position: center;
+}

@@ -1,5 +1,15 @@
+@font-face {
+  font-family: "Pixels";
+  src:
+    url("./fonts/BoldsPixels.woff2") format("woff2"),
+    url("./fonts/BoldsPixels.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Pixels, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -16,8 +26,33 @@ body {
   gap: 24px;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #111;
+  background-image: url(./images/dirt.webp);
+  background-color: #efefef;
   image-rendering: pixelated;
+}
+
+#root {
+  width: 800px;
+  height: 768px;
+  margin: 0 auto;
+  border: 32px solid transparent;
+  border-image-source: url(./images/game-borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+  filter: drop-shadow(18px 18px 0 rgba(17, 17, 17, 0.5));
+  box-sizing: border-box;
+  position: relative;
+}
+
+hr {
+  height: 24px;
+  border: 0 solid transparent;
+  border-width: 0 51px;
+  border-image-source: url(/images/separator.png);
+  border-image-slice: 0 51 0 51 fill;
+  border-image-repeat: repeat stretch;
+  width: 75%;
 }
 
 p {

@@ -13,10 +13,30 @@
   background-image: url(./images/hearts.png);
   background-repeat: no-repeat;
   background-position: var(--position-x) var(--position-y);
+  appearance: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .machine-heart.disabled {
+  pointer-events: none;
+}
+
+.machine-heart.inactive {
   --position-y: bottom;
+}
+
+.machine-heart:hover.inactive,
+.machine-heart:focus-visible.inactive {
+  --position-y: top;
+}
+
+.machine-heart:hover.active,
+.machine-heart:focus-visible.active {
+  filter: brightness(1.5);
 }
 
 .machine-heart-1 {

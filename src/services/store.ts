@@ -1,10 +1,6 @@
-import type { Locale } from "@/i18n/types";
+const STORAGE_KEY = "THE_DEVILE_MACHINE_STORAGE_KEY";
 
-const STORAGE_KEY = "THE_WIZARD_MACHINE_STORAGE_KEY";
-
-type Store = {
-  locale?: Locale;
-};
+type Store = {};
 
 function getDefaultStore(): Store {
   return {};

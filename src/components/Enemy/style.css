@@ -1,0 +1,6 @@
+.enemy {
+  display: block;
+  position: absolute;
+  right: 72px;
+  bottom: 48px;
+}

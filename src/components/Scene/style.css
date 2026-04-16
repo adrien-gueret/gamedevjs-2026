@@ -1,0 +1,15 @@
+.scene {
+  width: 100%;
+  flex: 1;
+  background: #111;
+  border: 0 solid transparent;
+  border-image-source: url(./images/scene-borders.png);
+  border-image-slice: 28 fill;
+  border-image-width: 28px;
+  border-image-repeat: round;
+  box-sizing: border-box;
+  background-image: url(./images/scene-background.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
