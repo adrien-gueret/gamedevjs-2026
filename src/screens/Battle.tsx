@@ -4,45 +4,8 @@ import type { ReelSymbol, BetCost } from "@/types/game";
 import SlotMachine from "@/components/SlotMachine";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene";
-
-const SYMBOLS: ReelSymbol[][] = [
-  [
-    "Shield",
-    "Sword",
-    "Sword",
-    "Shield",
-    "Sword",
-    "Shield",
-    "Sword",
-    "Shield",
-    "Sword",
-    "Coin",
-  ],
-  [
-    "Sword",
-    "Coin",
-    "Empty",
-    "Shield",
-    "Shield",
-    "Empty",
-    "Sword",
-    "Empty",
-    "Empty",
-    "Sword",
-  ],
-  [
-    "Empty",
-    "Shield",
-    "Empty",
-    "Empty",
-    "Sword",
-    "Empty",
-    "Empty",
-    "Sword",
-    "Empty",
-    "Shield",
-  ],
-];
+import { useGameState } from "@/services/gameStore";
+import { takeDamage, setBetCost } from "@/services/actions";
 
 type Payline = {
   name: "middle" | "top" | "bottom" | "diagonal-down" | "diagonal-up";
@@ -55,14 +18,17 @@ type ActiveSymbolPosition = {
   celebrationLevel: "normal" | "double" | "triple";
 };
 
-export default function Play() {
-  const [lifePoints, setLifePoints] = useState(50);
-  const [betCost, setBetCost] = useState<BetCost>(1);
-  const [startIndexes, setStartIndexes] = useState<number[]>(() =>
-    SYMBOLS.map(() => 0),
+export default function Battle() {
+  const state = useGameState();
+  const health = state.currentRun?.health ?? { value: 0, max: 10 };
+  const reels = state.currentRun?.currentBattle?.reels ?? [];
+  const betCost = state.currentRun?.currentBattle?.betCost ?? 1;
+
+  const [startIndexes, setStartIndexes] = useState<number[]>(
+    () => reels.map(() => 0) ?? [],
   );
-  const [spinningReels, setSpinningReels] = useState<boolean[]>(() =>
-    SYMBOLS.map(() => false),
+  const [spinningReels, setSpinningReels] = useState<boolean[]>(
+    () => reels.map(() => false) ?? [],
   );
   const [isSpinning, setIsSpinning] = useState(false);
 
@@ -140,7 +106,7 @@ export default function Play() {
   }, [paylinesToActivate]);
 
   const getDisplayedSymbolsFromFinalIndexes = (finalIndexes: number[]) => {
-    return SYMBOLS.map((reelSymbols, reelIndex) => {
+    return reels.map((reelSymbols, reelIndex) => {
       if (reelSymbols.length === 0) {
         return [] as ReelSymbol[];
       }
@@ -274,25 +240,25 @@ export default function Play() {
       return;
     }
 
-    if (lifePoints < betCost) {
+    if (health.value < betCost) {
       return;
     }
 
-    setLifePoints((previous) => previous - betCost);
+    takeDamage(betCost);
 
     clearSpinTimers();
     clearActivationTimers();
     setPaylinesToActivate([]);
     setActiveSymbolPositions([]);
 
-    const finalIndexes = SYMBOLS.map((reelSymbols) => {
+    const finalIndexes = reels.map((reelSymbols) => {
       if (reelSymbols.length === 0) {
         return 0;
       }
       return Math.floor(Math.random() * reelSymbols.length);
     });
 
-    const activeReelCount = SYMBOLS.filter(
+    const activeReelCount = reels.filter(
       (reelSymbols) => reelSymbols.length > 0,
     ).length;
 
@@ -303,9 +269,9 @@ export default function Play() {
     let stoppedReels = 0;
 
     setIsSpinning(true);
-    setSpinningReels(SYMBOLS.map((reelSymbols) => reelSymbols.length > 0));
+    setSpinningReels(reels.map((reelSymbols) => reelSymbols.length > 0));
 
-    SYMBOLS.forEach((reelSymbols, reelIndex) => {
+    reels.forEach((reelSymbols, reelIndex) => {
       if (reelSymbols.length === 0) {
         return;
       }
@@ -346,17 +312,13 @@ export default function Play() {
   return (
     <Screen>
       <Scene
-        heroLife={{ value: lifePoints, maxValue: 50 }}
-        enemyLife={{ value: 8, maxValue: 8 }}
+        heroLife={health}
+        enemy={state.currentRun?.currentBattle?.enemy!}
       />
       <hr />
       <div className="slot-machine-panel">
-        <div className="slot-machine-controls" style={{ display: "none" }}>
-          <p className="slot-machine-life-points">PV: {lifePoints}</p>
-        </div>
-
         <SlotMachine
-          symbols={SYMBOLS}
+          symbols={reels}
           startIndexes={startIndexes}
           spinningReels={spinningReels}
           betCost={betCost}

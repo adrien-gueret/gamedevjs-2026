@@ -1,6 +1,8 @@
 export type ReelSymbol = "Empty" | "Sword" | "Shield" | "Heart" | "Coin";
 
-export type EnnemyType = "rat" | "blob" | "skeleton" | "wizard";
+export type EnnemyType = "rat" | "blob" | "skeleton";
+
+export type PlayerType = "knight" | "wizard";
 
 export type BetCost = 1 | 2 | 3;
 
@@ -9,22 +11,27 @@ export type Health = {
   max: number;
 };
 
+export type Enemy = {
+  type: EnnemyType;
+  health: Health;
+};
+
 export type Battle = {
   reels: ReelSymbol[][];
   betCost: BetCost;
-  enemy: {
-    type: EnnemyType;
-    health: Health;
-  };
+  enemy: Enemy;
 };
 
 export type Run = {
   health: Health;
   gold: number;
+  type: PlayerType;
   reels: ReelSymbol[][];
-  wonGameCount: number;
+  levelIndex: number;
   currentBattle: Battle | null;
 };
+
+export type ConfigurableBaseRun = Omit<Run, "levelIndex" | "currentBattle">;
 
 export type GameState = {
   currentRun: Run | null;

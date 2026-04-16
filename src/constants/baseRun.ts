@@ -1,0 +1,45 @@
+import type { ConfigurableBaseRun } from "@/types/game";
+
+export const BASE_RUN_KNIGHT: ConfigurableBaseRun = {
+  health: { value: 50, max: 50 },
+  gold: 0,
+  type: "knight",
+  reels: [
+    [
+      "Shield",
+      "Sword",
+      "Sword",
+      "Shield",
+      "Sword",
+      "Shield",
+      "Sword",
+      "Shield",
+      "Sword",
+      "Coin",
+    ],
+    [
+      "Sword",
+      "Coin",
+      "Empty",
+      "Shield",
+      "Shield",
+      "Empty",
+      "Sword",
+      "Empty",
+      "Empty",
+      "Sword",
+    ],
+    [
+      "Empty",
+      "Shield",
+      "Empty",
+      "Empty",
+      "Sword",
+      "Empty",
+      "Empty",
+      "Sword",
+      "Empty",
+      "Shield",
+    ],
+  ],
+};

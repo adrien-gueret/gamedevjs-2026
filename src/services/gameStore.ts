@@ -28,14 +28,15 @@ const store = {
 
 export function setGameState(
   updater: GameState | ((prev: GameState) => GameState),
-): void {
+): GameState {
   state = typeof updater === "function" ? updater(state) : updater;
   storeKey("gameState", state);
   notify();
+  return state;
 }
 
-export function resetGameState(): void {
-  setGameState(DEFAULT_STATE);
+export function resetGameState(): GameState {
+  return setGameState(DEFAULT_STATE);
 }
 
 export function useGameState(): GameState {

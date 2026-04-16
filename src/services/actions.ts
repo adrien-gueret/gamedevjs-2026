@@ -1,32 +1,27 @@
-import { setGameState } from "./gameStore";
-import type { BetCost, Battle, ReelSymbol, Run } from "../types/game";
+import type { BetCost, ReelSymbol, Run, GameState } from "@/types/game";
 
-const DEFAULT_RUN: Run = {
-  health: { value: 10, max: 10 },
-  gold: 0,
-  reels: [],
-  wonGameCount: 0,
-  currentBattle: null,
-};
+import { getNewBattleEnemy } from "./enemies";
+
+import { setGameState } from "./gameStore";
 
 // ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
 
-export function startRun(): void {
-  setGameState({ currentRun: structuredClone(DEFAULT_RUN) });
+export function startRun(baseRun: Run): GameState {
+  return setGameState({ currentRun: structuredClone(baseRun) });
 }
 
-export function endRun(): void {
-  setGameState({ currentRun: null });
+export function endRun(): GameState {
+  return setGameState({ currentRun: null });
 }
 
 // ---------------------------------------------------------------------------
 // Player - Health
 // ---------------------------------------------------------------------------
 
-export function takeDamage(amount: number): void {
-  setGameState((prev) => {
+export function takeDamage(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     const health = next.currentRun!.health;
@@ -35,8 +30,8 @@ export function takeDamage(amount: number): void {
   });
 }
 
-export function healPlayer(amount: number): void {
-  setGameState((prev) => {
+export function healPlayer(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     const health = next.currentRun!.health;
@@ -49,8 +44,8 @@ export function healPlayer(amount: number): void {
 // Player - Gold
 // ---------------------------------------------------------------------------
 
-export function addGold(amount: number): void {
-  setGameState((prev) => {
+export function addGold(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.gold += amount;
@@ -58,24 +53,21 @@ export function addGold(amount: number): void {
   });
 }
 
-export function spendGold(amount: number): boolean {
-  let canAfford = false;
-  setGameState((prev) => {
+export function spendGold(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun || prev.currentRun.gold < amount) return prev;
-    canAfford = true;
     const next = structuredClone(prev);
     next.currentRun!.gold -= amount;
     return next;
   });
-  return canAfford;
 }
 
 // ---------------------------------------------------------------------------
 // Player - Reels
 // ---------------------------------------------------------------------------
 
-export function setRunReels(reels: ReelSymbol[][]): void {
-  setGameState((prev) => {
+export function setRunReels(reels: ReelSymbol[][]): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.reels = reels;
@@ -87,27 +79,31 @@ export function setRunReels(reels: ReelSymbol[][]): void {
 // Battle
 // ---------------------------------------------------------------------------
 
-export function startBattle(battle: Battle): void {
-  setGameState((prev) => {
+export function startNewBattle(): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
-    next.currentRun!.currentBattle = battle;
+    next.currentRun!.currentBattle = {
+      reels: structuredClone(prev.currentRun.reels),
+      betCost: 1,
+      enemy: getNewBattleEnemy(next.currentRun!.levelIndex),
+    };
     return next;
   });
 }
 
-export function endBattle(won: boolean): void {
-  setGameState((prev) => {
+export function endBattle(): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = null;
-    if (won) next.currentRun!.wonGameCount += 1;
+    next.currentRun!.levelIndex += 1;
     return next;
   });
 }
 
-export function setBattleReels(reels: ReelSymbol[][]): void {
-  setGameState((prev) => {
+export function setBattleReels(reels: ReelSymbol[][]): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle!.reels = reels;
@@ -115,8 +111,8 @@ export function setBattleReels(reels: ReelSymbol[][]): void {
   });
 }
 
-export function setBetCost(betCost: BetCost): void {
-  setGameState((prev) => {
+export function setBetCost(betCost: BetCost): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle!.betCost = betCost;
@@ -128,8 +124,8 @@ export function setBetCost(betCost: BetCost): void {
 // Enemy
 // ---------------------------------------------------------------------------
 
-export function damageEnemy(amount: number): void {
-  setGameState((prev) => {
+export function damageEnemy(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
     const health = next.currentRun!.currentBattle!.enemy.health;
@@ -138,8 +134,8 @@ export function damageEnemy(amount: number): void {
   });
 }
 
-export function healEnemy(amount: number): void {
-  setGameState((prev) => {
+export function healEnemy(amount: number): GameState {
+  return setGameState((prev) => {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
     const health = next.currentRun!.currentBattle!.enemy.health;

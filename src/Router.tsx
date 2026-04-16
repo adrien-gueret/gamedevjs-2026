@@ -4,7 +4,8 @@ import MainLayout from "@/layouts/MainLayout";
 
 import Error from "@/screens/Error";
 import Home from "@/screens/Home";
-import Play from "@/screens/Play";
+import Start from "@/screens/Start";
+import Battle from "@/screens/Battle";
 
 const router = createBrowserRouter(
   [
@@ -13,7 +14,8 @@ const router = createBrowserRouter(
       errorElement: <Error />,
       children: [
         { index: true, Component: Home },
-        { path: "play", Component: Play },
+        { path: "start", Component: Start },
+        { path: "battle", Component: Battle },
       ],
     },
   ],

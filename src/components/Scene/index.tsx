@@ -2,33 +2,30 @@ import Enemy from "@/components/Enemy";
 import Knight from "@/components/Knight";
 import HealthBar from "@/components/HealthBar";
 
+import type { Enemy as EnemyType, Health } from "@/types/game";
+
 import "./style.css";
 
-type Life = {
-  value: number;
-  maxValue: number;
-};
-
 type Props = {
-  heroLife: Life;
-  enemyLife: Life;
+  heroLife: Health;
+  enemy: EnemyType;
 };
 
-export default function Scene({ heroLife, enemyLife }: Props) {
+export default function Scene({ heroLife, enemy }: Props) {
   return (
     <div className="scene">
       <HealthBar
         variant="hero"
         value={heroLife.value}
-        maxValue={heroLife.maxValue}
+        maxValue={heroLife.max}
       />
       <HealthBar
         variant="enemy"
-        value={enemyLife.value}
-        maxValue={enemyLife.maxValue}
+        value={enemy.health.value}
+        maxValue={enemy.health.max}
       />
       <Knight />
-      <Enemy type="rat" />
+      <Enemy type={enemy.type} />
     </div>
   );
 }
