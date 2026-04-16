@@ -2,6 +2,8 @@ import { useImperativeHandle, useRef, useCallback } from "react";
 
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 
+import type { EnnemyType } from "@/types/game";
+
 import "./style.css";
 
 const BASE_ANIMATION_IDLE = [0, 1];
@@ -18,9 +20,10 @@ type FullAnimationName = `base_${AnimationName}`;
 
 type Props = {
   ref?: React.Ref<EnemyHandle>;
+  type: EnnemyType;
 };
 
-export default function Enemy({ ref }: Props) {
+export default function Enemy({ ref, type }: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
 
@@ -49,7 +52,7 @@ export default function Enemy({ ref }: Props) {
     <div className="enemy" ref={localRef}>
       <Sprite
         ref={spriteRef}
-        imgSrc="./images/characters/rat.png"
+        imgSrc={`./images/characters/${type}.png`}
         tileHeight={32}
         tileWidth={32}
         tileSeparationX={0}

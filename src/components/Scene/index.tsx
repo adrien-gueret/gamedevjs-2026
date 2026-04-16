@@ -28,7 +28,7 @@ export default function Scene({ heroLife, enemyLife }: Props) {
         maxValue={enemyLife.maxValue}
       />
       <Knight />
-      <Enemy />
+      <Enemy type="rat" />
     </div>
   );
 }
