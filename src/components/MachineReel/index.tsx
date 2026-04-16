@@ -5,6 +5,7 @@ import type { ReelSymbol } from "@/types/game";
 import MachineSymbol from "@/components/MachineSymbol";
 
 import "./style.css";
+import Tooltip from "../Tooltip";
 
 type Props = {
   symbols: ReelSymbol[];
@@ -101,16 +102,40 @@ export default function MachineReel({
           {visibleSymbols.map((symbol, index) => {
             const activeRow = activeRows.find((row) => row.rowIndex === index);
 
+            const symbolToLabel: Record<ReelSymbol, React.ReactNode> = {
+              Sword: (
+                <>
+                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
+                  <b style={{ color: "red" }}>attack</b>
+                </>
+              ),
+              Shield: (
+                <>
+                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
+                  <b style={{ color: "lightgreen" }}>block</b>
+                </>
+              ),
+              Coin: (
+                <>
+                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
+                  <b style={{ color: "yellow" }}>gold</b>
+                </>
+              ),
+              Empty: null,
+            };
+
             return (
               <div
                 key={`${normalizedStartIndex}-${index}`}
                 className="machine-reel-symbol"
               >
-                <MachineSymbol
-                  symbol={symbol}
-                  isActive={Boolean(activeRow)}
-                  celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
-                />
+                <Tooltip label={symbolToLabel[symbol]}>
+                  <MachineSymbol
+                    symbol={symbol}
+                    isActive={Boolean(activeRow)}
+                    celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
+                  />
+                </Tooltip>
               </div>
             );
           })}

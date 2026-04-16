@@ -1,11 +1,12 @@
-import { type ElementType, type ReactNode } from "react";
+import { type ElementType, type ReactNode, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import "./style.css";
 
 type Props<T extends ElementType = "div"> = {
   as?: T;
   children: ReactNode;
-  label: ReactNode;
+  label?: ReactNode | null;
 } & Omit<React.ComponentPropsWithoutRef<T>, "children">;
 
 export default function Tooltip<T extends ElementType = "div">({
@@ -15,13 +16,48 @@ export default function Tooltip<T extends ElementType = "div">({
   ...rest
 }: Props<T>) {
   const Wrapper = as ?? "div";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const wrapperRef = useRef<any>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+
+  const handleMouseEnter = () => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (rect) {
+      setCoords({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX + rect.width / 2,
+      });
+    }
+  };
+
+  const handleMouseLeave = () => setCoords(null);
+
+  if (!label) {
+    return children;
+  }
 
   return (
-    <Wrapper {...rest} className="tooltip-wrapper">
+    <Wrapper
+      {...rest}
+      ref={wrapperRef}
+      className="tooltip-wrapper"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {children}
-      <span className="tooltip-label" role="tooltip">
-        {label}
-      </span>
+      {coords &&
+        createPortal(
+          <span
+            className="tooltip-label"
+            role="tooltip"
+            style={{ top: coords.top, left: coords.left }}
+          >
+            {label}
+          </span>,
+          document.body,
+        )}
     </Wrapper>
   );
 }

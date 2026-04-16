@@ -76,7 +76,7 @@ export default function Enemy({ ref, type, nextActions }: Props) {
             ),
             defend: (
               <>
-                Will <b style={{ color: "yellow" }}>block</b> next{" "}
+                Will <b style={{ color: "lightgreen" }}>block</b> next{" "}
                 <b style={{ color: "cyan" }}>{action.value}</b> damage
               </>
             ),
