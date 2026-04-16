@@ -127,7 +127,7 @@ export default function Battle() {
     const paylines: Payline[] = [
       {
         name: "middle",
-        symbols: displayedSymbols.map((reel) => reel[1] ?? "Empty"),
+        symbols: displayedSymbols.map((reel) => reel[1] ?? "Sleep"),
       },
     ];
 
@@ -135,11 +135,11 @@ export default function Battle() {
       paylines.push(
         {
           name: "top",
-          symbols: displayedSymbols.map((reel) => reel[0] ?? "Empty"),
+          symbols: displayedSymbols.map((reel) => reel[0] ?? "Sleep"),
         },
         {
           name: "bottom",
-          symbols: displayedSymbols.map((reel) => reel[2] ?? "Empty"),
+          symbols: displayedSymbols.map((reel) => reel[2] ?? "Sleep"),
         },
       );
     }
@@ -150,14 +150,14 @@ export default function Battle() {
           name: "diagonal-down",
           symbols: displayedSymbols.map((reel, reelIndex) => {
             const rowIndex = Math.min(reelIndex, 2);
-            return reel[rowIndex] ?? "Empty";
+            return reel[rowIndex] ?? "Sleep";
           }),
         },
         {
           name: "diagonal-up",
           symbols: displayedSymbols.map((reel, reelIndex) => {
             const rowIndex = Math.max(2 - reelIndex, 0);
-            return reel[rowIndex] ?? "Empty";
+            return reel[rowIndex] ?? "Sleep";
           }),
         },
       );
@@ -169,11 +169,11 @@ export default function Battle() {
   const getActiveSymbolPositionsForPayline = (
     payline: Payline,
   ): ActiveSymbolPosition[] => {
-    const nonEmptySymbols = payline.symbols.filter(
-      (symbol) => symbol !== "Empty",
+    const nonSleepSymbols = payline.symbols.filter(
+      (symbol) => symbol !== "Sleep",
     );
 
-    const occurrences = nonEmptySymbols.reduce<Record<string, number>>(
+    const occurrences = nonSleepSymbols.reduce<Record<string, number>>(
       (accumulator, symbol) => {
         accumulator[symbol] = (accumulator[symbol] ?? 0) + 1;
         return accumulator;
@@ -184,7 +184,7 @@ export default function Battle() {
     const getCelebrationLevelForSymbol = (
       symbol: ReelSymbol,
     ): ActiveSymbolPosition["celebrationLevel"] => {
-      if (symbol === "Empty") {
+      if (symbol === "Sleep") {
         return "normal";
       }
 

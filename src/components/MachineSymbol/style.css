@@ -38,6 +38,10 @@
   background-image: url(./images/slots/coin.png);
 }
 
+.machine-symbol-sleep {
+  background-image: url(./images/slots/sleep.png);
+}
+
 @keyframes machine-symbol-activate {
   0% {
     transform: scale(1);

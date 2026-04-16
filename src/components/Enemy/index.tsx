@@ -61,7 +61,7 @@ export default function Enemy({ ref, type, nextActions }: Props) {
           > = {
             attack: "Sword",
             defend: "Shield",
-            none: "Empty",
+            sleep: "Sleep",
           };
 
           const actionTypeToLabel: Record<

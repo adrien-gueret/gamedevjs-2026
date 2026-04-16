@@ -1,4 +1,4 @@
-export type ReelSymbol = "Empty" | "Sword" | "Shield" | "Heart" | "Coin";
+export type ReelSymbol = "Sleep" | "Sword" | "Shield" | "Heart" | "Coin";
 
 export type EnnemyType = "rat" | "blob" | "skeleton";
 
@@ -12,7 +12,7 @@ export type Health = {
 };
 
 export type EnemyNextAction = {
-  type: "attack" | "defend" | "none";
+  type: "attack" | "defend" | "sleep";
   value: number;
 };
 

@@ -121,7 +121,7 @@ export default function MachineReel({
                   <b style={{ color: "yellow" }}>gold</b>
                 </>
               ),
-              Empty: null,
+              Sleep: <>Do nothing</>,
             };
 
             return (
