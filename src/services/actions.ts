@@ -1,6 +1,6 @@
 import type { BetCost, ReelSymbol, Run, GameState } from "@/types/game";
 
-import { getNewBattleEnemy } from "./enemies";
+import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
 
 import { setGameState } from "./gameStore";
 
@@ -80,7 +80,7 @@ export function setRunReels(reels: ReelSymbol[][]): GameState {
 // ---------------------------------------------------------------------------
 
 export function startNewBattle(): GameState {
-  return setGameState((prev) => {
+  setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = {
@@ -90,6 +90,8 @@ export function startNewBattle(): GameState {
     };
     return next;
   });
+
+  return setEnemyNextActions();
 }
 
 export function endBattle(): GameState {
@@ -140,6 +142,16 @@ export function healEnemy(amount: number): GameState {
     const next = structuredClone(prev);
     const health = next.currentRun!.currentBattle!.enemy.health;
     health.value = Math.min(health.max, health.value + amount);
+    return next;
+  });
+}
+
+export function setEnemyNextActions(): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun?.currentBattle) return prev;
+    const next = structuredClone(prev);
+    const enemy = next.currentRun!.currentBattle!.enemy;
+    enemy.nextActions = getEnemyNextActions(enemy, next.currentRun!.levelIndex);
     return next;
   });
 }

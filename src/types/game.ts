@@ -11,9 +11,15 @@ export type Health = {
   max: number;
 };
 
+export type EnemyNextAction = {
+  type: "attack" | "defend" | "none";
+  value: number;
+};
+
 export type Enemy = {
   type: EnnemyType;
   health: Health;
+  nextActions: EnemyNextAction[];
 };
 
 export type Battle = {

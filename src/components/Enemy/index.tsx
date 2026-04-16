@@ -1,8 +1,9 @@
 import { useImperativeHandle, useRef, useCallback } from "react";
 
+import MachineSymbol from "@/components/MachineSymbol";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 
-import type { EnnemyType } from "@/types/game";
+import type { EnnemyType, EnemyNextAction, ReelSymbol } from "@/types/game";
 
 import "./style.css";
 
@@ -21,9 +22,10 @@ type FullAnimationName = `base_${AnimationName}`;
 type Props = {
   ref?: React.Ref<EnemyHandle>;
   type: EnnemyType;
+  nextActions: EnemyNextAction[];
 };
 
-export default function Enemy({ ref, type }: Props) {
+export default function Enemy({ ref, type, nextActions }: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
 
@@ -50,6 +52,26 @@ export default function Enemy({ ref, type }: Props) {
 
   return (
     <div className="enemy" ref={localRef}>
+      <div className={`enemy-next-actions enemy-next-actions-${type}`}>
+        {nextActions.map((action, index) => {
+          const actionTypeToSymboleType: Record<
+            EnemyNextAction["type"],
+            ReelSymbol
+          > = {
+            attack: "Sword",
+            defend: "Shield",
+          };
+
+          return (
+            <div key={index} className="enemy-next-action">
+              <div className="enemy-next-action-type">
+                <MachineSymbol symbol={actionTypeToSymboleType[action.type]} />
+              </div>
+              <div className="enemy-next-action-value">{action.value}</div>
+            </div>
+          );
+        })}
+      </div>
       <Sprite
         ref={spriteRef}
         imgSrc={`./images/characters/${type}.png`}
