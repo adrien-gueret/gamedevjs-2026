@@ -9,19 +9,23 @@ export type Health = {
   max: number;
 };
 
-export type GameState = {
-  currentRun: {
+export type Battle = {
+  reels: ReelSymbol[][];
+  betCost: BetCost;
+  enemy: {
+    type: EnnemyType;
     health: Health;
-    gold: number;
-    reels: ReelSymbol[][];
-    wonGameCount: number;
-    currentGame: {
-      reels: ReelSymbol[][];
-      betCost: BetCost;
-      enemy: {
-        type: EnnemyType;
-        health: Health;
-      };
-    } | null;
   };
+};
+
+export type Run = {
+  health: Health;
+  gold: number;
+  reels: ReelSymbol[][];
+  wonGameCount: number;
+  currentBattle: Battle | null;
+};
+
+export type GameState = {
+  currentRun: Run | null;
 };

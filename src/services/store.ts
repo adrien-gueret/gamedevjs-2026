@@ -1,6 +1,10 @@
+import type { GameState } from "@/types/game";
+
 const STORAGE_KEY = "THE_DEVILE_MACHINE_STORAGE_KEY";
 
-type Store = {};
+type Store = {
+  gameState?: GameState;
+};
 
 function getDefaultStore(): Store {
   return {};

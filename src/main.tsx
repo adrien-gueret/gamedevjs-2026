@@ -20,6 +20,11 @@ if (!document.startViewTransition) {
   };
 }
 
+if (!("structuredClone" in globalThis)) {
+  (globalThis as any).structuredClone = (obj: unknown) =>
+    JSON.parse(JSON.stringify(obj));
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router />
