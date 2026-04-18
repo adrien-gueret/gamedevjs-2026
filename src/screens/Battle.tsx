@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import type { ReelSymbol, BetCost, NextAction } from "@/types/game";
 
@@ -27,7 +28,6 @@ import {
   canPlayerAttack,
   isPlayerDefeated,
 } from "@/services/selector";
-import { Link } from "react-router-dom";
 import { VictoryMessage } from "@/components/VictoryMessage";
 
 const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
@@ -57,6 +57,8 @@ export default function Battle() {
   const health = state.currentRun?.health ?? { value: 0, max: 10 };
   const reels = state.currentRun?.currentBattle?.reels ?? [];
   const betCost = state.currentRun?.currentBattle?.betCost ?? 1;
+
+  const navigate = useNavigate();
 
   const [startIndexes, setStartIndexes] = useState<number[]>(
     () => reels.map(() => 0) ?? [],
@@ -460,6 +462,11 @@ export default function Battle() {
     });
   };
 
+  const onHeal = async () => {
+    await playerRef.current?.setHealing();
+    navigate("/bonus-upgrade");
+  };
+
   return (
     <>
       <Screen>
@@ -490,7 +497,7 @@ export default function Battle() {
 
         {shouldShowWinScreen && (
           <DelayedRender delay={1000}>
-            <VictoryMessage />
+            <VictoryMessage onHeal={onHeal} />
           </DelayedRender>
         )}
       </Screen>

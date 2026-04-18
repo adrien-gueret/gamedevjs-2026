@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import type { ReelSymbol } from "@/types/game";
 
+import SymbolLabel from "@/components/SymbolLabel";
 import MachineSymbol from "@/components/MachineSymbol";
 
 import "./style.css";
@@ -102,40 +103,12 @@ export default function MachineReel({
           {visibleSymbols.map((symbol, index) => {
             const activeRow = activeRows.find((row) => row.rowIndex === index);
 
-            const symbolToLabel: Record<ReelSymbol, React.ReactNode> = {
-              Sword: (
-                <>
-                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
-                  <b style={{ color: "red" }}>attack</b>
-                </>
-              ),
-              Shield: (
-                <>
-                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
-                  <b style={{ color: "lightgreen" }}>block</b>
-                </>
-              ),
-              Coin: (
-                <>
-                  Gain <b style={{ color: "cyan" }}>1</b>{" "}
-                  <b style={{ color: "gold" }}>gold</b>
-                </>
-              ),
-              Heart: (
-                <>
-                  Heal <b style={{ color: "cyan" }}>1</b>{" "}
-                  <b style={{ color: "lightcoral" }}>health</b>
-                </>
-              ),
-              Sleep: <>Do nothing</>,
-            };
-
             return (
               <div
                 key={`${normalizedStartIndex}-${index}`}
                 className="machine-reel-symbol"
               >
-                <Tooltip label={symbolToLabel[symbol]}>
+                <Tooltip label={<SymbolLabel symbol={symbol} />}>
                   <MachineSymbol
                     symbol={symbol}
                     isActive={Boolean(activeRow)}

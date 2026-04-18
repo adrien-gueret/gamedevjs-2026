@@ -64,6 +64,45 @@ p {
   animation: fall 0.6s cubic-bezier(0.55, 0, 1, 1) forwards;
 }
 
+.floating-choice-item:hover {
+  animation-play-state: paused, running;
+}
+
+.floating-choice-item {
+  animation:
+    floating-choice-item-float 3s ease-in-out infinite,
+    floating-choice-item-tremble 0.15s linear infinite;
+  animation-play-state: running, paused;
+}
+
+@keyframes floating-choice-item-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes floating-choice-item-tremble {
+  0% {
+    translate: -1px -0.5px;
+  }
+  25% {
+    translate: 1px 0.5px;
+  }
+  50% {
+    translate: -1px 0.5px;
+  }
+  75% {
+    translate: 1px -0.5px;
+  }
+  100% {
+    translate: -1px -0.5px;
+  }
+}
+
 @keyframes fall {
   0% {
     transform: translateY(0) rotate(0deg);

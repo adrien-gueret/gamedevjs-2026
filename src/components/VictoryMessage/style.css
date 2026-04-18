@@ -28,17 +28,18 @@
 }
 
 .victory-nav-choice {
+  appearance: none;
   display: block;
   color: transparent;
   width: 96px;
   height: 96px;
   background-image: url(./images/destiny-choice.png);
   background-size: 192px 96px;
-  animation:
-    victory-float 3s ease-in-out infinite,
-    victory-tremble 0.15s linear infinite;
-  animation-play-state: running, paused;
-  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.4));
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
 }
 
 .victory-nav-choice-heal {
@@ -50,44 +51,11 @@
   animation-delay: -1.5s, 0s;
 }
 
-.victory-nav-choice:hover {
-  animation-play-state: paused, running;
-  cursor: pointer;
-}
-
-@keyframes victory-tremble {
-  0% {
-    translate: -1px -0.5px;
-  }
-  25% {
-    translate: 1px 0.5px;
-  }
-  50% {
-    translate: -1px 0.5px;
-  }
-  75% {
-    translate: 1px -0.5px;
-  }
-  100% {
-    translate: -1px -0.5px;
-  }
-}
-
 @keyframes victory-fade-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes victory-float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
   }
 }

@@ -4,9 +4,14 @@ import "./style.css";
 type Props = {
   children?: React.ReactNode;
   delay?: number;
+  heigth?: number;
 };
 
-export default function DelayedRender({ children, delay = 0 }: Props) {
+export default function DelayedRender({
+  children,
+  delay = 0,
+  heigth = 0,
+}: Props) {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
@@ -17,7 +22,9 @@ export default function DelayedRender({ children, delay = 0 }: Props) {
     return () => clearTimeout(timer);
   }, [delay]);
 
-  if (!shouldRender) return null;
+  if (!shouldRender) {
+    return heigth ? <div style={{ height: heigth }} /> : null;
+  }
 
   return <>{children}</>;
 }

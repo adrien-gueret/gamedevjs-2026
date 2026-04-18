@@ -3,4 +3,5 @@
   position: absolute;
   left: 72px;
   bottom: 48px;
+  overflow: visible;
 }

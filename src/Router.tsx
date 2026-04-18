@@ -6,6 +6,7 @@ import Error from "@/screens/Error";
 import Home from "@/screens/Home";
 import Start from "@/screens/Start";
 import Battle from "@/screens/Battle";
+import BonusUpgrade from "@/screens/BonusUpgrade";
 
 const router = createBrowserRouter(
   [
@@ -16,6 +17,7 @@ const router = createBrowserRouter(
         { index: true, Component: Home },
         { path: "start", Component: Start },
         { path: "battle", Component: Battle },
+        { path: "bonus-upgrade", Component: BonusUpgrade },
       ],
     },
   ],

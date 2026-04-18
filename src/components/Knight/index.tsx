@@ -19,6 +19,7 @@ export type KnightHandle = {
   setDead: () => HTMLDivElement;
   setAttacked: () => void;
   setIdle: () => void;
+  setHealing: () => Promise<Animation>;
 };
 
 type FullAnimationName = `base_${AnimationName}`;
@@ -130,6 +131,52 @@ export default function Knight({
     return flashAnimation.finished;
   }, []);
 
+  const setHealing: KnightHandle["setHealing"] = useCallback(() => {
+    const el = localRef.current!;
+    const circleCount = 10;
+    const circles: HTMLElement[] = [];
+    const promises: Promise<Animation>[] = [];
+
+    for (let i = 0; i < circleCount; i++) {
+      const circle = document.createElement("div");
+      const size = 8 + Math.random() * 6;
+      const xPercent = 5 + Math.random() * 90;
+      const delay = i * 90 + Math.random() * 40;
+      const rise = 60 + Math.random() * 60;
+      const duration = 600 + Math.random() * 500;
+
+      circle.style.cssText = `
+        position:absolute;
+        bottom:0;
+        opacity:0;
+        left:${xPercent}%;
+        width:${size}px;
+        height:${size}px;
+        border-radius:50%;
+        background:#4ade80;
+        box-shadow:0 0 5px #4ade80, 0 0 10px #16a34a;
+        pointer-events:none;
+      `;
+      circles.push(circle);
+      el.appendChild(circle);
+
+      const anim = circle.animate(
+        [
+          { transform: "translateY(0) scale(1)", opacity: 0.9 },
+          { transform: `translateY(-${rise}px) scale(0.4)`, opacity: 0 },
+        ],
+        { duration, delay, easing: "ease-out", fill: "forwards" },
+      );
+
+      promises.push(anim.finished);
+    }
+
+    return Promise.all(promises).then((results) => {
+      circles.forEach((c) => c.remove());
+      return results[results.length - 1];
+    });
+  }, []);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -137,8 +184,9 @@ export default function Knight({
       setDead,
       setIdle,
       setAttacked,
+      setHealing,
     }),
-    [attack, setDead, setIdle, setAttacked],
+    [attack, setDead, setIdle, setAttacked, setHealing],
   );
 
   return (

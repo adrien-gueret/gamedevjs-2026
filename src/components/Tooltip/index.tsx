@@ -7,12 +7,14 @@ type Props<T extends ElementType = "div"> = {
   as?: T;
   children: ReactNode;
   label?: ReactNode | null;
+  cursor?: string;
 } & Omit<React.ComponentPropsWithoutRef<T>, "children">;
 
 export default function Tooltip<T extends ElementType = "div">({
   as,
   children,
   label,
+  cursor = "help",
   ...rest
 }: Props<T>) {
   const Wrapper = as ?? "div";
@@ -43,6 +45,7 @@ export default function Tooltip<T extends ElementType = "div">({
       {...rest}
       ref={wrapperRef}
       className="tooltip-wrapper"
+      style={{ cursor }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

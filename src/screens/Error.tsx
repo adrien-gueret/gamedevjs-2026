@@ -1,4 +1,10 @@
+import Screen from "@/components/Screen";
+
 export default function Error() {
-  // TODO: implement error screen
-  return <p>An error occurred</p>;
+  return (
+    <Screen>
+      <h2>An error occurred</h2>
+      <p>Sorry, something went wrong. Try restarting the game!</p>
+    </Screen>
+  );
 }
