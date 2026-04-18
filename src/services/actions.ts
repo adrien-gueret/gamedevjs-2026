@@ -50,7 +50,7 @@ export function healPlayer(amount: number): GameState {
 // Run - Gold
 // ---------------------------------------------------------------------------
 
-export function addGold(amount: number): GameState {
+export function addGold(amount: number = 1): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);

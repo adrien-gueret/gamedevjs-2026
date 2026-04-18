@@ -1,0 +1,26 @@
+.gold-counter {
+  width: 90px;
+  height: 45px;
+  position: absolute;
+  top: 60px;
+  background-repeat: no-repeat;
+  background-image: url(./images/gold_counter.png);
+  left: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-left: 45px;
+  padding-right: 9px;
+}
+
+.gold-counter-label {
+  font-size: 18px;
+  color: #fff;
+  text-align: center;
+  text-shadow:
+    1px 1px 0 #000,
+    -1px 1px 0 #000,
+    1px -1px 0 #000,
+    -1px -1px 0 #000;
+}

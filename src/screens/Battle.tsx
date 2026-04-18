@@ -18,6 +18,7 @@ import {
   setEnemyNextActions,
   resetPlayerNextActions,
   resetEnemyNextActions,
+  addGold,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -32,6 +33,12 @@ import { VictoryMessage } from "@/components/VictoryMessage";
 const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
   Sword: { type: "attack", value: 1 },
   Shield: { type: "defend", value: 1 },
+};
+
+const symboleToDirectAction: Partial<
+  Record<ReelSymbol, (multiplier: number) => void>
+> = {
+  Coin: addGold,
 };
 
 type Payline = {
@@ -103,14 +110,21 @@ export default function Battle() {
     const allSame =
       symbols.length > 0 && symbols.every((s) => s === symbols[0]);
     const multiplier = allSame ? 2 : 1;
+
     symbols.forEach((symbol) => {
       const action = symbolToNextAction[symbol];
-      if (!action) return;
-      const scaledAction: typeof action =
-        action.value !== undefined
-          ? { ...action, value: action.value * multiplier }
-          : action;
-      addPlayerNextActions(scaledAction);
+      if (action) {
+        const scaledAction: typeof action =
+          action.value !== undefined
+            ? { ...action, value: action.value * multiplier }
+            : action;
+        addPlayerNextActions(scaledAction);
+      } else {
+        const directAction = symboleToDirectAction[symbol];
+        if (directAction) {
+          directAction(multiplier);
+        }
+      }
     });
   };
 
@@ -458,6 +472,7 @@ export default function Battle() {
           enemy={state.currentRun?.currentBattle?.enemy!}
           playerRef={playerRef}
           enemyRef={enemyRef}
+          gold={state.currentRun?.gold ?? 0}
         />
         <hr style={{ marginBottom: "auto" }} />
         <div className={shouldShowWinScreen ? "slot-machine-panel-fallen" : ""}>

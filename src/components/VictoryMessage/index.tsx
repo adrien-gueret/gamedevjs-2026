@@ -10,7 +10,7 @@ export function VictoryMessage() {
   const state = useGameState();
 
   const maxHealth = state.currentRun?.health.max ?? 0;
-  const healAmount = Math.ceil(maxHealth * 0.3);
+  const healAmount = Math.ceil(maxHealth * 0.25);
 
   return (
     <div className="victory-message">
@@ -29,7 +29,7 @@ export function VictoryMessage() {
         <Tooltip
           label={
             <>
-              Restore <b style={{ color: "cyan" }}>30%</b> of your max{" "}
+              Restore <b style={{ color: "cyan" }}>25%</b> of your max{" "}
               <b style={{ color: "lightcoral" }}>health</b> points (
               <b style={{ color: "cyan" }}>{healAmount}</b>)
             </>

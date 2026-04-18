@@ -1,6 +1,7 @@
 import Enemy, { type Props as EnemyProps } from "@/components/Enemy";
 import Knight, { type Props as KnightProps } from "@/components/Knight";
 import HealthBar from "@/components/HealthBar";
+import GoldCounter from "@/components/GoldCounter";
 
 import type { Enemy as EnemyType, Battle, Run } from "@/types/game";
 
@@ -11,9 +12,16 @@ type Props = {
   enemy: EnemyType;
   playerRef: KnightProps["ref"];
   enemyRef: EnemyProps["ref"];
+  gold: number;
 };
 
-export default function Scene({ player, enemy, playerRef, enemyRef }: Props) {
+export default function Scene({
+  player,
+  enemy,
+  playerRef,
+  enemyRef,
+  gold,
+}: Props) {
   return (
     <div className="scene">
       <HealthBar
@@ -21,6 +29,7 @@ export default function Scene({ player, enemy, playerRef, enemyRef }: Props) {
         value={player.health.value}
         maxValue={player.health.max}
       />
+      <GoldCounter value={gold} />
       <HealthBar
         variant="enemy"
         value={enemy.health.value}
