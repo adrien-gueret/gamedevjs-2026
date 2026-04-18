@@ -26,6 +26,10 @@ const store = {
   },
 };
 
+export function getGameState(): GameState {
+  return state;
+}
+
 export function setGameState(
   updater: GameState | ((prev: GameState) => GameState),
 ): GameState {

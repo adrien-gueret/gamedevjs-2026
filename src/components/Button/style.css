@@ -10,7 +10,7 @@
 }
 
 .button-base:disabled {
-  cursor: not-allowed;
+  pointer-events: none;
   background-position: bottom;
 }
 

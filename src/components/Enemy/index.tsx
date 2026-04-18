@@ -1,12 +1,11 @@
 import { useImperativeHandle, useRef, useCallback } from "react";
 
-import MachineSymbol from "@/components/MachineSymbol";
+import NextActions from "@/components/NextActions";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 
-import type { EnnemyType, EnemyNextAction, ReelSymbol } from "@/types/game";
+import type { EnnemyType, NextAction } from "@/types/game";
 
 import "./style.css";
-import Tooltip from "../Tooltip";
 
 const BASE_ANIMATION_IDLE = [0, 1];
 const BASE_POSE_ATTACKED = 2;
@@ -15,15 +14,18 @@ const BASE_POSE_DEAD = 3;
 export type AnimationName = "idle" | "attacked" | "dead";
 
 export type EnemyHandle = {
+  attack: (onAttackEnd: () => void) => Promise<Animation>;
   setDead: () => void;
+  setAttacked: () => void;
+  setIdle: () => void;
 };
 
 type FullAnimationName = `base_${AnimationName}`;
 
-type Props = {
+export type Props = {
   ref?: React.Ref<EnemyHandle>;
   type: EnnemyType;
-  nextActions: EnemyNextAction[];
+  nextActions: NextAction[];
 };
 
 export default function Enemy({ ref, type, nextActions }: Props) {
@@ -39,64 +41,73 @@ export default function Enemy({ ref, type, nextActions }: Props) {
     [],
   );
 
+  const attack: EnemyHandle["attack"] = useCallback(
+    async (onAttackEnd) => {
+      spriteRef.current?.setAnimation(getFullAnimationName("idle"));
+
+      const attackAnimation = localRef.current!.animate(
+        [
+          {
+            transform: `translate(-100px, 0px)`,
+          },
+        ],
+        {
+          duration: 300,
+          easing: "ease-in",
+          fill: "forwards",
+        },
+      );
+
+      await attackAnimation.finished;
+
+      onAttackEnd();
+
+      const goBackAnimation = localRef.current!.animate(
+        [
+          {
+            transform: `translate(0px, 0px)`,
+          },
+        ],
+        {
+          duration: 500,
+          easing: "ease-in",
+          fill: "forwards",
+        },
+      );
+
+      const results = await goBackAnimation.finished;
+
+      return results;
+    },
+    [getFullAnimationName],
+  );
+
   const setDead: EnemyHandle["setDead"] = useCallback(() => {
     spriteRef.current?.setAnimation(getFullAnimationName("dead"));
+  }, [getFullAnimationName]);
+
+  const setAttacked: EnemyHandle["setAttacked"] = useCallback(() => {
+    spriteRef.current?.setAnimation(getFullAnimationName("attacked"));
+  }, [getFullAnimationName]);
+
+  const setIdle: EnemyHandle["setIdle"] = useCallback(() => {
+    spriteRef.current?.setAnimation(getFullAnimationName("idle"));
   }, [getFullAnimationName]);
 
   useImperativeHandle(
     ref,
     () => ({
+      attack,
       setDead,
+      setAttacked,
+      setIdle,
     }),
-    [setDead],
+    [attack, setDead, setAttacked, setIdle],
   );
 
   return (
     <div className="enemy" ref={localRef}>
-      <div className={`enemy-next-actions enemy-next-actions-${type}`}>
-        {nextActions.map((action, index) => {
-          const actionTypeToSymboleType: Record<
-            EnemyNextAction["type"],
-            ReelSymbol
-          > = {
-            attack: "Sword",
-            defend: "Shield",
-            sleep: "Sleep",
-          };
-
-          const actionTypeToLabel: Record<
-            EnemyNextAction["type"],
-            React.ReactNode
-          > = {
-            attack: (
-              <>
-                Will <b style={{ color: "red" }}>attack</b> for{" "}
-                <b style={{ color: "cyan" }}>{action.value}</b> damage
-              </>
-            ),
-            defend: (
-              <>
-                Will <b style={{ color: "lightgreen" }}>block</b> next{" "}
-                <b style={{ color: "cyan" }}>{action.value}</b> damage
-              </>
-            ),
-            none: <>Will do nothing</>,
-          };
-
-          return (
-            <Tooltip key={index} label={actionTypeToLabel[action.type]}>
-              <div className="enemy-next-action">
-                <div className="enemy-next-action-type">
-                  <MachineSymbol
-                    symbol={actionTypeToSymboleType[action.type]}
-                  />
-                </div>
-                <div className="enemy-next-action-value">{action.value}</div>
-              </div>
-            </Tooltip>
-          );
-        })}
-      </div>
+      <NextActions nextActions={nextActions} type={type} />
       <Sprite
         ref={spriteRef}
         imgSrc={`./images/characters/${type}.png`}
@@ -109,6 +120,10 @@ export default function Enemy({ ref, type, nextActions }: Props) {
             name: "base_idle",
             tiles: BASE_ANIMATION_IDLE,
             duration: 750,
+          },
+          {
+            name: "base_attacked",
+            tiles: [BASE_POSE_ATTACKED],
           },
           {
             name: "base_dead",

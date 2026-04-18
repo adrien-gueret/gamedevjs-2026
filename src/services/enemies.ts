@@ -1,4 +1,4 @@
-import type { Enemy, EnemyNextAction } from "@/types/game";
+import type { Enemy, NextAction } from "@/types/game";
 
 import { random } from "./maths";
 
@@ -20,8 +20,8 @@ export function getNewBattleEnemy(levelIndex: number): Enemy {
 export function getEnemyNextActions(
   enemy: Enemy,
   levelIndex: number,
-): EnemyNextAction[] {
-  const attackTypes: EnemyNextAction["type"][] = ["attack", "defend"];
+): NextAction[] {
+  const attackTypes: Array<"attack" | "defend"> = ["attack", "defend"];
   const healthRatio = enemy.health.value / enemy.health.max;
 
   switch (enemy.type) {

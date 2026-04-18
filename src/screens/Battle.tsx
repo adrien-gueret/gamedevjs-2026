@@ -1,11 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { ReelSymbol, BetCost } from "@/types/game";
+import type { ReelSymbol, BetCost, NextAction } from "@/types/game";
+
+import type { EnemyHandle } from "@/components/Enemy";
+import type { KnightHandle } from "@/components/Knight";
 import SlotMachine from "@/components/SlotMachine";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene";
 import { useGameState } from "@/services/gameStore";
-import { takeDamage, setBetCost } from "@/services/actions";
+import {
+  takeDamage,
+  setBetCost,
+  addPlayerNextActions,
+  makeCharacterAttack,
+  setEnemyNextActions,
+  resetPlayerNextActions,
+  resetEnemyNextActions,
+} from "@/services/actions";
+import { sleep } from "@/services/utils";
+import {
+  isEnemyDefeated,
+  canEnemyAttack,
+  canPlayerAttack,
+  isPlayerDefeated,
+} from "@/services/selector";
+
+const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
+  Sword: { type: "attack", value: 1 },
+  Shield: { type: "defend", value: 1 },
+};
 
 type Payline = {
   name: "middle" | "top" | "bottom" | "diagonal-down" | "diagonal-up";
@@ -37,8 +60,13 @@ export default function Battle() {
     ActiveSymbolPosition[]
   >([]);
 
+  const [canSpin, setCanSpin] = useState(true);
+
   const timeoutRefs = useRef<Array<number | null>>([]);
   const activationTimeoutRefs = useRef<Array<number | null>>([]);
+
+  const playerRef = useRef<KnightHandle>(null);
+  const enemyRef = useRef<EnemyHandle>(null);
 
   const clearSpinTimers = () => {
     timeoutRefs.current.forEach((timerId) => {
@@ -58,8 +86,19 @@ export default function Battle() {
     activationTimeoutRefs.current = [];
   };
 
-  const onActivate = (symbol: ReelSymbol) => {
-    console.log("onActivate", symbol);
+  const onActivate = (symbols: ReelSymbol[]) => {
+    const allSame =
+      symbols.length > 0 && symbols.every((s) => s === symbols[0]);
+    const multiplier = allSame ? 2 : 1;
+    symbols.forEach((symbol) => {
+      const action = symbolToNextAction[symbol];
+      if (!action) return;
+      const scaledAction: typeof action =
+        action.value !== undefined
+          ? { ...action, value: action.value * multiplier }
+          : action;
+      addPlayerNextActions(scaledAction);
+    });
   };
 
   useEffect(() => {
@@ -84,9 +123,7 @@ export default function Battle() {
       activationTimeoutRefs.current.push(
         window.setTimeout(() => {
           setActiveSymbolPositions(getActiveSymbolPositionsForPayline(payline));
-          payline.symbols.forEach((symbol) => {
-            onActivate(symbol);
-          });
+          onActivate(payline.symbols);
         }, paylineIndex * activationStepDelay),
       );
 
@@ -99,6 +136,48 @@ export default function Battle() {
         ),
       );
     });
+
+    const lastActivationDelay =
+      (paylinesToActivate.length - 1) * activationStepDelay +
+      activationDuration;
+    activationTimeoutRefs.current.push(
+      window.setTimeout(async () => {
+        if (canPlayerAttack()) {
+          await playerRef.current?.attack(() => {
+            enemyRef.current?.setAttacked();
+
+            makeCharacterAttack("player");
+          });
+        }
+
+        if (!isEnemyDefeated()) {
+          await sleep(500);
+
+          enemyRef.current?.setIdle();
+
+          await sleep(250);
+
+          if (canEnemyAttack()) {
+            await enemyRef.current?.attack(() => {
+              playerRef.current?.setAttacked();
+              makeCharacterAttack("enemy");
+            });
+          }
+
+          if (isPlayerDefeated()) {
+            // TODO: game over
+          } else {
+            resetPlayerNextActions();
+            setEnemyNextActions();
+            setCanSpin(true);
+          }
+        } else {
+          resetEnemyNextActions();
+          enemyRef.current?.setDead();
+          // TODO: victory animation
+        }
+      }, lastActivationDelay),
+    );
 
     return () => {
       clearActivationTimers();
@@ -244,6 +323,7 @@ export default function Battle() {
       return;
     }
 
+    setCanSpin(false);
     takeDamage(betCost);
 
     clearSpinTimers();
@@ -312,8 +392,14 @@ export default function Battle() {
   return (
     <Screen>
       <Scene
-        heroLife={health}
+        player={{
+          health,
+          playerNextActions:
+            state.currentRun?.currentBattle?.playerNextActions || [],
+        }}
         enemy={state.currentRun?.currentBattle?.enemy!}
+        playerRef={playerRef}
+        enemyRef={enemyRef}
       />
       <hr />
       <div className="slot-machine-panel">
@@ -325,6 +411,7 @@ export default function Battle() {
           activeSymbolPositions={activeSymbolPositions}
           onSpin={handleSpin}
           onBetCostChange={setBetCost}
+          isInteractive={canSpin}
         />
       </div>
     </Screen>

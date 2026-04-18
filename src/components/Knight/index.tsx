@@ -1,6 +1,9 @@
 import { useImperativeHandle, useRef, useCallback } from "react";
 
+import NextActions from "@/components/NextActions";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
+
+import type { NextAction } from "@/types/game";
 
 import "./style.css";
 
@@ -11,30 +14,23 @@ const BASE_POSE_ATTACKING = 5;
 
 export type AnimationName = "idle" | "walking" | "attacking" | "dead";
 
-type Point = {
-  x: number;
-  y: number;
-};
-
 export type KnightHandle = {
-  moveBy: (
-    offset: Partial<Point>,
-    durationInMs?: number,
-    animationName?: AnimationName,
-  ) => Promise<Animation | false>;
+  attack: (onAttackEnd: () => void) => Promise<Animation>;
   setDead: () => void;
+  setAttacked: () => void;
+  setIdle: () => void;
 };
 
 type FullAnimationName = `base_${AnimationName}`;
 
-type Props = {
+export type Props = {
   ref?: React.Ref<KnightHandle>;
+  nextActions: NextAction[];
 };
 
-export default function Knight({ ref }: Props) {
+export default function Knight({ ref, nextActions }: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
-  const currentPosition = useRef({ x: 0, y: 0 });
 
   const getFullAnimationName = useCallback(
     (animationName: AnimationName): FullAnimationName => {
@@ -49,48 +45,99 @@ export default function Knight({ ref }: Props) {
     spriteRef.current?.setAnimation(getFullAnimationName("dead"));
   }, [getFullAnimationName]);
 
-  const moveBy: KnightHandle["moveBy"] = useCallback(
-    async (offset, durationInMs = 1000, animationName = "walking") => {
-      if (!localRef.current) return false;
+  const attack: KnightHandle["attack"] = useCallback(
+    async (onAttackEnd) => {
+      spriteRef.current?.setAnimation(getFullAnimationName("attacking"));
 
-      spriteRef.current?.setAnimation(getFullAnimationName(animationName));
-
-      const newX = currentPosition.current.x + (offset.x ?? 0);
-      const newY = currentPosition.current.y + (offset.y ?? 0);
-
-      const animation = localRef.current.animate(
+      const attackAnimation = localRef.current!.animate(
         [
           {
-            transform: `translate(${newX}px, ${newY}px)`,
+            transform: `translate(100px, 0px)`,
           },
         ],
         {
-          duration: durationInMs,
-          easing: "linear",
+          duration: 300,
+          easing: "ease-in",
           fill: "forwards",
         },
       );
 
-      const result = await animation.finished;
+      await attackAnimation.finished;
 
-      currentPosition.current = { x: newX, y: newY };
+      onAttackEnd();
 
-      return result;
+      spriteRef.current?.setAnimation(getFullAnimationName("walking"));
+
+      const goBackAnimation = localRef.current!.animate(
+        [
+          {
+            transform: `translate(0px, 0px)`,
+          },
+        ],
+        {
+          duration: 500,
+          easing: "ease-in",
+          fill: "forwards",
+        },
+      );
+
+      const results = await goBackAnimation.finished;
+
+      spriteRef.current?.setAnimation(getFullAnimationName("idle"));
+
+      return results;
     },
     [getFullAnimationName],
   );
 
+  const setIdle: KnightHandle["setIdle"] = useCallback(() => {
+    spriteRef.current?.setAnimation(getFullAnimationName("idle"));
+  }, [getFullAnimationName]);
+
+  const setAttacked: KnightHandle["setAttacked"] = useCallback(() => {
+    const flashAnimation = localRef.current!.animate(
+      [
+        { transform: "translate(0px, 0px)", filter: "brightness(1)" },
+        {
+          transform: "translate(-10px, 0px)",
+          filter: "brightness(0) invert(1)",
+        },
+        { transform: "translate(7px, 0px)", filter: "brightness(1)" },
+        {
+          transform: "translate(-5px, 0px)",
+          filter: "brightness(0) invert(1)",
+        },
+        { transform: "translate(3px, 0px)", filter: "brightness(1)" },
+        {
+          transform: "translate(-2px, 0px)",
+          filter: "brightness(0) invert(1)",
+        },
+        { transform: "translate(0px, 0px)", filter: "brightness(1)" },
+      ],
+      {
+        duration: 500,
+        easing: "ease-out",
+        fill: "forwards",
+      },
+    );
+
+    return flashAnimation.finished;
+  }, []);
+
   useImperativeHandle(
     ref,
     () => ({
-      moveBy,
+      attack,
       setDead,
+      setIdle,
+      setAttacked,
     }),
-    [moveBy, setDead],
+    [attack, setDead, setIdle, setAttacked],
   );
 
   return (
     <div className="knight" ref={localRef}>
+      <NextActions nextActions={nextActions} type="knight" />
       <Sprite
         ref={spriteRef}
         imgSrc="./images/characters/knight.png"

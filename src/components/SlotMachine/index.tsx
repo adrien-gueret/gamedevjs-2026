@@ -18,6 +18,7 @@ type Props = {
   }>;
   onSpin: () => void;
   onBetCostChange: (newBetCost: BetCost) => void;
+  isInteractive?: boolean;
 };
 
 export default function SlotMachine({
@@ -28,13 +29,17 @@ export default function SlotMachine({
   activeSymbolPositions,
   onSpin,
   onBetCostChange,
+  isInteractive,
 }: Props) {
   const isSpinning = spinningReels.some((isReelSpinning) => isReelSpinning);
 
   return (
     <div className="slot-machine">
       <div className="slot-machine-reels">
-        <MachineHearts onClick={onBetCostChange} betCost={betCost} />
+        <MachineHearts
+          onClick={isInteractive ? onBetCostChange : undefined}
+          betCost={betCost}
+        />
 
         <div className="helper-text text-1">
           1. Bet <b style={{ color: "#238c29" }}>1</b>,{" "}
@@ -59,7 +64,10 @@ export default function SlotMachine({
               }))}
           />
         ))}
-        <MachineHearts onClick={onBetCostChange} betCost={betCost} />
+        <MachineHearts
+          onClick={isInteractive ? onBetCostChange : undefined}
+          betCost={betCost}
+        />
       </div>
 
       <div className="helper-text text-2">
@@ -69,7 +77,11 @@ export default function SlotMachine({
       </div>
 
       <div className="spin-button">
-        <Button imageName="spin" onClick={onSpin} disabled={isSpinning}>
+        <Button
+          imageName="spin"
+          onClick={onSpin}
+          disabled={isSpinning || !isInteractive}
+        >
           Spin
         </Button>
       </div>

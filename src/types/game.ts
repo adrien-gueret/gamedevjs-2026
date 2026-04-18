@@ -11,21 +11,29 @@ export type Health = {
   max: number;
 };
 
-export type EnemyNextAction = {
-  type: "attack" | "defend" | "sleep";
+type NextActionWithValue = {
+  type: "attack" | "defend";
   value: number;
 };
+
+type NextActionWithoutValue = {
+  type: "sleep";
+  value?: never;
+};
+
+export type NextAction = NextActionWithValue | NextActionWithoutValue;
 
 export type Enemy = {
   type: EnnemyType;
   health: Health;
-  nextActions: EnemyNextAction[];
+  nextActions: NextAction[];
 };
 
 export type Battle = {
   reels: ReelSymbol[][];
   betCost: BetCost;
   enemy: Enemy;
+  playerNextActions: NextAction[];
 };
 
 export type Run = {
