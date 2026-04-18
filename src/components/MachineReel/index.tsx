@@ -118,7 +118,13 @@ export default function MachineReel({
               Coin: (
                 <>
                   Gain <b style={{ color: "cyan" }}>1</b>{" "}
-                  <b style={{ color: "yellow" }}>gold</b>
+                  <b style={{ color: "gold" }}>gold</b>
+                </>
+              ),
+              Heart: (
+                <>
+                  Heal <b style={{ color: "cyan" }}>1</b>{" "}
+                  <b style={{ color: "lightcoral" }}>health</b>
                 </>
               ),
               Sleep: <>Do nothing</>,

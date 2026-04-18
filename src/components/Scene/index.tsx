@@ -26,8 +26,17 @@ export default function Scene({ player, enemy, playerRef, enemyRef }: Props) {
         value={enemy.health.value}
         maxValue={enemy.health.max}
       />
-      <Knight ref={playerRef} nextActions={player.playerNextActions} />
-      <Enemy ref={enemyRef} type={enemy.type} nextActions={enemy.nextActions} />
+      <Knight
+        ref={playerRef}
+        nextActions={player.playerNextActions}
+        defaultAnimation={player.health.value === 0 ? "dead" : "idle"}
+      />
+      <Enemy
+        ref={enemyRef}
+        type={enemy.type}
+        nextActions={enemy.nextActions}
+        defaultAnimation={enemy.health.value === 0 ? "dead" : "idle"}
+      />
     </div>
   );
 }

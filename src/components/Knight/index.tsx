@@ -26,9 +26,14 @@ type FullAnimationName = `base_${AnimationName}`;
 export type Props = {
   ref?: React.Ref<KnightHandle>;
   nextActions: NextAction[];
+  defaultAnimation?: AnimationName;
 };
 
-export default function Knight({ ref, nextActions }: Props) {
+export default function Knight({
+  ref,
+  nextActions,
+  defaultAnimation = "idle",
+}: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
 
@@ -166,7 +171,7 @@ export default function Knight({ ref, nextActions }: Props) {
             tiles: [BASE_POSE_DEAD],
           },
         ]}
-        defaultAnimation={getFullAnimationName("idle")}
+        defaultAnimation={getFullAnimationName(defaultAnimation)}
         scale={3}
       />
     </div>

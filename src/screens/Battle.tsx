@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReelSymbol, BetCost, NextAction } from "@/types/game";
 
 import Blackout from "@/components/Blackout";
+import DelayedRender from "@/components/DelayedRender";
 import type { EnemyHandle } from "@/components/Enemy";
 import type { KnightHandle } from "@/components/Knight";
 import SlotMachine from "@/components/SlotMachine";
@@ -26,6 +27,7 @@ import {
   isPlayerDefeated,
 } from "@/services/selector";
 import { Link } from "react-router-dom";
+import { VictoryMessage } from "@/components/VictoryMessage";
 
 const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
   Sword: { type: "attack", value: 1 },
@@ -62,8 +64,15 @@ export default function Battle() {
     ActiveSymbolPosition[]
   >([]);
 
-  const [canSpin, setCanSpin] = useState(true);
-  const [shouldFadeOut, setShouldFadeOut] = useState(false);
+  const [shouldShowLostScreen, setShouldShowLostScreen] =
+    useState(isPlayerDefeated());
+
+  const [shouldShowWinScreen, setShouldShowWinScreen] =
+    useState(isEnemyDefeated());
+
+  const [canSpin, setCanSpin] = useState(
+    !shouldShowLostScreen && !shouldShowWinScreen,
+  );
 
   const timeoutRefs = useRef<Array<number | null>>([]);
   const activationTimeoutRefs = useRef<Array<number | null>>([]);
@@ -132,13 +141,13 @@ export default function Battle() {
       playerCloneRef.current = clone;
       rootEl?.appendChild(clone);
 
-      setShouldFadeOut(true);
+      setShouldShowLostScreen(true);
     }
   }, [endBattle]);
 
   const battleWon = useCallback(() => {
     endBattle();
-    alert("You Win!"); // TODO: better victory handling
+    setShouldShowWinScreen(true);
   }, [endBattle]);
 
   useEffect(() => {
@@ -148,17 +157,6 @@ export default function Battle() {
       playerCloneRef.current?.remove();
     };
   }, []);
-
-  const hasWon = isEnemyDefeated();
-  const hasLost = isPlayerDefeated();
-
-  useEffect(() => {
-    if (hasLost) {
-      battleLost();
-    } else if (hasWon) {
-      battleWon();
-    }
-  }, [hasWon, hasLost, battleLost, battleWon]);
 
   useEffect(() => {
     if (paylinesToActivate.length === 0) {
@@ -229,9 +227,10 @@ export default function Battle() {
             setCanSpin(true);
           }
         } else {
+          resetPlayerNextActions();
           resetEnemyNextActions();
           enemyRef.current?.setDead();
-          // TODO: victory animation
+          battleWon();
         }
       }, lastActivationDelay + 1000),
     );
@@ -380,6 +379,7 @@ export default function Battle() {
     takeDamage(betCost);
 
     if (health.value <= betCost) {
+      battleLost();
       return;
     }
 
@@ -459,8 +459,8 @@ export default function Battle() {
           playerRef={playerRef}
           enemyRef={enemyRef}
         />
-        <hr />
-        <div className="slot-machine-panel">
+        <hr style={{ marginBottom: "auto" }} />
+        <div className={shouldShowWinScreen ? "slot-machine-panel-fallen" : ""}>
           <SlotMachine
             symbols={reels}
             startIndexes={startIndexes}
@@ -472,13 +472,23 @@ export default function Battle() {
             isInteractive={canSpin}
           />
         </div>
-      </Screen>
-      {shouldFadeOut && (
-        <Blackout>
-          <h2>{hasLost ? "Defeat..." : "Victory!"}</h2>
 
-          <Link to={hasLost ? "/" : "/choose-path"}>
-            {hasLost ? "Try again" : "Continue"}
+        {shouldShowWinScreen && (
+          <DelayedRender delay={1000}>
+            <VictoryMessage />
+          </DelayedRender>
+        )}
+      </Screen>
+      {shouldShowLostScreen && (
+        <Blackout>
+          <h2 className="fade-in">Defeat...</h2>
+
+          <Link
+            className="fade-in"
+            style={{ "--animation-delay": "2s" } as React.CSSProperties}
+            to="/"
+          >
+            Try again
           </Link>
         </Blackout>
       )}

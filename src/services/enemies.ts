@@ -5,7 +5,7 @@ import { random } from "./maths";
 export function getNewBattleEnemy(levelIndex: number): Enemy {
   switch (levelIndex) {
     default:
-      const healthValue = 6 + random(0, 3);
+      const healthValue = 1; //6 + random(0, 3);
       return {
         type: "rat",
         health: {

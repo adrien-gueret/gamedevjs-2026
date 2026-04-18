@@ -26,9 +26,15 @@ export type Props = {
   ref?: React.Ref<EnemyHandle>;
   type: EnnemyType;
   nextActions: NextAction[];
+  defaultAnimation?: AnimationName;
 };
 
-export default function Enemy({ ref, type, nextActions }: Props) {
+export default function Enemy({
+  ref,
+  type,
+  nextActions,
+  defaultAnimation = "idle",
+}: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
 
@@ -130,7 +136,7 @@ export default function Enemy({ ref, type, nextActions }: Props) {
             tiles: [BASE_POSE_DEAD],
           },
         ]}
-        defaultAnimation={getFullAnimationName("idle")}
+        defaultAnimation={getFullAnimationName(defaultAnimation)}
         scale={3}
       />
     </div>

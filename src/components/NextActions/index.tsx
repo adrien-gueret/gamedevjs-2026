@@ -45,7 +45,7 @@ export default function NextActions({ nextActions, type }: Props) {
           <Tooltip key={index} label={actionTypeToLabel[action.type]}>
             <div
               className="next-action"
-              style={{ animationDelay: `${index * 0.4}s` }}
+              style={{ animationDelay: `${index * -0.4}s` }}
             >
               <div className="next-action-type">
                 <MachineSymbol symbol={actionTypeToSymbolType[action.type]} />

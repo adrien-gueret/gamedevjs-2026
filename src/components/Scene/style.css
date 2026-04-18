@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  flex: 1;
+  height: 279px;
   background: #111;
   border: 0 solid transparent;
   border-image-source: url(./images/scene-borders.png);

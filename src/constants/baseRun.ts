@@ -1,7 +1,7 @@
 import type { ConfigurableBaseRun } from "@/types/game";
 
 export const BASE_RUN_KNIGHT: ConfigurableBaseRun = {
-  health: { value: 3, max: 50 },
+  health: { value: 50, max: 50 },
   gold: 3,
   type: "knight",
   reels: [
