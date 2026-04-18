@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ReelSymbol, BetCost, NextAction } from "@/types/game";
 
+import Blackout from "@/components/Blackout";
 import type { EnemyHandle } from "@/components/Enemy";
 import type { KnightHandle } from "@/components/Knight";
 import SlotMachine from "@/components/SlotMachine";
@@ -24,6 +25,7 @@ import {
   canPlayerAttack,
   isPlayerDefeated,
 } from "@/services/selector";
+import { Link } from "react-router-dom";
 
 const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
   Sword: { type: "attack", value: 1 },
@@ -61,9 +63,11 @@ export default function Battle() {
   >([]);
 
   const [canSpin, setCanSpin] = useState(true);
+  const [shouldFadeOut, setShouldFadeOut] = useState(false);
 
   const timeoutRefs = useRef<Array<number | null>>([]);
   const activationTimeoutRefs = useRef<Array<number | null>>([]);
+  const playerCloneRef = useRef<HTMLElement | null>(null);
 
   const playerRef = useRef<KnightHandle>(null);
   const enemyRef = useRef<EnemyHandle>(null);
@@ -101,12 +105,60 @@ export default function Battle() {
     });
   };
 
+  const endBattle = useCallback(() => {
+    setCanSpin(false);
+    clearSpinTimers();
+    clearActivationTimers();
+  }, []);
+
+  const battleLost = useCallback(async () => {
+    endBattle();
+    const playerDomElement = playerRef.current?.setDead();
+
+    if (playerDomElement && !playerCloneRef.current) {
+      await sleep(500);
+
+      const rootEl = document.getElementById("root");
+      const rootRect = rootEl?.getBoundingClientRect() ?? { left: 0, top: 0 };
+      const rect = playerDomElement.getBoundingClientRect();
+      const clone = playerDomElement.cloneNode(true) as HTMLElement;
+      clone.style.position = "absolute";
+      clone.style.left = `${rect.left - rootRect.left - (rootEl?.clientLeft ?? 0) + (rootEl?.scrollLeft ?? 0)}px`;
+      clone.style.top = `${rect.top - rootRect.top - (rootEl?.clientTop ?? 0) + (rootEl?.scrollTop ?? 0)}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.zIndex = "15";
+      clone.style.pointerEvents = "none";
+      playerCloneRef.current = clone;
+      rootEl?.appendChild(clone);
+
+      setShouldFadeOut(true);
+    }
+  }, [endBattle]);
+
+  const battleWon = useCallback(() => {
+    endBattle();
+    alert("You Win!"); // TODO: better victory handling
+  }, [endBattle]);
+
   useEffect(() => {
     return () => {
       clearSpinTimers();
       clearActivationTimers();
+      playerCloneRef.current?.remove();
     };
   }, []);
+
+  const hasWon = isEnemyDefeated();
+  const hasLost = isPlayerDefeated();
+
+  useEffect(() => {
+    if (hasLost) {
+      battleLost();
+    } else if (hasWon) {
+      battleWon();
+    }
+  }, [hasWon, hasLost, battleLost, battleWon]);
 
   useEffect(() => {
     if (paylinesToActivate.length === 0) {
@@ -142,6 +194,11 @@ export default function Battle() {
       activationDuration;
     activationTimeoutRefs.current.push(
       window.setTimeout(async () => {
+        if (isPlayerDefeated()) {
+          battleLost();
+          return;
+        }
+
         if (canPlayerAttack()) {
           await playerRef.current?.attack(() => {
             enemyRef.current?.setAttacked();
@@ -165,7 +222,7 @@ export default function Battle() {
           }
 
           if (isPlayerDefeated()) {
-            // TODO: game over
+            battleLost();
           } else {
             resetPlayerNextActions();
             setEnemyNextActions();
@@ -176,7 +233,7 @@ export default function Battle() {
           enemyRef.current?.setDead();
           // TODO: victory animation
         }
-      }, lastActivationDelay),
+      }, lastActivationDelay + 1000),
     );
 
     return () => {
@@ -319,12 +376,12 @@ export default function Battle() {
       return;
     }
 
-    if (health.value < betCost) {
-      return;
-    }
-
     setCanSpin(false);
     takeDamage(betCost);
+
+    if (health.value <= betCost) {
+      return;
+    }
 
     clearSpinTimers();
     clearActivationTimers();
@@ -390,30 +447,41 @@ export default function Battle() {
   };
 
   return (
-    <Screen>
-      <Scene
-        player={{
-          health,
-          playerNextActions:
-            state.currentRun?.currentBattle?.playerNextActions || [],
-        }}
-        enemy={state.currentRun?.currentBattle?.enemy!}
-        playerRef={playerRef}
-        enemyRef={enemyRef}
-      />
-      <hr />
-      <div className="slot-machine-panel">
-        <SlotMachine
-          symbols={reels}
-          startIndexes={startIndexes}
-          spinningReels={spinningReels}
-          betCost={betCost}
-          activeSymbolPositions={activeSymbolPositions}
-          onSpin={handleSpin}
-          onBetCostChange={setBetCost}
-          isInteractive={canSpin}
+    <>
+      <Screen>
+        <Scene
+          player={{
+            health,
+            playerNextActions:
+              state.currentRun?.currentBattle?.playerNextActions || [],
+          }}
+          enemy={state.currentRun?.currentBattle?.enemy!}
+          playerRef={playerRef}
+          enemyRef={enemyRef}
         />
-      </div>
-    </Screen>
+        <hr />
+        <div className="slot-machine-panel">
+          <SlotMachine
+            symbols={reels}
+            startIndexes={startIndexes}
+            spinningReels={spinningReels}
+            betCost={betCost}
+            activeSymbolPositions={activeSymbolPositions}
+            onSpin={handleSpin}
+            onBetCostChange={setBetCost}
+            isInteractive={canSpin}
+          />
+        </div>
+      </Screen>
+      {shouldFadeOut && (
+        <Blackout>
+          <h2>{hasLost ? "Defeat..." : "Victory!"}</h2>
+
+          <Link to={hasLost ? "/" : "/choose-path"}>
+            {hasLost ? "Try again" : "Continue"}
+          </Link>
+        </Blackout>
+      )}
+    </>
   );
 }

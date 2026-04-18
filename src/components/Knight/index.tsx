@@ -16,7 +16,7 @@ export type AnimationName = "idle" | "walking" | "attacking" | "dead";
 
 export type KnightHandle = {
   attack: (onAttackEnd: () => void) => Promise<Animation>;
-  setDead: () => void;
+  setDead: () => HTMLDivElement;
   setAttacked: () => void;
   setIdle: () => void;
 };
@@ -43,6 +43,7 @@ export default function Knight({ ref, nextActions }: Props) {
 
   const setDead: KnightHandle["setDead"] = useCallback(() => {
     spriteRef.current?.setAnimation(getFullAnimationName("dead"));
+    return localRef.current!;
   }, [getFullAnimationName]);
 
   const attack: KnightHandle["attack"] = useCallback(
