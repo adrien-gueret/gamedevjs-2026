@@ -1,0 +1,94 @@
+.devil-deal-choices {
+  border: 24px solid transparent;
+  border-image-source: url(./images/machine-borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+}
+
+.devil-deal-choices-title,
+.devil-deal-choices-subtitle {
+  margin: 0;
+}
+
+.devil-deal-choices-title {
+  font-size: 18px;
+}
+
+.devil-deal-choices-subtitle {
+  font-size: 16px;
+  color: #aaa;
+  line-height: 12px;
+}
+
+.devil-deal-choices-container {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.deal-choice-button {
+  appearance: none;
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: transparent;
+  user-select: none;
+  width: 96px;
+  height: 96px;
+  display: block;
+  background-image: url(./images/devil-deal-choice.png);
+  background-size: 1152px 96px;
+}
+
+.deal-choice-betterbet1 {
+  background-position: 0 0;
+}
+
+.deal-choice-betterbet2 {
+  background-position: -96px 0;
+}
+
+.deal-choice-lockreel {
+  background-position: -192px 0;
+}
+
+.deal-choice-morehealth1 {
+  background-position: -288px 0;
+}
+
+.deal-choice-morehealth2 {
+  background-position: -384px 0;
+}
+
+.deal-choice-morehealth3 {
+  background-position: -480px 0;
+}
+
+.deal-choice-unlockskeleton {
+  background-position: -576px 0;
+}
+
+.deal-choice-unlockwizard {
+  background-position: -672px 0;
+}
+
+.deal-choice-destroyreelsymbol {
+  background-position: -768px 0;
+}
+
+.deal-choice-replacereelsymbol {
+  background-position: -864px 0;
+}
+
+.deal-choice-passivedefense {
+  background-position: -960px 0;
+}
+
+.deal-choice-passiveattack {
+  background-position: -1056px 0;
+}

@@ -9,7 +9,7 @@ import type { EnemyHandle } from "@/components/Enemy";
 import type { KnightHandle } from "@/components/Knight";
 import SlotMachine from "@/components/SlotMachine";
 import Screen from "@/components/Screen";
-import Scene from "@/components/Scene";
+import Scene from "@/components/Scene/Battle";
 import { useGameState } from "@/services/gameStore";
 import {
   takeDamage,
@@ -20,6 +20,8 @@ import {
   resetPlayerNextActions,
   resetEnemyNextActions,
   addGold,
+  endBattle,
+  healPlayer,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -39,6 +41,7 @@ const symboleToDirectAction: Partial<
   Record<ReelSymbol, (multiplier: number) => void>
 > = {
   Coin: addGold,
+  Heart: healPlayer,
 };
 
 type Payline = {
@@ -55,7 +58,7 @@ type ActiveSymbolPosition = {
 export default function Battle() {
   const state = useGameState();
   const health = state.currentRun?.health ?? { value: 0, max: 10 };
-  const reels = state.currentRun?.currentBattle?.reels ?? [];
+  const reels = state.currentRun?.reels ?? [];
   const betCost = state.currentRun?.currentBattle?.betCost ?? 1;
 
   const navigate = useNavigate();
@@ -130,14 +133,14 @@ export default function Battle() {
     });
   };
 
-  const endBattle = useCallback(() => {
+  const stopBattle = useCallback(() => {
     setCanSpin(false);
     clearSpinTimers();
     clearActivationTimers();
   }, []);
 
   const battleLost = useCallback(async () => {
-    endBattle();
+    stopBattle();
     const playerDomElement = playerRef.current?.setDead();
 
     if (playerDomElement && !playerCloneRef.current) {
@@ -159,12 +162,12 @@ export default function Battle() {
 
       setShouldShowLostScreen(true);
     }
-  }, [endBattle]);
+  }, [stopBattle]);
 
   const battleWon = useCallback(() => {
-    endBattle();
+    stopBattle();
     setShouldShowWinScreen(true);
-  }, [endBattle]);
+  }, [stopBattle]);
 
   useEffect(() => {
     return () => {
@@ -465,7 +468,12 @@ export default function Battle() {
   const onHeal = async () => {
     await playerRef.current?.setHealing();
     navigate("/bonus-upgrade");
+    endBattle();
   };
+
+  if (!state.currentRun?.currentBattle) {
+    return null;
+  }
 
   return (
     <>
@@ -474,14 +482,14 @@ export default function Battle() {
           player={{
             health,
             playerNextActions:
-              state.currentRun?.currentBattle?.playerNextActions || [],
+              state.currentRun.currentBattle.playerNextActions || [],
           }}
-          enemy={state.currentRun?.currentBattle?.enemy!}
+          enemy={state.currentRun.currentBattle.enemy!}
           playerRef={playerRef}
           enemyRef={enemyRef}
-          gold={state.currentRun?.gold ?? 0}
+          gold={state.gold}
         />
-        <hr style={{ marginBottom: "auto" }} />
+        <hr className="ui-separator" />
         <div className={shouldShowWinScreen ? "slot-machine-panel-fallen" : ""}>
           <SlotMachine
             symbols={reels}
@@ -497,7 +505,7 @@ export default function Battle() {
 
         {shouldShowWinScreen && (
           <DelayedRender delay={1000}>
-            <VictoryMessage onHeal={onHeal} />
+            <VictoryMessage onHeal={onHeal} onDevilDeal={endBattle} />
           </DelayedRender>
         )}
       </Screen>
@@ -507,6 +515,7 @@ export default function Battle() {
 
           <Link
             className="fade-in"
+            onClick={endBattle}
             style={{ "--animation-delay": "2s" } as React.CSSProperties}
             to="/"
           >

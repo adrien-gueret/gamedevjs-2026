@@ -7,6 +7,7 @@ import Home from "@/screens/Home";
 import Start from "@/screens/Start";
 import Battle from "@/screens/Battle";
 import BonusUpgrade from "@/screens/BonusUpgrade";
+import DevilDeal from "@/screens/DevilDeal";
 
 const router = createBrowserRouter(
   [
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
         { path: "start", Component: Start },
         { path: "battle", Component: Battle },
         { path: "bonus-upgrade", Component: BonusUpgrade },
+        { path: "devil-deal", Component: DevilDeal },
       ],
     },
   ],

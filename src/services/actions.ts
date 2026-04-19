@@ -1,9 +1,9 @@
 import type {
   BetCost,
-  ReelSymbol,
   Run,
   GameState,
   NextAction,
+  ReelSymbol,
 } from "@/types/game";
 
 import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
@@ -15,11 +15,33 @@ import { setGameState } from "./gameStore";
 // ---------------------------------------------------------------------------
 
 export function startRun(baseRun: Run): GameState {
-  return setGameState({ currentRun: structuredClone(baseRun) });
+  return setGameState((prev) => ({
+    ...prev,
+    currentRun: structuredClone(baseRun),
+  }));
 }
 
 export function endRun(): GameState {
-  return setGameState({ currentRun: null });
+  return setGameState((prev) => ({
+    ...prev,
+    currentRun: null,
+  }));
+}
+
+export function setCurrentPathname(pathname: string): GameState {
+  return setGameState((prev) => ({ ...prev, currentPathname: pathname }));
+}
+export function setReelSymbol(
+  reelIndex: number,
+  symbolIndex: number,
+  newSymbol: ReelSymbol,
+): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.reels[reelIndex][symbolIndex] = newSymbol;
+    return next;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -54,29 +76,18 @@ export function addGold(amount: number = 1): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
-    next.currentRun!.gold += amount;
+    next.gold += amount;
     return next;
   });
 }
 
 export function spendGold(amount: number): GameState {
   return setGameState((prev) => {
-    if (!prev.currentRun || prev.currentRun.gold < amount) return prev;
+    if (!prev.currentRun || prev.gold < amount) {
+      return prev;
+    }
     const next = structuredClone(prev);
-    next.currentRun!.gold -= amount;
-    return next;
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Run - Reels
-// ---------------------------------------------------------------------------
-
-export function setRunReels(reels: ReelSymbol[][]): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.reels = reels;
+    next.gold -= amount;
     return next;
   });
 }
@@ -90,7 +101,6 @@ export function startNewBattle(): GameState {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = {
-      reels: structuredClone(prev.currentRun.reels),
       betCost: 1,
       enemy: getNewBattleEnemy(next.currentRun!.levelIndex),
       playerNextActions: [],
@@ -107,15 +117,6 @@ export function endBattle(): GameState {
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = null;
     next.currentRun!.levelIndex += 1;
-    return next;
-  });
-}
-
-export function setBattleReels(reels: ReelSymbol[][]): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.reels = reels;
     return next;
   });
 }
@@ -282,4 +283,15 @@ export function setEnemyNextActions(): GameState {
     enemy.nextActions = getEnemyNextActions(enemy, next.currentRun!.levelIndex);
     return next;
   });
+}
+
+// ---------------------------------------------------------------------------
+// Run - Random choices
+// ---------------------------------------------------------------------------
+
+export function setRandomChoices(randomChoices: any[] = []): GameState {
+  return setGameState((prev) => ({
+    ...prev,
+    currentRun: prev.currentRun ? { ...prev.currentRun, randomChoices } : null,
+  }));
 }

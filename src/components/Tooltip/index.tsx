@@ -1,4 +1,10 @@
-import { type ElementType, type ReactNode, useRef, useState } from "react";
+import {
+  type ElementType,
+  type ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import "./style.css";
@@ -36,6 +42,26 @@ export default function Tooltip<T extends ElementType = "div">({
 
   const handleMouseLeave = () => setCoords(null);
 
+  const tooltipRef = useCallback(
+    (node: HTMLSpanElement | null) => {
+      if (!node || !coords) return;
+      const rootEl = document.getElementById("root");
+      if (!rootEl) return;
+      const rootRect = rootEl.getBoundingClientRect();
+      const rootLeft = rootRect.left + window.scrollX;
+      const rootRight = rootRect.right + window.scrollX;
+      const halfWidth = node.offsetWidth / 2;
+      let adjustedLeft = coords.left;
+      if (adjustedLeft - halfWidth < rootLeft) {
+        adjustedLeft = rootLeft + halfWidth;
+      } else if (adjustedLeft + halfWidth > rootRight) {
+        adjustedLeft = rootRight - halfWidth;
+      }
+      node.style.left = `${adjustedLeft}px`;
+    },
+    [coords],
+  );
+
   if (!label) {
     return children;
   }
@@ -53,6 +79,7 @@ export default function Tooltip<T extends ElementType = "div">({
       {coords &&
         createPortal(
           <span
+            ref={tooltipRef}
             className="tooltip-label"
             role="tooltip"
             style={{ top: coords.top, left: coords.left }}

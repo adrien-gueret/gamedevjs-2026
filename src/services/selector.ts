@@ -1,4 +1,6 @@
 import { getGameState } from "@/services/gameStore";
+import type { DevilDealType } from "@/types/game";
+import { PERMANENT_DEVIL_DEALS } from "@/constants/devilDeals";
 
 export function canPlayerAttack(): boolean {
   const currentState = getGameState();
@@ -33,4 +35,25 @@ export function isPlayerDefeated(): boolean {
   const currentState = getGameState();
   const playerHealth = currentState.currentRun?.health.value ?? 0;
   return playerHealth <= 0;
+}
+
+export function hasUnlockedPermanentDeal(dealType: DevilDealType): boolean {
+  const currentState = getGameState();
+  return currentState.unlockedPermanentDeals.includes(dealType);
+}
+
+export function canBuyDevilDeal(dealType: DevilDealType): boolean {
+  const deal = PERMANENT_DEVIL_DEALS.find((deal) => deal.type === dealType);
+
+  if (!deal) {
+    return true;
+  }
+
+  const hasRequiredDeals = deal.requirements
+    ? deal.requirements.every((requiredDeal) =>
+        hasUnlockedPermanentDeal(requiredDeal),
+      )
+    : true;
+
+  return hasRequiredDeals && !hasUnlockedPermanentDeal(dealType);
 }

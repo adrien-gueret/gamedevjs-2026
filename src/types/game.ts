@@ -4,6 +4,40 @@ export type EnnemyType = "rat" | "blob" | "skeleton";
 
 export type PlayerType = "knight" | "wizard";
 
+export type DevilDealType =
+  // Permanent upgrades (only with gold cost)
+  | "betterBet1"
+  | "betterBet2"
+  | "lockReel"
+  | "moreHealth1"
+  | "moreHealth2"
+  | "moreHealth3"
+  | "unlockSkeleton"
+  | "unlockWizard"
+  // Run-only upgrades
+  | "destroyReelSymbol"
+  | "replaceReelSymbol"
+  | "passiveDefense"
+  | "passiveAttack";
+
+export type DevilDealCostType = "health" | "gold" | "reel";
+
+export type DevilDealCost = {
+  type: DevilDealCostType;
+  value: number;
+};
+
+export type DevilDeal = {
+  type: DevilDealType;
+  requirements?: DevilDealType[];
+  permanent: boolean;
+  cost: DevilDealCost | DevilDealCost[];
+};
+
+export type BuyableDevilDeal = Omit<DevilDeal, "requirements" | "cost"> & {
+  cost: DevilDealCost;
+};
+
 export type BetCost = 1 | 2 | 3;
 
 export type Health = {
@@ -30,7 +64,6 @@ export type Enemy = {
 };
 
 export type Battle = {
-  reels: ReelSymbol[][];
   betCost: BetCost;
   enemy: Enemy;
   playerNextActions: NextAction[];
@@ -38,15 +71,21 @@ export type Battle = {
 
 export type Run = {
   health: Health;
-  gold: number;
   type: PlayerType;
   reels: ReelSymbol[][];
   levelIndex: number;
   currentBattle: Battle | null;
+  randomChoices: any[];
 };
 
-export type ConfigurableBaseRun = Omit<Run, "levelIndex" | "currentBattle">;
+export type ConfigurableBaseRun = Omit<
+  Run,
+  "levelIndex" | "currentBattle" | "randomChoices"
+>;
 
 export type GameState = {
+  gold: number;
+  unlockedPermanentDeals: DevilDealType[];
+  currentPathname: string;
   currentRun: Run | null;
 };

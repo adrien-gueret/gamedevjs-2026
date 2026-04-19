@@ -13,10 +13,10 @@ export default function Start() {
       ...BASE_RUN_KNIGHT,
       levelIndex: 0,
       currentBattle: null,
+      randomChoices: [],
     });
 
     startNewBattle();
-
     navigate("/battle");
   }, [navigate]);
 

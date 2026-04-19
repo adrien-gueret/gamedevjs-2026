@@ -17,6 +17,8 @@ type Props = {
     rowIndex: number;
     celebrationLevel: "normal" | "double" | "triple";
   }>;
+  shouldShowAllSymbols?: boolean;
+  onSymbolClick?: (symbolIndex: number, symbol: ReelSymbol) => boolean;
 };
 
 export default function MachineReel({
@@ -25,12 +27,17 @@ export default function MachineReel({
   isSpinning = false,
   reelIndex = 0,
   activeRows = [],
+  shouldShowAllSymbols = false,
+  onSymbolClick,
 }: Props) {
-  const visibleCount = 3;
   const reelSize = symbols.length;
+  const visibleCount = shouldShowAllSymbols ? reelSize : 3;
   const wasSpinningRef = useRef(isSpinning);
   const stopTimeoutRef = useRef<number | null>(null);
   const [isStopping, setIsStopping] = useState(false);
+  const [lastReplacedIndex, setLastReplacedIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (wasSpinningRef.current && !isSpinning) {
@@ -82,11 +89,12 @@ export default function MachineReel({
 
   return (
     <div
-      className={`machine-reel${isSpinning ? " is-spinning" : ""}${isStopping ? " is-stopping" : ""}`}
+      className={`machine-reel${isSpinning ? " is-spinning" : ""}${isStopping ? " is-stopping" : ""}${shouldShowAllSymbols ? " is-expanded" : ""}`}
       style={
         {
           "--reel-spin-duration": `${spinDuration}s`,
           "--reel-cycle-distance": `${reelCycleDistance}px`,
+          "--visible-symbols": `${visibleCount}`,
         } as CSSProperties
       }
     >
@@ -105,15 +113,32 @@ export default function MachineReel({
 
             return (
               <div
-                key={`${normalizedStartIndex}-${index}`}
+                key={`${normalizedStartIndex}-${index}-${symbol}`}
                 className="machine-reel-symbol"
               >
-                <Tooltip label={<SymbolLabel symbol={symbol} />}>
-                  <MachineSymbol
-                    symbol={symbol}
-                    isActive={Boolean(activeRow)}
-                    celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
-                  />
+                <Tooltip
+                  label={<SymbolLabel symbol={symbol} />}
+                  cursor={onSymbolClick ? "pointer" : "help"}
+                >
+                  {onSymbolClick ? (
+                    <button
+                      className={`machine-reel-clickable-symbol${lastReplacedIndex === index ? " is-new" : ""}`}
+                      onClick={() => {
+                        if (onSymbolClick(index, symbol)) {
+                          setLastReplacedIndex(index);
+                        }
+                      }}
+                      onAnimationEnd={() => setLastReplacedIndex(null)}
+                    >
+                      <MachineSymbol symbol={symbol} />
+                    </button>
+                  ) : (
+                    <MachineSymbol
+                      symbol={symbol}
+                      isActive={Boolean(activeRow)}
+                      celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
+                    />
+                  )}
                 </Tooltip>
               </div>
             );

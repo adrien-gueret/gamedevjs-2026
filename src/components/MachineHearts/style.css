@@ -21,6 +21,11 @@
   cursor: pointer;
 }
 
+.machine-heart.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .machine-heart:disabled {
   pointer-events: none;
 }

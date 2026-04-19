@@ -14,9 +14,10 @@ const healAmountPercentage = 0.25;
 
 type Props = {
   onHeal: () => void;
+  onDevilDeal: () => void;
 };
 
-export function VictoryMessage({ onHeal }: Props) {
+export function VictoryMessage({ onHeal, onDevilDeal }: Props) {
   const hasClickedHealRef = useRef(false);
   const state = useGameState();
 
@@ -81,7 +82,8 @@ export function VictoryMessage({ onHeal }: Props) {
           >
             <Link
               className="victory-nav-choice victory-nav-choice-devil floating-choice-item"
-              to="/devil"
+              to="/devil-deal"
+              onClick={onDevilDeal}
             >
               Devil Deal
             </Link>

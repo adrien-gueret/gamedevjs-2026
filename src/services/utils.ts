@@ -12,3 +12,12 @@ export function shuffleArray<T>(array: T[]): T[] {
   }
   return shuffled;
 }
+
+export function getRandomElements<T>(array: T[], count: number): T[] {
+  if (count >= array.length) {
+    return shuffleArray(array);
+  }
+
+  const shuffled = shuffleArray(array);
+  return shuffled.slice(0, count);
+}

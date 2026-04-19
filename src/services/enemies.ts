@@ -5,7 +5,7 @@ import { random } from "./maths";
 export function getNewBattleEnemy(levelIndex: number): Enemy {
   switch (levelIndex) {
     default:
-      const healthValue = 6 + random(0, 3);
+      const healthValue = 3;
       return {
         type: "rat",
         health: {
@@ -28,13 +28,14 @@ export function getEnemyNextActions(
     case "rat":
     default: {
       if (levelIndex === 0) {
+        const actionType = attackTypes[random(0, 1)];
         return [
           {
-            type: attackTypes[random(0, 1)],
+            type: actionType,
             value:
-              healthRatio === 1
+              actionType === "defend"
                 ? 1
-                : random(healthRatio < 0.25 ? 2 : 1, healthRatio < 0.5 ? 3 : 2),
+                : random(1, healthRatio === 1 ? 1 : 2),
           },
         ];
       }

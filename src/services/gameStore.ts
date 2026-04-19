@@ -5,6 +5,9 @@ import type { GameState } from "@/types/game";
 import { getKey, storeKey } from "./store";
 
 const DEFAULT_STATE: GameState = {
+  gold: 0,
+  unlockedPermanentDeals: [],
+  currentPathname: "/",
   currentRun: null,
 };
 

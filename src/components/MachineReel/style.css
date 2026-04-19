@@ -4,11 +4,28 @@
   --reel-spin-duration: 0.32s;
   --reel-cycle-distance: 660px;
 
+  --delta-height: 0px;
+
   position: relative;
   width: 66px;
-  height: calc(var(--symbol-size) * var(--visible-symbols));
+  height: calc(
+    var(--symbol-size) * var(--visible-symbols) + var(--delta-height)
+  );
   overflow: hidden;
   background-image: url(./images/reel.png);
+}
+
+.machine-reel.is-expanded {
+  --symbol-size: 50px;
+  --delta-height: 16px;
+  background-size: 100% 300%;
+  background-position: center;
+}
+
+.machine-reel.is-expanded::before,
+.machine-reel.is-expanded::after {
+  background-color: #4c4449;
+  height: 15px;
 }
 
 .machine-reel::before,
@@ -59,6 +76,35 @@
 
 .machine-reel.is-stopping .machine-symbol {
   animation: reel-stop-symbol 420ms ease-out both;
+}
+
+.machine-reel-clickable-symbol {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  appearance: none;
+}
+
+.machine-reel-clickable-symbol.is-new {
+  animation: symbol-appear 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes symbol-appear {
+  0% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.machine-reel-clickable-symbol:hover {
+  filter: drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff)
+    drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff);
+  z-index: 3;
 }
 
 @keyframes reel-scroll {

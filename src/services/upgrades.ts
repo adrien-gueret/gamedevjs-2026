@@ -1,15 +1,37 @@
-import type { ReelSymbol } from "@/types/game";
+import type { ReelSymbol, DevilDealType, BuyableDevilDeal } from "@/types/game";
 
-import { shuffleArray } from "./utils";
+import {
+  PERMANENT_DEVIL_DEALS,
+  RUN_ONLY_DEVIL_DEALS,
+} from "@/constants/devilDeals";
+
+import { canBuyDevilDeal } from "./selector";
+
+import { getRandomElements } from "./utils";
 
 export function getRandomSymbols(): ReelSymbol[] {
-  const symbols: ReelSymbol[] = shuffleArray([
-    "Sword",
-    "Shield",
-    "Coin",
-    "Heart",
-  ]);
-  const randomSymbols: ReelSymbol[] = symbols.slice(0, 3);
+  return getRandomElements(["Sword", "Shield", "Coin", "Heart"], 3);
+}
 
-  return randomSymbols;
+export function getRandomDevilDeals(): BuyableDevilDeal[] {
+  const buyablePermanentDevilDeals = PERMANENT_DEVIL_DEALS.filter((deal) =>
+    canBuyDevilDeal(deal.type),
+  );
+
+  const randomPermanentDevilDeals = getRandomElements(
+    buyablePermanentDevilDeals,
+    2,
+  ) as BuyableDevilDeal[];
+
+  const randomRunOnlyDevilDeals = getRandomElements(
+    RUN_ONLY_DEVIL_DEALS,
+    3,
+  ).map((deal) => ({
+    ...deal,
+    cost: Array.isArray(deal.cost)
+      ? getRandomElements(deal.cost, 1)[0]
+      : deal.cost,
+  }));
+
+  return [...randomPermanentDevilDeals, ...randomRunOnlyDevilDeals];
 }

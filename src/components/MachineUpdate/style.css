@@ -1,0 +1,18 @@
+.machine-update {
+  position: absolute;
+}
+
+.machine-update-reels {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: center;
+}
+
+.machine-update-question {
+  font-size: 18px;
+}
+
+.machine-update-question .machine-symbol {
+  margin: 0 -12px;
+}

@@ -3,24 +3,25 @@ import type { BetCost } from "@/types/game";
 import "./style.css";
 
 type Props = {
-  betCost: number;
+  betCost: BetCost;
+  maxBetCost: BetCost;
   onClick?: (newBetCost: BetCost) => void;
 };
 
-export default function MachineHearts({ betCost, onClick }: Props) {
+export default function MachineHearts({ betCost, maxBetCost, onClick }: Props) {
   return (
     <div className="machine-hearts">
       <button
         type="button"
-        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"}`}
+        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"} ${maxBetCost < 3 ? "hidden" : ""}`}
         onClick={onClick ? () => onClick(betCost === 3 ? 2 : 3) : undefined}
-        disabled={!onClick}
+        disabled={!onClick || maxBetCost < 3}
       />
       <button
         type="button"
-        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"}`}
+        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"} ${maxBetCost < 2 ? "hidden" : ""}`}
         onClick={onClick ? () => onClick(betCost === 2 ? 1 : 2) : undefined}
-        disabled={!onClick}
+        disabled={!onClick || maxBetCost < 2}
       />
       <button
         type="button"
@@ -30,15 +31,15 @@ export default function MachineHearts({ betCost, onClick }: Props) {
       />
       <button
         type="button"
-        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"}`}
+        className={`machine-heart machine-heart-2 ${betCost >= 2 ? "active" : "inactive"} ${maxBetCost < 2 ? "hidden" : ""}`}
         onClick={onClick ? () => onClick(betCost === 2 ? 1 : 2) : undefined}
-        disabled={!onClick}
+        disabled={!onClick || maxBetCost < 2}
       />
       <button
         type="button"
-        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"}`}
+        className={`machine-heart machine-heart-3 ${betCost >= 3 ? "active" : "inactive"} ${maxBetCost < 3 ? "hidden" : ""}`}
         onClick={onClick ? () => onClick(betCost === 3 ? 2 : 3) : undefined}
-        disabled={!onClick}
+        disabled={!onClick || maxBetCost < 3}
       />
     </div>
   );
