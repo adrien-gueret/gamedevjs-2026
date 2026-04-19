@@ -1,4 +1,4 @@
-import type { ReelSymbol, DevilDealType, BuyableDevilDeal } from "@/types/game";
+import type { ReelSymbol, BuyableDevilDeal } from "@/types/game";
 
 import {
   PERMANENT_DEVIL_DEALS,
@@ -9,8 +9,15 @@ import { canBuyDevilDeal } from "./selector";
 
 import { getRandomElements } from "./utils";
 
-export function getRandomSymbols(): ReelSymbol[] {
+export function getRandomBonusSymbols(): ReelSymbol[] {
   return getRandomElements(["Sword", "Shield", "Coin", "Heart"], 3);
+}
+
+export function getMalusBonusSymbol(): ReelSymbol {
+  return getRandomElements<ReelSymbol>(
+    ["Evil-Heart", "Evil-Shield", "Evil-Sword"],
+    1,
+  )[0];
 }
 
 export function getRandomDevilDeals(): BuyableDevilDeal[] {

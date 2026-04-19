@@ -50,8 +50,6 @@ export default function DevilDeal() {
     navigate("/battle");
   */
 
-  console.log("storedDeals", storedDeals);
-
   const permanentDeals = storedDeals.filter((deal) => deal.permanent);
   const runOnlyDeals = storedDeals.filter((deal) => !deal.permanent);
 

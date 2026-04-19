@@ -4,11 +4,35 @@ import type {
   GameState,
   NextAction,
   ReelSymbol,
+  PassiveEffectType,
 } from "@/types/game";
 
 import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
 
 import { setGameState } from "./gameStore";
+
+function getPassiveEffectNextActions(state: GameState): NextAction[] {
+  const passiveEffects = state.currentRun?.passiveEffects ?? [];
+
+  const attackCount = passiveEffects.filter(
+    (effect) => effect === "attack",
+  ).length;
+  const defendCount = passiveEffects.filter(
+    (effect) => effect === "defend",
+  ).length;
+
+  const nextActions: NextAction[] = [];
+
+  if (attackCount > 0) {
+    nextActions.push({ type: "attack", value: attackCount });
+  }
+
+  if (defendCount > 0) {
+    nextActions.push({ type: "defend", value: defendCount });
+  }
+
+  return nextActions;
+}
 
 // ---------------------------------------------------------------------------
 // Run - Global
@@ -40,6 +64,15 @@ export function setReelSymbol(
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.reels[reelIndex][symbolIndex] = newSymbol;
+    return next;
+  });
+}
+
+export function addPassiveEffect(effect: PassiveEffectType): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.passiveEffects.push(effect);
     return next;
   });
 }
@@ -103,7 +136,7 @@ export function startNewBattle(): GameState {
     next.currentRun!.currentBattle = {
       betCost: 1,
       enemy: getNewBattleEnemy(next.currentRun!.levelIndex),
-      playerNextActions: [],
+      playerNextActions: getPassiveEffectNextActions(next),
     };
     return next;
   });
@@ -152,7 +185,8 @@ export function resetPlayerNextActions(): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.playerNextActions = [];
+    next.currentRun!.currentBattle!.playerNextActions =
+      getPassiveEffectNextActions(next);
     return next;
   });
 }
@@ -281,6 +315,24 @@ export function setEnemyNextActions(): GameState {
     const next = structuredClone(prev);
     const enemy = next.currentRun!.currentBattle!.enemy;
     enemy.nextActions = getEnemyNextActions(enemy, next.currentRun!.levelIndex);
+    return next;
+  });
+}
+
+export function addEnemyNextActions(nextAction: NextAction): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun?.currentBattle) return prev;
+    const next = structuredClone(prev);
+    const battle = next.currentRun!.currentBattle!;
+    const existing = battle.enemy.nextActions.find(
+      (action) => action.type === nextAction.type,
+    );
+
+    if (!existing) {
+      battle.enemy.nextActions = battle.enemy.nextActions.concat(nextAction);
+    } else if (existing.value !== undefined) {
+      existing.value += nextAction.value ?? 0;
+    }
     return next;
   });
 }

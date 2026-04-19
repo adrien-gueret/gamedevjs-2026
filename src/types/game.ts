@@ -1,4 +1,12 @@
-export type ReelSymbol = "Sleep" | "Sword" | "Shield" | "Heart" | "Coin";
+export type ReelSymbol =
+  | "Sleep"
+  | "Sword"
+  | "Shield"
+  | "Heart"
+  | "Coin"
+  | "Evil-Heart"
+  | "Evil-Shield"
+  | "Evil-Sword";
 
 export type EnnemyType = "rat" | "blob" | "skeleton";
 
@@ -19,6 +27,8 @@ export type DevilDealType =
   | "replaceReelSymbol"
   | "passiveDefense"
   | "passiveAttack";
+
+export type PassiveEffectType = "attack" | "defend";
 
 export type DevilDealCostType = "health" | "gold" | "reel";
 
@@ -74,13 +84,14 @@ export type Run = {
   type: PlayerType;
   reels: ReelSymbol[][];
   levelIndex: number;
+  passiveEffects: PassiveEffectType[];
   currentBattle: Battle | null;
   randomChoices: any[];
 };
 
 export type ConfigurableBaseRun = Omit<
   Run,
-  "levelIndex" | "currentBattle" | "randomChoices"
+  "levelIndex" | "currentBattle" | "randomChoices" | "passiveEffects"
 >;
 
 export type GameState = {

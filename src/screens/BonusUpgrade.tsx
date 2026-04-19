@@ -9,7 +9,7 @@ import MachineSymbol from "@/components/MachineSymbol";
 import MachineUpdate from "@/components/MachineUpdate";
 import Tooltip from "@/components/Tooltip";
 
-import { getRandomSymbols } from "@/services/upgrades";
+import { getRandomBonusSymbols } from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
 import { setRandomChoices, setReelSymbol } from "@/services/actions";
 import { random } from "@/services/maths";
@@ -38,7 +38,7 @@ export default function BonusUpgrade() {
 
   useEffect(() => {
     if (!hasMadeChoice && !storedSymbols.length) {
-      const newSymbols = getRandomSymbols();
+      const newSymbols = getRandomBonusSymbols();
       setRandomChoices(newSymbols);
     }
   }, [hasMadeChoice, storedSymbols]);

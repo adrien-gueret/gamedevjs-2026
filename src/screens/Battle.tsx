@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import type { ReelSymbol, BetCost, NextAction } from "@/types/game";
+import type { ReelSymbol, BetCost } from "@/types/game";
 
 import Blackout from "@/components/Blackout";
 import DelayedRender from "@/components/DelayedRender";
@@ -22,6 +22,8 @@ import {
   addGold,
   endBattle,
   healPlayer,
+  healEnemy,
+  addEnemyNextActions,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -32,16 +34,20 @@ import {
 } from "@/services/selector";
 import { VictoryMessage } from "@/components/VictoryMessage";
 
-const symbolToNextAction: Partial<Record<ReelSymbol, NextAction>> = {
-  Sword: { type: "attack", value: 1 },
-  Shield: { type: "defend", value: 1 },
-};
-
 const symboleToDirectAction: Partial<
   Record<ReelSymbol, (multiplier: number) => void>
 > = {
+  Sword: (multiplier) =>
+    addPlayerNextActions({ type: "attack", value: 1 * multiplier }),
+  Shield: (multiplier) =>
+    addPlayerNextActions({ type: "defend", value: 1 * multiplier }),
   Coin: addGold,
   Heart: healPlayer,
+  "Evil-Heart": healEnemy,
+  "Evil-Sword": (multiplier) =>
+    addEnemyNextActions({ type: "attack", value: 1 * multiplier }),
+  "Evil-Shield": (multiplier) =>
+    addEnemyNextActions({ type: "defend", value: 1 * multiplier }),
 };
 
 type Payline = {
@@ -117,18 +123,9 @@ export default function Battle() {
     const multiplier = allSame ? 2 : 1;
 
     symbols.forEach((symbol) => {
-      const action = symbolToNextAction[symbol];
-      if (action) {
-        const scaledAction: typeof action =
-          action.value !== undefined
-            ? { ...action, value: action.value * multiplier }
-            : action;
-        addPlayerNextActions(scaledAction);
-      } else {
-        const directAction = symboleToDirectAction[symbol];
-        if (directAction) {
-          directAction(multiplier);
-        }
+      const directAction = symboleToDirectAction[symbol];
+      if (directAction) {
+        directAction(multiplier);
       }
     });
   };

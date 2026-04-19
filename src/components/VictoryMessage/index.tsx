@@ -10,7 +10,7 @@ import { healPlayer } from "@/services/actions";
 import "./style.css";
 import DelayedRender from "../DelayedRender";
 
-const healAmountPercentage = 0.25;
+const healAmountPercentage = 0.35;
 
 type Props = {
   onHeal: () => void;
