@@ -18,6 +18,7 @@ import {
   spendGold,
   spendMaxHealth,
   setReelSymbol,
+  removeReelSymbol,
 } from "@/services/actions";
 import { random } from "@/services/maths";
 
@@ -45,10 +46,13 @@ export default function DevilDeal() {
   const navigate = useNavigate();
   const isLeaving = useRef(false);
   const concludeDeal = useRef<() => void | null>(null);
+
   const forcedMalusTotalRef = useRef(0);
   const [forcedMalusCount, setForcedMalusCount] = useState(0);
   const [currentForcedMalusSymbol, setCurrentForcedMalusSymbol] =
     useState<ReelSymbol | null>(null);
+
+  const [showRemoveSymbolBonus, setShowRemoveSymbolBonus] = useState(false);
 
   const storedDeals = (state.currentRun?.randomChoices ??
     []) as BuyableDevilDeal[];
@@ -95,8 +99,7 @@ export default function DevilDeal() {
               break;
 
             case "destroyReelSymbol":
-              // TODO
-              alert('TODO: "destroyReelSymbol" effect');
+              setShowRemoveSymbolBonus(true);
               break;
 
             case "replaceReelSymbol":
@@ -204,6 +207,18 @@ export default function DevilDeal() {
 
               setCurrentForcedMalusSymbol(newRandomSymbol);
             }
+          }}
+        />
+      )}
+
+      {showRemoveSymbolBonus && (
+        <MachineUpdate
+          variant="remove"
+          onSymbolSelect={(reelIndex, symbolIndex) => {
+            removeReelSymbol(reelIndex, symbolIndex);
+          }}
+          onComplete={() => {
+            setShowRemoveSymbolBonus(false);
           }}
         />
       )}

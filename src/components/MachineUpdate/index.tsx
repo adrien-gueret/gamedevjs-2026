@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { useGameState } from "@/services/gameStore";
 import MachineReel from "@/components/MachineReel";
@@ -12,12 +12,13 @@ import type { ReelSymbol } from "@/types/game";
 import "./style.css";
 
 type Props = {
-  newSymbol: ReelSymbol;
+  newSymbol?: ReelSymbol;
   onSymbolSelect?: (reelIndex: number, symbolIndex: number) => void;
   onComplete?: () => void;
   onClose?: () => void;
   devilDialog?: string;
   shouldForbidMalusSelection?: boolean;
+  variant?: "replace" | "remove";
 };
 
 export default function MachineUpdate({
@@ -27,9 +28,23 @@ export default function MachineUpdate({
   onClose,
   devilDialog,
   shouldForbidMalusSelection,
+  variant = "replace",
 }: Props) {
   const state = useGameState();
   const [hasMadeChoice, setHasMadeChoice] = useState(false);
+
+  const variantToDescriptionMap: Record<typeof variant, ReactNode> = {
+    replace: (
+      <>
+        Which symbol would you like to replace with{" "}
+        <Tooltip label={<SymbolLabel symbol={newSymbol!} />}>
+          <MachineSymbol symbol={newSymbol!} />
+        </Tooltip>
+        ?
+      </>
+    ),
+    remove: "Which symbol would you like to remove from your machine?",
+  };
 
   return (
     <div className="machine-update">
@@ -41,11 +56,7 @@ export default function MachineUpdate({
               <hr />
             </>
           )}
-          Which symbol would you like to replace with{" "}
-          <Tooltip label={<SymbolLabel symbol={newSymbol} />}>
-            <MachineSymbol symbol={newSymbol} />
-          </Tooltip>
-          ?
+          {variantToDescriptionMap[variant]}
         </div>
         <div className="machine-update-reels">
           {state.currentRun?.reels.map((reelSymbols, index) => (

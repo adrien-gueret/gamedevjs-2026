@@ -56,6 +56,7 @@ export function endRun(): GameState {
 export function setCurrentPathname(pathname: string): GameState {
   return setGameState((prev) => ({ ...prev, currentPathname: pathname }));
 }
+
 export function setReelSymbol(
   reelIndex: number,
   symbolIndex: number,
@@ -65,6 +66,18 @@ export function setReelSymbol(
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.reels[reelIndex][symbolIndex] = newSymbol;
+    return next;
+  });
+}
+
+export function removeReelSymbol(
+  reelIndex: number,
+  symbolIndex: number,
+): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.reels[reelIndex].splice(symbolIndex, 1);
     return next;
   });
 }
