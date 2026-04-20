@@ -28,7 +28,8 @@ export function getEnemyNextActions(
     case "rat":
     default: {
       if (levelIndex === 0) {
-        const actionType = attackTypes[random(0, 1)];
+        const actionType = attackTypes[random(0, 2) % 2];
+
         return [
           {
             type: actionType,

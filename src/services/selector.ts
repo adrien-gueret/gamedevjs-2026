@@ -42,7 +42,7 @@ export function hasUnlockedPermanentDeal(dealType: DevilDealType): boolean {
   return currentState.unlockedPermanentDeals.includes(dealType);
 }
 
-export function canBuyDevilDeal(dealType: DevilDealType): boolean {
+export function canDevilDealBeInShop(dealType: DevilDealType): boolean {
   const deal = PERMANENT_DEVIL_DEALS.find((deal) => deal.type === dealType);
 
   if (!deal) {

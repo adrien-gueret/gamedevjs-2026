@@ -33,6 +33,7 @@ export default function BonusUpgrade() {
   const navigate = useNavigate();
   const [hasMadeChoice, setHasMadeChoice] = useState(false);
   const storedSymbols = state.currentRun?.randomChoices ?? [];
+  console.log("Stored symbols:", storedSymbols);
   const [newSymbol, setNewSymbol] = useState<ReelSymbol | null>(null);
   const phrase = useRef(BONUS_PHRASES[random(0, BONUS_PHRASES.length - 1)]);
 

@@ -1,10 +1,21 @@
 import type { DevilDealType, DevilDealCost } from "@/types/game";
 import type { ReactNode } from "react";
 
-type Props = { dealType: DevilDealType; cost: DevilDealCost };
+type Props = {
+  dealType: DevilDealType;
+  cost: DevilDealCost;
+  isAffordable: boolean;
+};
 
-export default function DealLabel({ dealType, cost }: Props) {
+export default function DealLabel({ dealType, cost, isAffordable }: Props) {
   let costLabel: ReactNode = null;
+
+  const notAffordable = isAffordable ? null : (
+    <>
+      {" "}
+      <b style={{ color: "red" }}>(Not affordable)</b>
+    </>
+  );
 
   switch (cost.type) {
     case "gold":
@@ -13,6 +24,7 @@ export default function DealLabel({ dealType, cost }: Props) {
           <hr />
           Cost: <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
           <b style={{ color: "gold" }}>gold</b>
+          {notAffordable}
         </>
       );
       break;
@@ -23,6 +35,7 @@ export default function DealLabel({ dealType, cost }: Props) {
           <hr />
           Cost: <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
           <b style={{ color: "lightcoral" }}>MAX health</b>
+          {notAffordable}
         </>
       );
       break;
@@ -32,7 +45,8 @@ export default function DealLabel({ dealType, cost }: Props) {
         <>
           <hr />
           Cost: force to add <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
-          <b style={{ color: "orange" }}>malus</b> in your machine
+          <b style={{ color: "#953297" }}>malus</b> in your machine
+          {notAffordable}
         </>
       );
       break;

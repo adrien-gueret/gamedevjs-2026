@@ -5,6 +5,7 @@ import type {
   NextAction,
   ReelSymbol,
   PassiveEffectType,
+  DevilDealType,
 } from "@/types/game";
 
 import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
@@ -77,6 +78,20 @@ export function addPassiveEffect(effect: PassiveEffectType): GameState {
   });
 }
 
+export function addPermanentBonus(effect: DevilDealType): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.unlockedPermanentDeals.push(effect);
+
+    if (["moreHealth1", "moreHealth2", "moreHealth3"].includes(effect)) {
+      next.currentRun!.health.max += 10;
+    }
+
+    return next;
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Run - Player health
 // ---------------------------------------------------------------------------
@@ -116,11 +131,23 @@ export function addGold(amount: number = 1): GameState {
 
 export function spendGold(amount: number): GameState {
   return setGameState((prev) => {
-    if (!prev.currentRun || prev.gold < amount) {
+    if (!prev.currentRun) {
       return prev;
     }
     const next = structuredClone(prev);
     next.gold -= amount;
+    return next;
+  });
+}
+
+export function spendMaxHealth(amount: number): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) {
+      return prev;
+    }
+    const next = structuredClone(prev);
+    next.currentRun!.health.value -= amount;
+    next.currentRun!.health.max -= amount;
     return next;
   });
 }

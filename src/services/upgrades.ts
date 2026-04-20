@@ -5,7 +5,7 @@ import {
   RUN_ONLY_DEVIL_DEALS,
 } from "@/constants/devilDeals";
 
-import { canBuyDevilDeal } from "./selector";
+import { canDevilDealBeInShop } from "./selector";
 
 import { getRandomElements } from "./utils";
 
@@ -22,7 +22,7 @@ export function getMalusBonusSymbol(): ReelSymbol {
 
 export function getRandomDevilDeals(): BuyableDevilDeal[] {
   const buyablePermanentDevilDeals = PERMANENT_DEVIL_DEALS.filter((deal) =>
-    canBuyDevilDeal(deal.type),
+    canDevilDealBeInShop(deal.type),
   );
 
   const randomPermanentDevilDeals = getRandomElements(

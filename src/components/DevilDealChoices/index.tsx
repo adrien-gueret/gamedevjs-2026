@@ -1,5 +1,8 @@
+import { useCallback } from "react";
+
 import Tooltip from "@/components/Tooltip";
 import DealLabel from "@/components/DealLabel";
+import { useGameState } from "@/services/gameStore";
 import type { BuyableDevilDeal } from "@/types/game";
 
 import "./style.css";
@@ -17,32 +20,60 @@ export default function DevilDealChoices({
   deals,
   onBuyDeal,
 }: Props) {
+  const state = useGameState();
+  const canAffordDeal = useCallback(
+    (deal: BuyableDevilDeal): boolean => {
+      switch (deal.cost.type) {
+        case "gold":
+          return state.gold >= deal.cost.value;
+
+        case "health":
+          return (state.currentRun?.health.value ?? 0) > deal.cost.value;
+
+        default:
+          return true;
+      }
+    },
+    [state.gold, state.currentRun?.health.value],
+  );
+
   return (
     <div className="devil-deal-choices">
       <h2 className="devil-deal-choices-title">{title}</h2>
       <p className="devil-deal-choices-subtitle">{subtitle}</p>
       <div className="devil-deal-choices-container">
-        {deals.map((deal, index) => (
-          <div
-            key={deal.type}
-            className="deal-choice floating-choice-item"
-            style={{
-              animationDelay: `-${index * 1.5}s`,
-            }}
-          >
-            <Tooltip
-              content={deal.type}
-              label={<DealLabel dealType={deal.type} cost={deal.cost} />}
+        {deals.length === 0 ? (
+          <p className="devil-deal-choices-empty">No deals available</p>
+        ) : (
+          deals.map((deal, index) => (
+            <div
+              key={deal.type}
+              className="deal-choice floating-choice-item"
+              style={{
+                animationDelay: `-${index * 1.5}s`,
+              }}
             >
-              <button
-                className={`deal-choice-button deal-choice-${deal.type.toLowerCase()}`}
-                onClick={() => onBuyDeal(deal)}
+              <Tooltip
+                content={deal.type}
+                label={
+                  <DealLabel
+                    dealType={deal.type}
+                    cost={deal.cost}
+                    isAffordable={canAffordDeal(deal)}
+                  />
+                }
               >
-                {deal.type}
-              </button>
-            </Tooltip>
-          </div>
-        ))}
+                <button
+                  className={`deal-choice-button deal-choice-${deal.type.toLowerCase()}`}
+                  onClick={() => onBuyDeal(deal)}
+                  disabled={!canAffordDeal(deal)}
+                >
+                  {deal.type}
+                </button>
+              </Tooltip>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

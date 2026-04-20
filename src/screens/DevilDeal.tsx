@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
@@ -15,7 +15,7 @@ import { random } from "@/services/maths";
 import { sleep } from "@/services/utils";
 import { startNewBattle } from "@/services/actions";
 
-import type { BuyableDevilDeal } from "@/types/game";
+import type { BuyableDevilDeal, DevilDealType } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
 import GoldCounter from "@/components/GoldCounter";
 
@@ -31,6 +31,7 @@ const DEAL_PHRASES = [
 export default function DevilDeal() {
   const state = useGameState();
   const navigate = useNavigate();
+  const isLeaving = useRef(false);
 
   const storedDeals = (state.currentRun?.randomChoices ??
     []) as BuyableDevilDeal[];
@@ -38,20 +39,31 @@ export default function DevilDeal() {
   const phrase = useRef(DEAL_PHRASES[random(0, DEAL_PHRASES.length - 1)]);
 
   useEffect(() => {
-    if (!storedDeals.length) {
+    if (!storedDeals.length && !isLeaving.current) {
       const newDeals = getRandomDevilDeals();
       setRandomChoices(newDeals);
     }
   }, [storedDeals]);
 
-  /*
-    startNewBattle();
-      setRandomChoices();
-    navigate("/battle");
-  */
+  const leave = useCallback(() => {
+    if (isLeaving.current) {
+      return;
+    }
+    isLeaving.current = true;
+    setRandomChoices();
+    navigate("/bonus-upgrade");
+  }, []);
 
   const permanentDeals = storedDeals.filter((deal) => deal.permanent);
   const runOnlyDeals = storedDeals.filter((deal) => !deal.permanent);
+
+  const onBuyDeal = useCallback(
+    (deal: BuyableDevilDeal) => {
+      setRandomChoices(storedDeals.filter((d) => d.type !== deal.type));
+      console.log("Buy", deal);
+    },
+    [storedDeals],
+  );
 
   return (
     <Screen>
@@ -73,7 +85,7 @@ export default function DevilDeal() {
             title="Permanent Deals"
             subtitle="Benefits from these deals will last even in the afterlife!"
             deals={permanentDeals}
-            onBuyDeal={(deal) => console.log("Buy", deal)}
+            onBuyDeal={onBuyDeal}
           />
         )}
 
@@ -81,8 +93,14 @@ export default function DevilDeal() {
           title="Temporary Deals"
           subtitle="Benefits from these deals won't follow you after this life."
           deals={runOnlyDeals}
-          onBuyDeal={(deal) => console.log("Buy", deal)}
+          onBuyDeal={onBuyDeal}
         />
+      </div>
+
+      <div>
+        <button type="button" onClick={leave}>
+          Leave
+        </button>
       </div>
 
       <HealthBar

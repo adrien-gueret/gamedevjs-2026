@@ -45,6 +45,11 @@
   background-size: 1152px 96px;
 }
 
+.deal-choice-button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(100%) brightness(50%);
+}
+
 .deal-choice-betterbet1 {
   background-position: 0 0;
 }
