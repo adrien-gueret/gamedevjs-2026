@@ -44,8 +44,11 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
       costLabel = (
         <>
           <hr />
-          Cost: force to add <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
-          <b style={{ color: "#953297" }}>malus</b> in your machine
+          Cost: replace <b style={{ color: "cyan" }}>{cost.value}</b> bonus
+          symbol
+          {cost.value > 1 ? "s" : ""} with{" "}
+          <b style={{ color: "#953297" }}>curse{cost.value > 1 ? "s" : ""}</b>{" "}
+          symbol
           {notAffordable}
         </>
       );
@@ -129,8 +132,8 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
     case "replaceReelSymbol":
       return (
         <>
-          <b style={{ color: "gold" }}>Pick</b> a new symbol to add to the
-          machine, replacing an existing one.
+          <b style={{ color: "gold" }}>Replace</b> any symbol from your machine
+          with a new one.
           {costLabel}
         </>
       );

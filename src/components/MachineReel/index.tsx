@@ -126,7 +126,7 @@ export default function MachineReel({
             const isSelectionnable =
               Boolean(onSymbolClick) &&
               (!shouldForbidMalusSelection || !isMalusSymbol(symbol));
-            console.log("isSelectionnable", { symbol, isSelectionnable });
+
             return (
               <div
                 key={`${normalizedStartIndex}-${index}-${symbol}`}

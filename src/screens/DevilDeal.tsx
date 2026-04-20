@@ -9,6 +9,7 @@ import MachineUpdate from "@/components/MachineUpdate";
 import {
   getRandomDevilDeals,
   getRandomMalusBonusSymbol,
+  isMalusSymbol,
 } from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
 import {
@@ -53,6 +54,7 @@ export default function DevilDeal() {
     useState<ReelSymbol | null>(null);
 
   const [showRemoveSymbolBonus, setShowRemoveSymbolBonus] = useState(false);
+  const [showReplaceSymbolBonus, setShowReplaceSymbolBonus] = useState(false);
 
   const storedDeals = (state.currentRun?.randomChoices ??
     []) as BuyableDevilDeal[];
@@ -103,8 +105,7 @@ export default function DevilDeal() {
               break;
 
             case "replaceReelSymbol":
-              // TODO
-              alert('TODO: "replaceReelSymbol" effect');
+              setShowReplaceSymbolBonus(true);
               break;
           }
         }
@@ -119,11 +120,20 @@ export default function DevilDeal() {
           spendMaxHealth(deal.cost.value);
           break;
 
-        case "reel":
+        case "reel": {
+          const allSymbols = (state.currentRun?.reels ?? []).flat();
+          const allAreMalus =
+            allSymbols.length === 0 || allSymbols.every(isMalusSymbol);
+
+          if (allAreMalus) {
+            break;
+          }
+
           forcedMalusTotalRef.current = deal.cost.value;
           setForcedMalusCount(deal.cost.value);
           setCurrentForcedMalusSymbol(getRandomMalusBonusSymbol());
           return;
+        }
       }
 
       concludeDeal.current();

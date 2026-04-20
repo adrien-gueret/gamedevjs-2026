@@ -110,11 +110,6 @@ export function addPermanentBonus(effect: DevilDealType): GameState {
     next.unlockedPermanentDeals.push(effect);
 
     if (["moreHealth1", "moreHealth2", "moreHealth3"].includes(effect)) {
-      console.log({
-        current: next.currentRun!.health.max,
-        added: 10,
-        next: next.currentRun!.health.max + 10,
-      });
       next.currentRun!.health.max += 10;
     }
 
