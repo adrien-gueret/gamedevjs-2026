@@ -1,0 +1,18 @@
+.replacement-bonus-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 24px solid transparent;
+  border-image-source: url(./images/machine-borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+}
+
+.replacement-bonus-modal::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+}

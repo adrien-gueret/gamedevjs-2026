@@ -5,10 +5,12 @@ import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
 import DevilDealChoices from "@/components/DevilDealChoices";
 import MachineUpdate from "@/components/MachineUpdate";
+import SymbolPicker from "@/components/SymbolPicker";
 
 import {
   getRandomDevilDeals,
   getRandomMalusBonusSymbol,
+  getRandomBonusSymbols,
   isMalusSymbol,
 } from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
@@ -26,6 +28,7 @@ import { random } from "@/services/maths";
 import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
 import GoldCounter from "@/components/GoldCounter";
+import ReplacementBonusModal from "@/components/ReplacementBonusModal";
 
 const DEAL_PHRASES = [
   "I have some offers you can't refuse...",
@@ -54,7 +57,13 @@ export default function DevilDeal() {
     useState<ReelSymbol | null>(null);
 
   const [showRemoveSymbolBonus, setShowRemoveSymbolBonus] = useState(false);
-  const [showReplaceSymbolBonus, setShowReplaceSymbolBonus] = useState(false);
+  const [symbolsForReplacementBonus, setSymbolsForReplacementBonus] = useState<
+    ReelSymbol[]
+  >([]);
+  const [
+    selectedSymbolForReplacementBonus,
+    setSelectedSymbolForReplacementBonus,
+  ] = useState<ReelSymbol | null>(null);
 
   const storedDeals = (state.currentRun?.randomChoices ??
     []) as BuyableDevilDeal[];
@@ -105,7 +114,7 @@ export default function DevilDeal() {
               break;
 
             case "replaceReelSymbol":
-              setShowReplaceSymbolBonus(true);
+              setSymbolsForReplacementBonus(getRandomBonusSymbols(5));
               break;
           }
         }
@@ -232,6 +241,36 @@ export default function DevilDeal() {
             setShowRemoveSymbolBonus(false);
           }}
         />
+      )}
+
+      {symbolsForReplacementBonus.length > 0 && (
+        <>
+          <ReplacementBonusModal>
+            <p>Pick the symbol you want to add in your machine</p>
+            <hr />
+            <SymbolPicker
+              symbols={symbolsForReplacementBonus}
+              onSelect={setSelectedSymbolForReplacementBonus}
+            />
+          </ReplacementBonusModal>
+          {selectedSymbolForReplacementBonus && (
+            <MachineUpdate
+              newSymbol={selectedSymbolForReplacementBonus}
+              variant="replace"
+              onSymbolSelect={(reelIndex, symbolIndex) => {
+                setReelSymbol(
+                  reelIndex,
+                  symbolIndex,
+                  selectedSymbolForReplacementBonus,
+                );
+              }}
+              onComplete={() => {
+                setSymbolsForReplacementBonus([]);
+              }}
+              onClose={() => setSelectedSymbolForReplacementBonus(null)}
+            />
+          )}
+        </>
       )}
     </Screen>
   );

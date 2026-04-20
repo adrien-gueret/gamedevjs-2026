@@ -9,8 +9,8 @@ import { canDevilDealBeInShop } from "./selector";
 
 import { getRandomElements } from "./utils";
 
-export function getRandomBonusSymbols(): ReelSymbol[] {
-  return getRandomElements(["Sword", "Shield", "Coin", "Heart"], 3);
+export function getRandomBonusSymbols(amount: number = 3): ReelSymbol[] {
+  return getRandomElements(["Sword", "Shield", "Coin", "Heart"], amount);
 }
 
 export const MALUS_SYMBOLS: ReelSymbol[] = [
