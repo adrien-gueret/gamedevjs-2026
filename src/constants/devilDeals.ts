@@ -48,7 +48,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "health" },
       { value: 4, type: "gold" },
-      { value: 3, type: "reel" },
+      { value: 2, type: "reel" },
     ],
     permanent: false,
   },
@@ -66,7 +66,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "health" },
       { value: 4, type: "gold" },
-      { value: 2, type: "reel" },
+      { value: 1, type: "reel" },
     ],
     permanent: false,
   },
@@ -75,7 +75,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "health" },
       { value: 4, type: "gold" },
-      { value: 2, type: "reel" },
+      { value: 1, type: "reel" },
     ],
     permanent: false,
   },

@@ -179,6 +179,7 @@ export default function DevilDeal() {
 
       {currentForcedMalusSymbol && (
         <MachineUpdate
+          variant="replace"
           key={currentForcedMalusSymbol}
           devilDialog={
             forcedMalusCount === 1

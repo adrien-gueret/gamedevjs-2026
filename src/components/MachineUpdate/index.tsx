@@ -14,21 +14,23 @@ import "./style.css";
 type Props = {
   newSymbol?: ReelSymbol;
   onSymbolSelect?: (reelIndex: number, symbolIndex: number) => void;
+  onReelSelect?: (reelIndex: number) => void;
   onComplete?: () => void;
   onClose?: () => void;
   devilDialog?: string;
   shouldForbidMalusSelection?: boolean;
-  variant?: "replace" | "remove";
+  variant: "replace" | "remove" | "add";
 };
 
 export default function MachineUpdate({
   newSymbol,
   onSymbolSelect,
+  onReelSelect,
   onComplete,
   onClose,
   devilDialog,
   shouldForbidMalusSelection,
-  variant = "replace",
+  variant,
 }: Props) {
   const state = useGameState();
   const [hasMadeChoice, setHasMadeChoice] = useState(false);
@@ -44,6 +46,15 @@ export default function MachineUpdate({
       </>
     ),
     remove: "Which symbol would you like to remove from your machine?",
+    add: (
+      <>
+        Which reel would you like to add{" "}
+        <Tooltip label={<SymbolLabel symbol={newSymbol!} />}>
+          <MachineSymbol symbol={newSymbol!} />
+        </Tooltip>{" "}
+        to?
+      </>
+    ),
   };
 
   return (
@@ -66,6 +77,7 @@ export default function MachineUpdate({
               reelIndex={index}
               shouldShowAllSymbols
               shouldForbidMalusSelection={shouldForbidMalusSelection}
+              shouldAnimateSelectedSymbol={variant === "replace"}
               onSymbolClick={
                 onSymbolSelect
                   ? (symbolIndex) => {
@@ -74,6 +86,19 @@ export default function MachineUpdate({
                       }
                       setHasMadeChoice(true);
                       onSymbolSelect?.(index, symbolIndex);
+                      sleep(500).then(() => onComplete?.());
+                      return true;
+                    }
+                  : undefined
+              }
+              onReelClick={
+                onReelSelect
+                  ? () => {
+                      if (hasMadeChoice) {
+                        return false;
+                      }
+                      setHasMadeChoice(true);
+                      onReelSelect?.(index);
                       sleep(500).then(() => onComplete?.());
                       return true;
                     }

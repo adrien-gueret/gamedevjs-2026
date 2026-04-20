@@ -8,7 +8,7 @@ import SymbolPicker from "@/components/SymbolPicker";
 
 import { getRandomBonusSymbols } from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
-import { setRandomChoices, setReelSymbol } from "@/services/actions";
+import { setRandomChoices, addSymbolTooReel } from "@/services/actions";
 import { random } from "@/services/maths";
 import { startNewBattle } from "@/services/actions";
 
@@ -49,6 +49,12 @@ export default function BonusUpgrade() {
     navigate("/battle");
   }, []);
 
+  useEffect(() => {
+    if ((state.currentRun?.levelIndex ?? 0) % 3 === 0) {
+      leave();
+    }
+  }, [state.currentRun?.levelIndex, leave]);
+
   return (
     <Screen>
       <Scene />
@@ -74,13 +80,18 @@ export default function BonusUpgrade() {
       {newSymbol && (
         <MachineUpdate
           newSymbol={newSymbol}
-          onSymbolSelect={(reelIndex, symbolIndex) => {
-            setReelSymbol(reelIndex, symbolIndex, newSymbol);
+          variant="add"
+          onReelSelect={(reelIndex) => {
+            addSymbolTooReel(reelIndex, newSymbol);
           }}
           onComplete={leave}
           onClose={() => setNewSymbol(null)}
         />
       )}
+
+      <button type="button" onClick={leave}>
+        Skip
+      </button>
     </Screen>
   );
 }

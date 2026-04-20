@@ -20,8 +20,10 @@ type Props = {
     celebrationLevel: "normal" | "double" | "triple";
   }>;
   shouldShowAllSymbols?: boolean;
-  onSymbolClick?: (symbolIndex: number, symbol: ReelSymbol) => boolean;
+  onSymbolClick?: (symbolIndex: number) => boolean;
+  onReelClick?: () => void;
   shouldForbidMalusSelection?: boolean;
+  shouldAnimateSelectedSymbol?: boolean;
 };
 
 export default function MachineReel({
@@ -32,7 +34,9 @@ export default function MachineReel({
   activeRows = [],
   shouldShowAllSymbols = false,
   onSymbolClick,
+  onReelClick,
   shouldForbidMalusSelection,
+  shouldAnimateSelectedSymbol,
 }: Props) {
   const reelSize = symbols.length;
   const visibleCount = shouldShowAllSymbols ? reelSize : 3;
@@ -91,8 +95,12 @@ export default function MachineReel({
   const spinDuration = 0.28 + reelIndex * 0.045;
   const reelCycleDistance = reelSize * 66;
 
+  const isReelClickable = Boolean(onReelClick);
+  const ReelWrapper = isReelClickable ? "button" : "div";
+
   return (
-    <div
+    <ReelWrapper
+      onClick={isReelClickable ? onReelClick : undefined}
       className={`machine-reel${isSpinning ? " is-spinning" : ""}${isStopping ? " is-stopping" : ""}${shouldShowAllSymbols ? " is-expanded" : ""}`}
       style={
         {
@@ -118,7 +126,7 @@ export default function MachineReel({
             const isSelectionnable =
               Boolean(onSymbolClick) &&
               (!shouldForbidMalusSelection || !isMalusSymbol(symbol));
-
+            console.log("isSelectionnable", { symbol, isSelectionnable });
             return (
               <div
                 key={`${normalizedStartIndex}-${index}-${symbol}`}
@@ -130,9 +138,9 @@ export default function MachineReel({
                 >
                   {isSelectionnable ? (
                     <button
-                      className={`machine-reel-clickable-symbol${lastReplacedIndex === index ? " is-new" : ""}`}
+                      className={`machine-reel-symbol-container machine-reel-clickable-symbol${shouldAnimateSelectedSymbol && lastReplacedIndex === index ? " is-new" : ""}`}
                       onClick={() => {
-                        if (onSymbolClick!(index, symbol)) {
+                        if (onSymbolClick!(index)) {
                           setLastReplacedIndex(index);
                         }
                       }}
@@ -141,11 +149,17 @@ export default function MachineReel({
                       <MachineSymbol symbol={symbol} />
                     </button>
                   ) : (
-                    <MachineSymbol
-                      symbol={symbol}
-                      isActive={Boolean(activeRow)}
-                      celebrationLevel={activeRow?.celebrationLevel ?? "normal"}
-                    />
+                    <div
+                      className={`machine-reel-symbol-container${shouldAnimateSelectedSymbol && lastReplacedIndex === index ? " is-new" : ""}`}
+                    >
+                      <MachineSymbol
+                        symbol={symbol}
+                        isActive={Boolean(activeRow)}
+                        celebrationLevel={
+                          activeRow?.celebrationLevel ?? "normal"
+                        }
+                      />
+                    </div>
                   )}
                 </Tooltip>
               </div>
@@ -153,6 +167,6 @@ export default function MachineReel({
           })}
         </div>
       )}
-    </div>
+    </ReelWrapper>
   );
 }

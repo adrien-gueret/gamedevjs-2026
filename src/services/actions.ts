@@ -82,6 +82,18 @@ export function removeReelSymbol(
   });
 }
 
+export function addSymbolTooReel(
+  reelIndex: number,
+  newSymbol: ReelSymbol,
+): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.reels[reelIndex].push(newSymbol);
+    return next;
+  });
+}
+
 export function addPassiveEffect(effect: PassiveEffectType): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
