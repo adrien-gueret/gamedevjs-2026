@@ -8,9 +8,9 @@ export type ReelSymbol =
   | "Evil-Shield"
   | "Evil-Sword";
 
-export type EnnemyType = "rat" | "blob" | "skeleton";
+export type EnemyType = "rat" | "blob" | "skeleton" | "wizard";
 
-export type PlayerType = "knight" | "wizard";
+export type PlayerType = "knight" | "skeleton" | "wizard";
 
 export type DevilDealType =
   // Permanent upgrades (only with gold cost)
@@ -68,7 +68,7 @@ type NextActionWithoutValue = {
 export type NextAction = NextActionWithValue | NextActionWithoutValue;
 
 export type Enemy = {
-  type: EnnemyType;
+  type: EnemyType;
   health: Health;
   nextActions: NextAction[];
 };

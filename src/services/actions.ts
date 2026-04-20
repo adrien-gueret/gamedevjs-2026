@@ -191,7 +191,10 @@ export function startNewBattle(): GameState {
         : next.unlockedPermanentDeals.includes("betterBet1")
           ? 2
           : 1,
-      enemy: getNewBattleEnemy(next.currentRun!.levelIndex),
+      enemy: {
+        ...getNewBattleEnemy(next.currentRun!.levelIndex),
+        nextActions: [],
+      },
       playerNextActions: getPassiveEffectNextActions(next),
       hasUsedLockedReel: false,
     };

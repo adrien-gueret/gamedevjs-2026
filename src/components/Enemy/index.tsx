@@ -2,10 +2,12 @@ import { useImperativeHandle, useRef, useCallback } from "react";
 
 import NextActions from "@/components/NextActions";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
+import EnemyLabel from "@/components/EnemyLabel";
 
-import type { EnnemyType, NextAction } from "@/types/game";
+import type { EnemyType, NextAction } from "@/types/game";
 
 import "./style.css";
+import Tooltip from "../Tooltip";
 
 const BASE_ANIMATION_IDLE = [0, 1];
 const BASE_POSE_ATTACKED = 2;
@@ -24,7 +26,7 @@ type FullAnimationName = `base_${AnimationName}`;
 
 export type Props = {
   ref?: React.Ref<EnemyHandle>;
-  type: EnnemyType;
+  type: EnemyType;
   nextActions: NextAction[];
   defaultAnimation?: AnimationName;
 };
@@ -114,31 +116,34 @@ export default function Enemy({
   return (
     <div className="enemy" ref={localRef}>
       <NextActions nextActions={nextActions} type={type} />
-      <Sprite
-        ref={spriteRef}
-        imgSrc={`./images/characters/${type}.png`}
-        tileHeight={32}
-        tileWidth={32}
-        tileSeparationX={0}
-        tileSeparationY={0}
-        animations={[
-          {
-            name: "base_idle",
-            tiles: BASE_ANIMATION_IDLE,
-            duration: 750,
-          },
-          {
-            name: "base_attacked",
-            tiles: [BASE_POSE_ATTACKED],
-          },
-          {
-            name: "base_dead",
-            tiles: [BASE_POSE_DEAD],
-          },
-        ]}
-        defaultAnimation={getFullAnimationName(defaultAnimation)}
-        scale={3}
-      />
+
+      <Tooltip label={<EnemyLabel enemyType={type} />}>
+        <Sprite
+          ref={spriteRef}
+          imgSrc={`./images/characters/${type}.png`}
+          tileHeight={32}
+          tileWidth={32}
+          tileSeparationX={0}
+          tileSeparationY={0}
+          animations={[
+            {
+              name: "base_idle",
+              tiles: BASE_ANIMATION_IDLE,
+              duration: 750,
+            },
+            {
+              name: "base_attacked",
+              tiles: [BASE_POSE_ATTACKED],
+            },
+            {
+              name: "base_dead",
+              tiles: [BASE_POSE_DEAD],
+            },
+          ]}
+          defaultAnimation={getFullAnimationName(defaultAnimation)}
+          scale={3}
+        />
+      </Tooltip>
     </div>
   );
 }

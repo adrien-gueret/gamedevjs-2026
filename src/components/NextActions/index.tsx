@@ -4,7 +4,7 @@ import Tooltip from "@/components/Tooltip";
 import type {
   NextAction,
   ReelSymbol,
-  EnnemyType,
+  EnemyType,
   PlayerType,
 } from "@/types/game";
 
@@ -12,7 +12,7 @@ import "./style.css";
 
 type Props = {
   nextActions: NextAction[];
-  type: EnnemyType | PlayerType;
+  type: EnemyType | PlayerType;
 };
 
 export default function NextActions({ nextActions, type }: Props) {

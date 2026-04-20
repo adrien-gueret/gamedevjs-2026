@@ -40,6 +40,7 @@ export default function BattleScene({
         nextActions={player.playerNextActions}
         defaultAnimation={player.health.value === 0 ? "dead" : "idle"}
       />
+
       <Enemy
         ref={enemyRef}
         type={enemy.type}
