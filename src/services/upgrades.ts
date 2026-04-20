@@ -13,11 +13,18 @@ export function getRandomBonusSymbols(): ReelSymbol[] {
   return getRandomElements(["Sword", "Shield", "Coin", "Heart"], 3);
 }
 
-export function getMalusBonusSymbol(): ReelSymbol {
-  return getRandomElements<ReelSymbol>(
-    ["Evil-Heart", "Evil-Shield", "Evil-Sword"],
-    1,
-  )[0];
+export const MALUS_SYMBOLS: ReelSymbol[] = [
+  "Evil-Heart",
+  "Evil-Shield",
+  "Evil-Sword",
+];
+
+export function isMalusSymbol(symbol: ReelSymbol): boolean {
+  return MALUS_SYMBOLS.includes(symbol);
+}
+
+export function getRandomMalusBonusSymbol(): ReelSymbol {
+  return getRandomElements<ReelSymbol>(MALUS_SYMBOLS, 1)[0];
 }
 
 export function getRandomDevilDeals(): BuyableDevilDeal[] {

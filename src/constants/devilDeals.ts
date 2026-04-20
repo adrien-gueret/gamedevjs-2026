@@ -11,7 +11,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "lockReel",
     cost: { value: 5, type: "gold" },
-    requirements: ["betterBet1"],
+    requirements: ["betterBet2"],
     permanent: true,
   },
   {
@@ -34,12 +34,12 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "unlockSkeleton",
     cost: { value: 10, type: "gold" },
-    requirements: ["betterBet1", "moreHealth1"],
+    requirements: ["betterBet2", "moreHealth1"],
     permanent: true,
   },
   {
     type: "unlockWizard",
-    cost: { value: 10, type: "gold" },
+    cost: { value: 15, type: "gold" },
     requirements: ["unlockSkeleton", "moreHealth2"],
     permanent: true,
   },
@@ -48,7 +48,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "health" },
       { value: 4, type: "gold" },
-      { value: 2, type: "reel" },
+      { value: 3, type: "reel" },
     ],
     permanent: false,
   },
@@ -57,7 +57,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 3, type: "health" },
       { value: 2, type: "gold" },
-      { value: 1, type: "reel" },
+      { value: 2, type: "reel" },
     ],
     permanent: false,
   },

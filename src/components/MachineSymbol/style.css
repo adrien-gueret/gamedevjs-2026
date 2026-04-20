@@ -43,6 +43,18 @@
   background-image: url(./images/slots/sleep.png);
 }
 
+.machine-symbol-evil-sword {
+  background-image: url(./images/slots/evil-sword.png);
+}
+
+.machine-symbol-evil-shield {
+  background-image: url(./images/slots/evil-shield.png);
+}
+
+.machine-symbol-evil-heart {
+  background-image: url(./images/slots/evil-heart.png);
+}
+
 @keyframes machine-symbol-activate {
   0% {
     transform: scale(1);

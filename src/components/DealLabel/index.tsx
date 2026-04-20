@@ -76,7 +76,8 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
     case "lockReel":
       return (
         <>
-          Allow to lock one reel before spinning, so that it won't spin at all.
+          Allow to lock the middle reel before spinning, so that it won't spin
+          at all.
           {costLabel}
         </>
       );

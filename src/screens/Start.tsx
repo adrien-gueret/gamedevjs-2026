@@ -29,7 +29,7 @@ export default function Start() {
       levelIndex: 0,
       currentBattle: null,
       randomChoices: [],
-      passiveEffects: ["attack", "defend"],
+      passiveEffects: [],
     });
 
     startNewBattle();

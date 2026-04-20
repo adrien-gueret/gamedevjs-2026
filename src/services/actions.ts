@@ -85,6 +85,11 @@ export function addPermanentBonus(effect: DevilDealType): GameState {
     next.unlockedPermanentDeals.push(effect);
 
     if (["moreHealth1", "moreHealth2", "moreHealth3"].includes(effect)) {
+      console.log({
+        current: next.currentRun!.health.max,
+        added: 10,
+        next: next.currentRun!.health.max + 10,
+      });
       next.currentRun!.health.max += 10;
     }
 
@@ -161,9 +166,14 @@ export function startNewBattle(): GameState {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = {
-      betCost: 1,
+      betCost: next.unlockedPermanentDeals.includes("betterBet2")
+        ? 3
+        : next.unlockedPermanentDeals.includes("betterBet1")
+          ? 2
+          : 1,
       enemy: getNewBattleEnemy(next.currentRun!.levelIndex),
       playerNextActions: getPassiveEffectNextActions(next),
+      hasUsedLockedReel: false,
     };
     return next;
   });
@@ -186,6 +196,15 @@ export function setBetCost(betCost: BetCost): GameState {
     if (!prev.currentRun?.currentBattle) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle!.betCost = betCost;
+    return next;
+  });
+}
+
+export function setHasUsedLockedReel(): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun?.currentBattle) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.currentBattle!.hasUsedLockedReel = true;
     return next;
   });
 }

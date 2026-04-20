@@ -24,6 +24,7 @@ import {
   healPlayer,
   healEnemy,
   addEnemyNextActions,
+  setHasUsedLockedReel,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -91,6 +92,8 @@ export default function Battle() {
   const [canSpin, setCanSpin] = useState(
     !shouldShowLostScreen && !shouldShowWinScreen,
   );
+
+  const [isMiddleReelLocked, setIsMiddleReelLocked] = useState(false);
 
   const timeoutRefs = useRef<Array<number | null>>([]);
   const activationTimeoutRefs = useRef<Array<number | null>>([]);
@@ -404,9 +407,12 @@ export default function Battle() {
     setPaylinesToActivate([]);
     setActiveSymbolPositions([]);
 
-    const finalIndexes = reels.map((reelSymbols) => {
+    const finalIndexes = reels.map((reelSymbols, reelIndex) => {
       if (reelSymbols.length === 0) {
         return 0;
+      }
+      if (reelIndex === 1 && isMiddleReelLocked) {
+        return startIndexes[1] ?? 0;
       }
       return Math.floor(Math.random() * reelSymbols.length);
     });
@@ -422,7 +428,12 @@ export default function Battle() {
     let stoppedReels = 0;
 
     setIsSpinning(true);
-    setSpinningReels(reels.map((reelSymbols) => reelSymbols.length > 0));
+    setSpinningReels(
+      reels.map(
+        (reelSymbols, reelIndex) =>
+          reelSymbols.length > 0 && !(reelIndex === 1 && isMiddleReelLocked),
+      ),
+    );
 
     reels.forEach((reelSymbols, reelIndex) => {
       if (reelSymbols.length === 0) {
@@ -449,6 +460,10 @@ export default function Battle() {
         if (stoppedReels >= activeReelCount) {
           window.setTimeout(() => {
             setIsSpinning(false);
+            if (isMiddleReelLocked) {
+              setHasUsedLockedReel();
+              setIsMiddleReelLocked(false);
+            }
             const displayedSymbols =
               getDisplayedSymbolsFromFinalIndexes(finalIndexes);
             const paylines = getPaylinesFromDisplayedSymbols(
@@ -494,6 +509,11 @@ export default function Battle() {
             spinningReels={spinningReels}
             betCost={betCost}
             activeSymbolPositions={activeSymbolPositions}
+            isMiddleReelLocked={isMiddleReelLocked}
+            hasUsedLockedReel={state.currentRun.currentBattle.hasUsedLockedReel}
+            onToggleMiddleReelLock={() => {
+              setIsMiddleReelLocked((prev) => !prev);
+            }}
             onSpin={handleSpin}
             onBetCostChange={setBetCost}
             isInteractive={canSpin}

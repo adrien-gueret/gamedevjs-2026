@@ -73,6 +73,36 @@
   left: 16px;
 }
 
+.machine-reel-lock-button-container {
+  position: absolute;
+  display: block;
+  top: 32px;
+  left: calc(50% - 24px);
+  width: 48px;
+  height: 48px;
+  display: block;
+  z-index: 10;
+}
+
+.machine-reel-lock-button {
+  display: block;
+  width: 48px;
+  height: 48px;
+  display: block;
+  appearance: none;
+  background-color: transparent;
+  background-image: url(./images/lock.png);
+  background-size: 48px 96px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background-position: bottom;
+}
+
+.machine-reel-lock-button.locked {
+  background-position: top;
+}
+
 .spin-button {
   position: absolute;
   bottom: -10px;

@@ -77,6 +77,7 @@ export type Battle = {
   betCost: BetCost;
   enemy: Enemy;
   playerNextActions: NextAction[];
+  hasUsedLockedReel: boolean;
 };
 
 export type Run = {

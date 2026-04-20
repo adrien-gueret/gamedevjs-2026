@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { ReelSymbol, BetCost } from "@/types/game";
 
 import Button from "@/components/Button";
@@ -7,6 +8,7 @@ import MachineHearts from "@/components/MachineHearts";
 import { hasUnlockedPermanentDeal } from "@/services/selector";
 
 import "./style.css";
+import Tooltip from "../Tooltip";
 
 type Props = {
   symbols: ReelSymbol[][];
@@ -18,6 +20,9 @@ type Props = {
     rowIndex: number;
     celebrationLevel: "normal" | "double" | "triple";
   }>;
+  isMiddleReelLocked: boolean;
+  hasUsedLockedReel: boolean;
+  onToggleMiddleReelLock: () => void;
   onSpin: () => void;
   onBetCostChange: (newBetCost: BetCost) => void;
   isInteractive?: boolean;
@@ -29,6 +34,9 @@ export default function SlotMachine({
   spinningReels,
   betCost,
   activeSymbolPositions,
+  isMiddleReelLocked,
+  hasUsedLockedReel,
+  onToggleMiddleReelLock,
   onSpin,
   onBetCostChange,
   isInteractive,
@@ -74,19 +82,41 @@ export default function SlotMachine({
         </div>
 
         {symbols.map((reelSymbols, index) => (
-          <MachineReel
-            key={index}
-            symbols={reelSymbols}
-            startIndex={startIndexes[index]}
-            isSpinning={spinningReels[index] ?? false}
-            reelIndex={index}
-            activeRows={activeSymbolPositions
-              .filter((position) => position.reelIndex === index)
-              .map((position) => ({
-                rowIndex: position.rowIndex,
-                celebrationLevel: position.celebrationLevel,
-              }))}
-          />
+          <Fragment key={index}>
+            {index === 1 &&
+              hasUnlockedPermanentDeal("lockReel") &&
+              !hasUsedLockedReel && (
+                <div className="machine-reel-lock-button-container">
+                  <Tooltip
+                    label={
+                      isMiddleReelLocked
+                        ? "Unlock middle reel"
+                        : "Lock middle reel (once per fight!)"
+                    }
+                  >
+                    <button
+                      className={`machine-reel-lock-button${isMiddleReelLocked ? " locked" : ""}`}
+                      onClick={onToggleMiddleReelLock}
+                    />
+                  </Tooltip>
+                </div>
+              )}
+            <MachineReel
+              symbols={reelSymbols}
+              startIndex={startIndexes[index]}
+              isSpinning={
+                (spinningReels[index] ?? false) &&
+                !(index === 1 && isMiddleReelLocked)
+              }
+              reelIndex={index}
+              activeRows={activeSymbolPositions
+                .filter((position) => position.reelIndex === index)
+                .map((position) => ({
+                  rowIndex: position.rowIndex,
+                  celebrationLevel: position.celebrationLevel,
+                }))}
+            />
+          </Fragment>
         ))}
         <MachineHearts
           onClick={isInteractive ? onBetCostChange : undefined}

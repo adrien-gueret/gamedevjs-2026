@@ -50,9 +50,7 @@ export function canDevilDealBeInShop(dealType: DevilDealType): boolean {
   }
 
   const hasRequiredDeals = deal.requirements
-    ? deal.requirements.every((requiredDeal) =>
-        hasUnlockedPermanentDeal(requiredDeal),
-      )
+    ? deal.requirements.every(hasUnlockedPermanentDeal)
     : true;
 
   return hasRequiredDeals && !hasUnlockedPermanentDeal(dealType);

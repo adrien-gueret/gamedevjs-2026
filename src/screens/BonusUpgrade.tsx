@@ -1,19 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import ChoiceItem from "@/components/ChoiceItem";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
-import SymbolLabel from "@/components/SymbolLabel";
-import MachineSymbol from "@/components/MachineSymbol";
 import MachineUpdate from "@/components/MachineUpdate";
-import Tooltip from "@/components/Tooltip";
+import SymbolPicker from "@/components/SymbolPicker";
 
 import { getRandomBonusSymbols } from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
 import { setRandomChoices, setReelSymbol } from "@/services/actions";
 import { random } from "@/services/maths";
-import { sleep } from "@/services/utils";
 import { startNewBattle } from "@/services/actions";
 
 import type { ReelSymbol } from "@/types/game";
@@ -31,28 +27,27 @@ const BONUS_PHRASES = [
 export default function BonusUpgrade() {
   const state = useGameState();
   const navigate = useNavigate();
-  const [hasMadeChoice, setHasMadeChoice] = useState(false);
   const storedSymbols = state.currentRun?.randomChoices ?? [];
-  console.log("Stored symbols:", storedSymbols);
   const [newSymbol, setNewSymbol] = useState<ReelSymbol | null>(null);
   const phrase = useRef(BONUS_PHRASES[random(0, BONUS_PHRASES.length - 1)]);
+  const isLeaving = useRef(false);
 
   useEffect(() => {
-    if (!hasMadeChoice && !storedSymbols.length) {
+    if (!storedSymbols.length && !isLeaving.current) {
       const newSymbols = getRandomBonusSymbols();
       setRandomChoices(newSymbols);
     }
-  }, [hasMadeChoice, storedSymbols]);
+  }, [storedSymbols]);
 
-  useEffect(() => {
-    if (hasMadeChoice) {
-      sleep(500).then(() => {
-        startNewBattle();
-        setRandomChoices();
-        navigate("/battle");
-      });
+  const leave = useCallback(() => {
+    if (isLeaving.current) {
+      return;
     }
-  }, [hasMadeChoice]);
+    isLeaving.current = true;
+    startNewBattle();
+    setRandomChoices();
+    navigate("/battle");
+  }, []);
 
   return (
     <Screen>
@@ -74,34 +69,15 @@ export default function BonusUpgrade() {
           <b style={{ color: "gold" }}>free</b>!
         </h2>
 
-        <div>
-          {storedSymbols.map((symbol, index) => (
-            <Tooltip
-              key={symbol}
-              cursor="pointer"
-              label={<SymbolLabel symbol={symbol} />}
-            >
-              <ChoiceItem
-                delay={1.5 * index}
-                onClick={() => setNewSymbol(symbol)}
-              >
-                <MachineSymbol symbol={symbol} />
-              </ChoiceItem>
-            </Tooltip>
-          ))}
-        </div>
+        <SymbolPicker symbols={storedSymbols} onSelect={setNewSymbol} />
       </div>
       {newSymbol && (
         <MachineUpdate
           newSymbol={newSymbol}
           onSymbolSelect={(reelIndex, symbolIndex) => {
-            if (hasMadeChoice) {
-              return false;
-            }
             setReelSymbol(reelIndex, symbolIndex, newSymbol);
-            setHasMadeChoice(true);
-            return true;
           }}
+          onComplete={leave}
           onClose={() => setNewSymbol(null)}
         />
       )}

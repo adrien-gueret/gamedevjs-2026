@@ -24,6 +24,7 @@ function RouterSync() {
       }
       return;
     }
+
     setCurrentPathname(location.pathname);
   }, [location.pathname]);
 

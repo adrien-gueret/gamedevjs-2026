@@ -4,9 +4,11 @@ import type { ReelSymbol } from "@/types/game";
 
 import SymbolLabel from "@/components/SymbolLabel";
 import MachineSymbol from "@/components/MachineSymbol";
+import Tooltip from "@/components/Tooltip";
+
+import { isMalusSymbol } from "@/services/upgrades";
 
 import "./style.css";
-import Tooltip from "../Tooltip";
 
 type Props = {
   symbols: ReelSymbol[];
@@ -19,6 +21,7 @@ type Props = {
   }>;
   shouldShowAllSymbols?: boolean;
   onSymbolClick?: (symbolIndex: number, symbol: ReelSymbol) => boolean;
+  shouldForbidMalusSelection?: boolean;
 };
 
 export default function MachineReel({
@@ -29,6 +32,7 @@ export default function MachineReel({
   activeRows = [],
   shouldShowAllSymbols = false,
   onSymbolClick,
+  shouldForbidMalusSelection,
 }: Props) {
   const reelSize = symbols.length;
   const visibleCount = shouldShowAllSymbols ? reelSize : 3;
@@ -111,6 +115,10 @@ export default function MachineReel({
           {visibleSymbols.map((symbol, index) => {
             const activeRow = activeRows.find((row) => row.rowIndex === index);
 
+            const isSelectionnable =
+              Boolean(onSymbolClick) &&
+              (!shouldForbidMalusSelection || !isMalusSymbol(symbol));
+
             return (
               <div
                 key={`${normalizedStartIndex}-${index}-${symbol}`}
@@ -118,13 +126,13 @@ export default function MachineReel({
               >
                 <Tooltip
                   label={<SymbolLabel symbol={symbol} />}
-                  cursor={onSymbolClick ? "pointer" : "help"}
+                  cursor={isSelectionnable ? "pointer" : "help"}
                 >
-                  {onSymbolClick ? (
+                  {isSelectionnable ? (
                     <button
                       className={`machine-reel-clickable-symbol${lastReplacedIndex === index ? " is-new" : ""}`}
                       onClick={() => {
-                        if (onSymbolClick(index, symbol)) {
+                        if (onSymbolClick!(index, symbol)) {
                           setLastReplacedIndex(index);
                         }
                       }}

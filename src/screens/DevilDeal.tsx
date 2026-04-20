@@ -1,21 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
 import DevilDealChoices from "@/components/DevilDealChoices";
-import MachineSymbol from "@/components/MachineSymbol";
 import MachineUpdate from "@/components/MachineUpdate";
-import Tooltip from "@/components/Tooltip";
 
-import { getRandomDevilDeals } from "@/services/upgrades";
+import {
+  getRandomDevilDeals,
+  getRandomMalusBonusSymbol,
+} from "@/services/upgrades";
 import { useGameState } from "@/services/gameStore";
-import { setRandomChoices } from "@/services/actions";
+import {
+  addPermanentBonus,
+  addPassiveEffect,
+  setRandomChoices,
+  spendGold,
+  spendMaxHealth,
+  setReelSymbol,
+} from "@/services/actions";
 import { random } from "@/services/maths";
-import { sleep } from "@/services/utils";
-import { startNewBattle } from "@/services/actions";
 
-import type { BuyableDevilDeal, DevilDealType } from "@/types/game";
+import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
 import GoldCounter from "@/components/GoldCounter";
 
@@ -28,10 +34,21 @@ const DEAL_PHRASES = [
   "Choose wisely. Or don't - I profit either way.",
 ];
 
+const MALUS_DIALOGS = [
+  "Before you can claim your prize, you have to sacrifice something...",
+  "Good... Another sacrifice is required...",
+  "Perfect... I'm afraid you need a last sacrifice...",
+];
+
 export default function DevilDeal() {
   const state = useGameState();
   const navigate = useNavigate();
   const isLeaving = useRef(false);
+  const concludeDeal = useRef<() => void | null>(null);
+  const forcedMalusTotalRef = useRef(0);
+  const [forcedMalusCount, setForcedMalusCount] = useState(0);
+  const [currentForcedMalusSymbol, setCurrentForcedMalusSymbol] =
+    useState<ReelSymbol | null>(null);
 
   const storedDeals = (state.currentRun?.randomChoices ??
     []) as BuyableDevilDeal[];
@@ -50,6 +67,7 @@ export default function DevilDeal() {
       return;
     }
     isLeaving.current = true;
+
     setRandomChoices();
     navigate("/bonus-upgrade");
   }, []);
@@ -60,7 +78,52 @@ export default function DevilDeal() {
   const onBuyDeal = useCallback(
     (deal: BuyableDevilDeal) => {
       setRandomChoices(storedDeals.filter((d) => d.type !== deal.type));
-      console.log("Buy", deal);
+
+      concludeDeal.current = () => {
+        concludeDeal.current = null;
+
+        if (deal.permanent) {
+          addPermanentBonus(deal.type);
+        } else {
+          switch (deal.type) {
+            case "passiveAttack":
+              addPassiveEffect("attack");
+              break;
+
+            case "passiveDefense":
+              addPassiveEffect("defend");
+              break;
+
+            case "destroyReelSymbol":
+              // TODO
+              alert('TODO: "destroyReelSymbol" effect');
+              break;
+
+            case "replaceReelSymbol":
+              // TODO
+              alert('TODO: "replaceReelSymbol" effect');
+              break;
+          }
+        }
+      };
+
+      switch (deal.cost.type) {
+        case "gold":
+          spendGold(deal.cost.value);
+          break;
+
+        case "health":
+          spendMaxHealth(deal.cost.value);
+          break;
+
+        case "reel":
+          forcedMalusTotalRef.current = deal.cost.value;
+          setForcedMalusCount(deal.cost.value);
+          setCurrentForcedMalusSymbol(getRandomMalusBonusSymbol());
+          return;
+      }
+
+      concludeDeal.current();
     },
     [storedDeals],
   );
@@ -111,20 +174,39 @@ export default function DevilDeal() {
 
       <GoldCounter value={state.gold} />
 
-      {/*newSymbol && (
+      {currentForcedMalusSymbol && (
         <MachineUpdate
-          newSymbol={newSymbol}
+          key={currentForcedMalusSymbol}
+          devilDialog={
+            forcedMalusCount === 1
+              ? MALUS_DIALOGS[MALUS_DIALOGS.length - 1]
+              : MALUS_DIALOGS[forcedMalusTotalRef.current - forcedMalusCount]
+          }
+          newSymbol={currentForcedMalusSymbol}
           onSymbolSelect={(reelIndex, symbolIndex) => {
-            if (hasMadeChoice) {
-              return false;
-            }
-            setReelSymbol(reelIndex, symbolIndex, newSymbol);
-            setHasMadeChoice(true);
-            return true;
+            setReelSymbol(reelIndex, symbolIndex, currentForcedMalusSymbol);
           }}
-          onClose={() => setNewSymbol(null)}
+          shouldForbidMalusSelection
+          onComplete={() => {
+            if (forcedMalusCount - 1 === 0) {
+              setCurrentForcedMalusSymbol(null);
+              setForcedMalusCount(0);
+
+              concludeDeal.current?.();
+            } else {
+              setForcedMalusCount((count) => count - 1);
+
+              let newRandomSymbol = getRandomMalusBonusSymbol();
+
+              while (newRandomSymbol === currentForcedMalusSymbol) {
+                newRandomSymbol = getRandomMalusBonusSymbol();
+              }
+
+              setCurrentForcedMalusSymbol(newRandomSymbol);
+            }
+          }}
         />
-      )*/}
+      )}
     </Screen>
   );
 }
