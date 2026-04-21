@@ -36,6 +36,7 @@ import {
   canPlayerAttack,
   isPlayerDefeated,
   getRandomNotGluedSymbolIndexes,
+  isSymbolGlued,
 } from "@/services/selector";
 import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
@@ -321,7 +322,9 @@ export default function Battle() {
 
       return Array.from({ length: 3 }, (_, offset) => {
         const symbolIndex = (finalIndex + offset) % reelSymbols.length;
-        return reelSymbols[symbolIndex];
+        return isSymbolGlued(reelIndex, symbolIndex)
+          ? "Glued"
+          : reelSymbols[symbolIndex];
       });
     });
   };

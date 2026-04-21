@@ -11,6 +11,7 @@ import type {
 import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
 
 import { setGameState } from "./gameStore";
+import { isSymbolGlued } from "./selector";
 
 function getPassiveEffectNextActions(state: GameState): NextAction[] {
   const passiveEffects = state.currentRun?.passiveEffects ?? [];
@@ -62,6 +63,10 @@ export function setReelSymbol(
   symbolIndex: number,
   newSymbol: ReelSymbol,
 ): GameState {
+  if (isSymbolGlued(reelIndex, symbolIndex)) {
+    unglueSymbol(reelIndex, symbolIndex);
+  }
+
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
@@ -74,6 +79,10 @@ export function removeReelSymbol(
   reelIndex: number,
   symbolIndex: number,
 ): GameState {
+  if (isSymbolGlued(reelIndex, symbolIndex)) {
+    unglueSymbol(reelIndex, symbolIndex);
+  }
+
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);

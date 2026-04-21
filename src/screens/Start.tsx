@@ -30,7 +30,7 @@ export default function Start() {
       currentBattle: null,
       randomChoices: [],
       passiveEffects: [],
-      gluedSymbolsIndexes: [],
+      gluedSymbolsIndexes: [[], [], []],
     });
 
     startNewBattle();

@@ -7,6 +7,7 @@ import MachineSymbol from "@/components/MachineSymbol";
 import Tooltip from "@/components/Tooltip";
 
 import { isMalusSymbol } from "@/services/upgrades";
+import { isSymbolGlued } from "@/services/selector";
 
 import "./style.css";
 
@@ -114,7 +115,16 @@ export default function MachineReel({
         <div className="machine-reel-strip" aria-hidden="true">
           {spinStrip.map((symbol, index) => (
             <div key={`spin-${index}`} className="machine-reel-symbol">
-              <MachineSymbol symbol={symbol} />
+              <MachineSymbol
+                symbol={
+                  isSymbolGlued(
+                    reelIndex,
+                    (normalizedStartIndex + index) % reelSize,
+                  )
+                    ? "Glued"
+                    : symbol
+                }
+              />
             </div>
           ))}
         </div>
@@ -123,17 +133,24 @@ export default function MachineReel({
           {visibleSymbols.map((symbol, index) => {
             const activeRow = activeRows.find((row) => row.rowIndex === index);
 
+            const symbolToShow = isSymbolGlued(
+              reelIndex,
+              (normalizedStartIndex + index) % reelSize,
+            )
+              ? "Glued"
+              : symbol;
+
             const isSelectionnable =
               Boolean(onSymbolClick) &&
-              (!shouldForbidMalusSelection || !isMalusSymbol(symbol));
+              (!shouldForbidMalusSelection || !isMalusSymbol(symbolToShow));
 
             return (
               <div
-                key={`${normalizedStartIndex}-${index}-${symbol}`}
+                key={`${normalizedStartIndex}-${index}-${symbolToShow}`}
                 className="machine-reel-symbol"
               >
                 <Tooltip
-                  label={<SymbolLabel symbol={symbol} />}
+                  label={<SymbolLabel symbol={symbolToShow} />}
                   cursor={isSelectionnable ? "pointer" : "help"}
                 >
                   {isSelectionnable ? (
@@ -146,14 +163,14 @@ export default function MachineReel({
                       }}
                       onAnimationEnd={() => setLastReplacedIndex(null)}
                     >
-                      <MachineSymbol symbol={symbol} />
+                      <MachineSymbol symbol={symbolToShow} />
                     </button>
                   ) : (
                     <div
                       className={`machine-reel-symbol-container${shouldAnimateSelectedSymbol && lastReplacedIndex === index ? " is-new" : ""}`}
                     >
                       <MachineSymbol
-                        symbol={symbol}
+                        symbol={symbolToShow}
                         isActive={Boolean(activeRow)}
                         celebrationLevel={
                           activeRow?.celebrationLevel ?? "normal"
