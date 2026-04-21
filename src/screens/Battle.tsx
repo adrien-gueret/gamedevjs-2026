@@ -491,6 +491,7 @@ export default function Battle() {
     <>
       <Screen>
         <Scene
+          levelIndex={state.currentRun.levelIndex}
           player={{
             health,
             playerNextActions:

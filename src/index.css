@@ -45,6 +45,10 @@ body {
   position: relative;
 }
 
+#root > .knight .next-actions {
+  display: none;
+}
+
 hr.ui-separator {
   height: 24px;
   border: 0 solid transparent;

@@ -50,7 +50,7 @@ export default function BonusUpgrade() {
   }, []);
 
   useEffect(() => {
-    if ((state.currentRun?.levelIndex ?? 0) % 3 === 0) {
+    if ((state.currentRun?.levelIndex ?? 0) % 2 === 0) {
       leave();
     }
   }, [state.currentRun?.levelIndex, leave]);

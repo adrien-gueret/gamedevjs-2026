@@ -13,6 +13,7 @@ type Props = {
   playerRef: KnightProps["ref"];
   enemyRef: EnemyProps["ref"];
   gold: number;
+  levelIndex: number;
 };
 
 export default function BattleScene({
@@ -21,9 +22,11 @@ export default function BattleScene({
   playerRef,
   enemyRef,
   gold,
+  levelIndex,
 }: Props) {
   return (
     <Scene type="battle">
+      <div className="level-indicator">Fight n°{levelIndex + 1}</div>
       <HealthBar
         variant="hero"
         value={player.health.value}
