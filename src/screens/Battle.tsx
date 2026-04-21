@@ -28,6 +28,7 @@ import {
   addSymbolTooReel,
   setReelSymbol,
   glueSymbol,
+  unglueSymbol,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -42,8 +43,13 @@ import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { random } from "@/services/maths";
 
+const ACTIVATION_DURATION = 420;
+
 const symboleToDirectAction: Partial<
-  Record<ReelSymbol, (multiplier: number) => void>
+  Record<
+    ReelSymbol,
+    (multiplier: number, reelIndex: number, symbolIndex: number) => void
+  >
 > = {
   Sword: (multiplier) =>
     addPlayerNextActions({ type: "attack", value: 1 * multiplier }),
@@ -127,15 +133,34 @@ export default function Battle() {
     activationTimeoutRefs.current = [];
   };
 
-  const onActivate = (symbols: ReelSymbol[]) => {
+  const onActivate = (
+    symbols: ReelSymbol[],
+    positions: ActiveSymbolPosition[],
+  ) => {
     const allSame =
       symbols.length > 0 && symbols.every((s) => s === symbols[0]);
     const multiplier = allSame ? 2 : 1;
 
-    symbols.forEach((symbol) => {
+    symbols.forEach((symbol, i) => {
+      const pos = positions[i];
+      if (!pos) return;
+      const reel = reels[pos.reelIndex];
+      const symbolIndex = reel
+        ? ((startIndexes[pos.reelIndex] ?? 0) + pos.rowIndex) % reel.length
+        : 0;
+
+      if (symbol === "Glued") {
+        // Delay unglue until after the animation, so the real symbol
+        // is revealed without animating.
+        window.setTimeout(() => {
+          unglueSymbol(pos.reelIndex, symbolIndex);
+        }, ACTIVATION_DURATION + 50);
+        return;
+      }
+
       const directAction = symboleToDirectAction[symbol];
       if (directAction) {
-        directAction(multiplier);
+        directAction(multiplier, pos.reelIndex, symbolIndex);
       }
     });
   };
@@ -193,13 +218,13 @@ export default function Battle() {
     clearActivationTimers();
 
     const activationStepDelay = 550;
-    const activationDuration = 420;
 
     paylinesToActivate.forEach((payline, paylineIndex) => {
       activationTimeoutRefs.current.push(
         window.setTimeout(() => {
-          setActiveSymbolPositions(getActiveSymbolPositionsForPayline(payline));
-          onActivate(payline.symbols);
+          const positions = getActiveSymbolPositionsForPayline(payline);
+          setActiveSymbolPositions(positions);
+          onActivate(payline.symbols, positions);
         }, paylineIndex * activationStepDelay),
       );
 
@@ -208,14 +233,14 @@ export default function Battle() {
           () => {
             setActiveSymbolPositions([]);
           },
-          paylineIndex * activationStepDelay + activationDuration,
+          paylineIndex * activationStepDelay + ACTIVATION_DURATION,
         ),
       );
     });
 
     const lastActivationDelay =
       (paylinesToActivate.length - 1) * activationStepDelay +
-      activationDuration;
+      ACTIVATION_DURATION;
     activationTimeoutRefs.current.push(
       window.setTimeout(async () => {
         if (isPlayerDefeated()) {
@@ -259,6 +284,7 @@ export default function Battle() {
                   break;
                 }
 
+                // TODO: make animation
                 glueSymbol(
                   randomSymbolIndexes.reelIndex,
                   randomSymbolIndexes.symbolIndex,

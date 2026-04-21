@@ -146,7 +146,7 @@ export default function MachineReel({
 
             return (
               <div
-                key={`${normalizedStartIndex}-${index}-${symbolToShow}`}
+                key={`${normalizedStartIndex}-${index}-${symbol}`}
                 className="machine-reel-symbol"
               >
                 <Tooltip
