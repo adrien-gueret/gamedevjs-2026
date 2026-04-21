@@ -27,9 +27,10 @@ export type DevilDealType =
   | "destroyReelSymbol"
   | "replaceReelSymbol"
   | "passiveDefense"
-  | "passiveAttack";
+  | "passiveAttack"
+  | "passiveWantedToDie";
 
-export type PassiveEffectType = "attack" | "defend";
+export type PassiveEffectType = "attack" | "defend" | "wantedToDie";
 
 export type DevilDealCostType = "health" | "gold" | "reel";
 
@@ -94,11 +95,7 @@ export type Run = {
 
 export type ConfigurableBaseRun = Omit<
   Run,
-  | "levelIndex"
-  | "currentBattle"
-  | "randomChoices"
-  | "passiveEffects"
-  | "gluedSymbolsIndexes"
+  "levelIndex" | "currentBattle" | "randomChoices"
 >;
 
 export type GameState = {

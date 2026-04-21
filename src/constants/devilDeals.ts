@@ -34,7 +34,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "unlockSkeleton",
     cost: { value: 10, type: "gold" },
-    requirements: ["betterBet2", "moreHealth1"],
+    requirements: ["moreHealth1"],
     permanent: true,
   },
   {
@@ -77,6 +77,11 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
       { value: 4, type: "gold" },
       { value: 1, type: "reel" },
     ],
+    permanent: false,
+  },
+  {
+    type: "passiveWantedToDie",
+    cost: [{ value: 8, type: "health" }],
     permanent: false,
   },
 ];

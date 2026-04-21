@@ -1,16 +1,17 @@
 import Scene from ".";
 
 import Enemy, { type Props as EnemyProps } from "@/components/Enemy";
-import Knight, { type Props as KnightProps } from "@/components/Knight";
+import Player, { type Props as PlayerProps } from "@/components/Player";
 import HealthBar from "@/components/HealthBar";
 import GoldCounter from "@/components/GoldCounter";
 
-import type { Enemy as EnemyType, Battle, Run } from "@/types/game";
+import type { Enemy as EnemyType, Battle, Run, PlayerType } from "@/types/game";
 
 type Props = {
-  player: Pick<Run, "health"> & Pick<Battle, "playerNextActions">;
+  player: Pick<Run, "health"> &
+    Pick<Battle, "playerNextActions"> & { type: PlayerType };
   enemy: EnemyType;
-  playerRef: KnightProps["ref"];
+  playerRef: PlayerProps["ref"];
   enemyRef: EnemyProps["ref"];
   gold: number;
   levelIndex: number;
@@ -38,10 +39,11 @@ export default function BattleScene({
         value={enemy.health.value}
         maxValue={enemy.health.max}
       />
-      <Knight
+      <Player
         ref={playerRef}
         nextActions={player.playerNextActions}
         defaultAnimation={player.health.value === 0 ? "dead" : "idle"}
+        type={player.type}
       />
 
       <Enemy

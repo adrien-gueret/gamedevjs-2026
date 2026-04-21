@@ -45,7 +45,7 @@ body {
   position: relative;
 }
 
-#root > .knight .next-actions {
+#root > .player .next-actions {
   display: none;
 }
 

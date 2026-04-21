@@ -153,6 +153,15 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
           {costLabel}
         </>
       );
+    case "passiveWantedToDie":
+      return (
+        <>
+          Instantly die. Don't worry...
+          <br />I promise to resurrect you, and I won't even charge you for that
+          this time!
+          {costLabel}
+        </>
+      );
 
     default:
       return <>Do nothing</>;

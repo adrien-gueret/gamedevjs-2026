@@ -6,7 +6,7 @@ import type { ReelSymbol, BetCost } from "@/types/game";
 import Blackout from "@/components/Blackout";
 import DelayedRender from "@/components/DelayedRender";
 import type { EnemyHandle } from "@/components/Enemy";
-import type { KnightHandle } from "@/components/Knight";
+import type { PlayerHandle } from "@/components/Player";
 import SlotMachine from "@/components/SlotMachine";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Battle";
@@ -125,7 +125,7 @@ export default function Battle() {
 
   const playerCloneRef = useRef<HTMLElement | null>(null);
 
-  const playerRef = useRef<KnightHandle>(null);
+  const playerRef = useRef<PlayerHandle>(null);
   const enemyRef = useRef<EnemyHandle>(null);
 
   const clearSpinTimers = () => {
@@ -208,6 +208,14 @@ export default function Battle() {
       setShouldShowLostScreen(true);
     }
   }, [stopBattle]);
+
+  const hasRunAutoLoose = useRef(false);
+  useEffect(() => {
+    if (isPlayerDefeated() && !hasRunAutoLoose.current) {
+      hasRunAutoLoose.current = true;
+      battleLost();
+    }
+  }, []);
 
   const battleWon = useCallback(() => {
     stopBattle();
@@ -298,7 +306,7 @@ export default function Battle() {
                 }
 
                 enemyRef.current?.setSpecialAttack();
-                await sleep(1500);
+                await sleep(2000);
                 enemyRef.current?.setIdle();
 
                 glueSymbol(
@@ -323,7 +331,7 @@ export default function Battle() {
                 }
 
                 enemyRef.current?.setSpecialAttack();
-                await sleep(1500);
+                await sleep(2000);
                 enemyRef.current?.setIdle();
 
                 setReelSymbol(1, symbolIndex, getRandomMalusSymbol());
@@ -332,7 +340,7 @@ export default function Battle() {
 
               case "wizard": {
                 enemyRef.current?.setSpecialAttack();
-                await sleep(1500);
+                await sleep(2000);
                 enemyRef.current?.setIdle();
                 const malus = getRandomMalusSymbol();
                 addSymbolTooReel(random(0, 2), malus);
@@ -589,6 +597,9 @@ export default function Battle() {
     return null;
   }
 
+  const hasAskedToDie =
+    state.currentRun?.passiveEffects.includes("wantedToDie") ?? false;
+
   return (
     <>
       <Screen>
@@ -598,6 +609,7 @@ export default function Battle() {
             health,
             playerNextActions:
               state.currentRun.currentBattle.playerNextActions || [],
+            type: state.currentRun.type,
           }}
           enemy={state.currentRun.currentBattle.enemy!}
           playerRef={playerRef}
@@ -663,7 +675,7 @@ export default function Battle() {
           >
             "Don't worry, I'll resurrect you soon.{" "}
             {state.gold > 0
-              ? "You can even keep your gold! Just give me half."
+              ? `You can even keep your gold!${hasAskedToDie ? "" : " Just give me half."}`
               : null}
             "
           </p>
@@ -674,8 +686,12 @@ export default function Battle() {
               style={{ "--animation-delay": "4s" } as React.CSSProperties}
             >
               <GoldCounter value={state.gold} />
-              <img src="./images/right-arrow.png" alt="" />
-              <GoldCounter value={Math.ceil(state.gold / 2)} />
+              {!hasAskedToDie && (
+                <>
+                  <img src="./images/right-arrow.png" alt="" />
+                  <GoldCounter value={Math.ceil(state.gold / 2)} />
+                </>
+              )}
             </div>
           )}
 

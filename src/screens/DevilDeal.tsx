@@ -110,6 +110,13 @@ export default function DevilDeal() {
               addPassiveEffect("defend");
               break;
 
+            case "passiveWantedToDie": {
+              spendMaxHealth(Infinity);
+              addPassiveEffect("wantedToDie");
+              leave();
+              break;
+            }
+
             case "destroyReelSymbol":
               setShowRemoveSymbolBonus(true);
               break;
@@ -148,7 +155,7 @@ export default function DevilDeal() {
 
       concludeDeal.current();
     },
-    [storedDeals],
+    [storedDeals, leave],
   );
 
   return (

@@ -3,7 +3,7 @@ import { useImperativeHandle, useRef, useCallback } from "react";
 import NextActions from "@/components/NextActions";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 
-import type { NextAction } from "@/types/game";
+import type { NextAction, PlayerType } from "@/types/game";
 
 import "./style.css";
 
@@ -14,7 +14,7 @@ const BASE_POSE_ATTACKING = 5;
 
 export type AnimationName = "idle" | "walking" | "attacking" | "dead";
 
-export type KnightHandle = {
+export type PlayerHandle = {
   attack: (onAttackEnd: () => void) => Promise<Animation>;
   setDead: () => HTMLDivElement;
   setAttacked: () => void;
@@ -25,15 +25,17 @@ export type KnightHandle = {
 type FullAnimationName = `base_${AnimationName}`;
 
 export type Props = {
-  ref?: React.Ref<KnightHandle>;
+  ref?: React.Ref<PlayerHandle>;
   nextActions: NextAction[];
   defaultAnimation?: AnimationName;
+  type: PlayerType;
 };
 
-export default function Knight({
+export default function Player({
   ref,
   nextActions,
   defaultAnimation = "idle",
+  type,
 }: Props) {
   const localRef = useRef<HTMLDivElement>(null);
   const spriteRef = useRef<SpriteHandle<string>>(null);
@@ -47,12 +49,12 @@ export default function Knight({
     [],
   );
 
-  const setDead: KnightHandle["setDead"] = useCallback(() => {
+  const setDead: PlayerHandle["setDead"] = useCallback(() => {
     spriteRef.current?.setAnimation(getFullAnimationName("dead"));
     return localRef.current!;
   }, [getFullAnimationName]);
 
-  const attack: KnightHandle["attack"] = useCallback(
+  const attack: PlayerHandle["attack"] = useCallback(
     async (onAttackEnd) => {
       spriteRef.current?.setAnimation(getFullAnimationName("attacking"));
 
@@ -97,11 +99,11 @@ export default function Knight({
     [getFullAnimationName],
   );
 
-  const setIdle: KnightHandle["setIdle"] = useCallback(() => {
+  const setIdle: PlayerHandle["setIdle"] = useCallback(() => {
     spriteRef.current?.setAnimation(getFullAnimationName("idle"));
   }, [getFullAnimationName]);
 
-  const setAttacked: KnightHandle["setAttacked"] = useCallback(() => {
+  const setAttacked: PlayerHandle["setAttacked"] = useCallback(() => {
     const flashAnimation = localRef.current!.animate(
       [
         { transform: "translate(0px, 0px)", filter: "brightness(1)" },
@@ -131,7 +133,7 @@ export default function Knight({
     return flashAnimation.finished;
   }, []);
 
-  const setHealing: KnightHandle["setHealing"] = useCallback(() => {
+  const setHealing: PlayerHandle["setHealing"] = useCallback(() => {
     const el = localRef.current!;
     const circleCount = 10;
     const circles: HTMLElement[] = [];
@@ -189,12 +191,14 @@ export default function Knight({
     [attack, setDead, setIdle, setAttacked, setHealing],
   );
 
+  const imageFilename = type === "knight" ? "knight" : `${type}_player`;
+
   return (
-    <div className="knight" ref={localRef}>
-      <NextActions nextActions={nextActions} type="knight" />
+    <div className="player" ref={localRef}>
+      <NextActions nextActions={nextActions} type={type} />
       <Sprite
         ref={spriteRef}
-        imgSrc="./images/characters/knight.png"
+        imgSrc={`./images/characters/${imageFilename}.png`}
         tileHeight={32}
         tileWidth={32}
         tileSeparationX={1}

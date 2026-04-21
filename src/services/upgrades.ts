@@ -25,7 +25,10 @@ export function isMalusSymbol(symbol: ReelSymbol): boolean {
 }
 
 export function getRandomMalusSymbol(): ReelSymbol {
-  return getRandomElements<ReelSymbol>(MALUS_SYMBOLS, 1)[0];
+  return getRandomElements<ReelSymbol>(
+    ["Evil-Heart", "Evil-Shield", "Evil-Sword"],
+    1,
+  )[0];
 }
 
 export function getRandomDevilDeals(): BuyableDevilDeal[] {

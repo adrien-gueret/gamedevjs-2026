@@ -243,9 +243,12 @@ export function endBattle(hasWon: boolean): GameState {
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = null;
 
+    const hasAskedToDie =
+      next.currentRun!.passiveEffects.includes("wantedToDie");
+
     if (hasWon) {
       next.currentRun!.levelIndex += 1;
-    } else {
+    } else if (!hasAskedToDie) {
       next.gold = Math.ceil(next.gold / 2);
     }
 

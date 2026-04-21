@@ -50,11 +50,14 @@ export default function BonusUpgrade() {
     navigate("/battle");
   }, []);
 
+  const hasWantedToDie =
+    state.currentRun?.passiveEffects.includes("wantedToDie") ?? false;
+
   useEffect(() => {
-    if ((state.currentRun?.levelIndex ?? 0) % 2 === 0) {
+    if (hasWantedToDie || (state.currentRun?.levelIndex ?? 0) % 2 === 0) {
       leave();
     }
-  }, [state.currentRun?.levelIndex, leave]);
+  }, [hasWantedToDie, state.currentRun?.levelIndex, leave]);
 
   return (
     <Screen>
