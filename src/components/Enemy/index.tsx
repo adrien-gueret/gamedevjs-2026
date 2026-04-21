@@ -12,14 +12,16 @@ import Tooltip from "../Tooltip";
 const BASE_ANIMATION_IDLE = [0, 1];
 const BASE_POSE_ATTACKED = 2;
 const BASE_POSE_DEAD = 3;
+const BASE_ANIMATION_SPECIAL_ATTACK = [4, 5];
 
-export type AnimationName = "idle" | "attacked" | "dead";
+export type AnimationName = "idle" | "attacked" | "dead" | "special_attack";
 
 export type EnemyHandle = {
   attack: (onAttackEnd: () => void) => Promise<Animation>;
   setDead: () => void;
   setAttacked: () => void;
   setIdle: () => void;
+  setSpecialAttack: () => void;
 };
 
 type FullAnimationName = `base_${AnimationName}`;
@@ -102,6 +104,10 @@ export default function Enemy({
     spriteRef.current?.setAnimation(getFullAnimationName("idle"));
   }, [getFullAnimationName]);
 
+  const setSpecialAttack: EnemyHandle["setSpecialAttack"] = useCallback(() => {
+    spriteRef.current?.setAnimation(getFullAnimationName("special_attack"));
+  }, [getFullAnimationName]);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -109,8 +115,9 @@ export default function Enemy({
       setDead,
       setAttacked,
       setIdle,
+      setSpecialAttack,
     }),
-    [attack, setDead, setAttacked, setIdle],
+    [attack, setDead, setAttacked, setIdle, setSpecialAttack],
   );
 
   return (
@@ -138,6 +145,11 @@ export default function Enemy({
             {
               name: "base_dead",
               tiles: [BASE_POSE_DEAD],
+            },
+            {
+              name: "base_special_attack",
+              tiles: BASE_ANIMATION_SPECIAL_ATTACK,
+              duration: 750,
             },
           ]}
           defaultAnimation={getFullAnimationName(defaultAnimation)}

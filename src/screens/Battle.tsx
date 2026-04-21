@@ -297,7 +297,10 @@ export default function Battle() {
                   break;
                 }
 
-                // TODO: make animation
+                enemyRef.current?.setSpecialAttack();
+                await sleep(1500);
+                enemyRef.current?.setIdle();
+
                 glueSymbol(
                   randomSymbolIndexes.reelIndex,
                   randomSymbolIndexes.symbolIndex,
@@ -319,13 +322,18 @@ export default function Battle() {
                   break;
                 }
 
-                // TODO: make animation
+                enemyRef.current?.setSpecialAttack();
+                await sleep(1500);
+                enemyRef.current?.setIdle();
+
                 setReelSymbol(1, symbolIndex, getRandomMalusSymbol());
                 break;
               }
 
               case "wizard": {
-                // TODO: make animation
+                enemyRef.current?.setSpecialAttack();
+                await sleep(1500);
+                enemyRef.current?.setIdle();
                 const malus = getRandomMalusSymbol();
                 addSymbolTooReel(random(0, 2), malus);
                 break;
