@@ -106,32 +106,147 @@ export function getEnemyNextActions(
   enemy: Enemy,
   levelIndex: number,
 ): NextAction[] {
-  const attackTypes: Array<"attack" | "defend"> = ["attack", "defend"];
   const healthRatio = enemy.health.value / enemy.health.max;
 
-  if (levelIndex === 0) {
-    const actionType = attackTypes[random(0, 2) % 2];
-
-    return [
-      {
-        type: actionType,
-        value:
-          actionType === "defend" ? 1 : random(1, healthRatio === 1 ? 1 : 2),
-      },
-    ];
-  }
-
-  switch (enemy.type) {
-    case "rat":
-    default: {
-      const actionType = attackTypes[random(0, 1)];
+  switch (levelIndex) {
+    case 0:
+    case 1: {
+      const attackTypes: Array<"attack" | "defend"> = ["attack", "defend"];
+      const actionType = attackTypes[random(0, 2) % 2];
 
       return [
         {
           type: actionType,
-          value: random(1, healthRatio === 1 ? 1 : 2),
+          value:
+            actionType === "defend" ? 1 : random(1, healthRatio === 1 ? 1 : 2),
         },
       ];
+    }
+
+    default: {
+      const roll = random(1, 100);
+
+      let actionType: "attack" | "defend";
+      let value: number;
+
+      switch (enemy.type) {
+        case "rat": {
+          actionType = roll <= 80 ? "attack" : "defend";
+          const base =
+            actionType === "attack"
+              ? Math.max(
+                  Math.ceil(levelIndex / 8),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2 + 1))) *
+                      levelIndex) /
+                      10,
+                  ),
+                )
+              : Math.max(
+                  1,
+                  Math.ceil(levelIndex / 16),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 3 + 1))) *
+                      levelIndex) /
+                      24,
+                  ),
+                );
+          value =
+            actionType === "attack"
+              ? Math.max(1, Math.round(base * (1 + (1 - healthRatio) * 0.2)))
+              : base;
+          break;
+        }
+
+        case "blob":
+          actionType =
+            healthRatio <= 0.5
+              ? roll <= 80
+                ? "defend"
+                : "attack"
+              : roll <= 80
+                ? "attack"
+                : "defend";
+          value =
+            actionType === "attack"
+              ? Math.max(
+                  Math.ceil(levelIndex / 10),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.5 + 1))) *
+                      levelIndex) /
+                      11,
+                  ),
+                )
+              : Math.max(
+                  1,
+                  Math.ceil(levelIndex / 12),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.8 + 1))) *
+                      levelIndex) /
+                      20,
+                  ),
+                );
+          break;
+
+        case "skeleton":
+          actionType =
+            healthRatio <= 0.5
+              ? roll <= 80
+                ? "attack"
+                : "defend"
+              : roll <= 80
+                ? "defend"
+                : "attack";
+          value =
+            actionType === "attack"
+              ? Math.max(
+                  Math.ceil(levelIndex / 9),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.3 + 1))) *
+                      levelIndex) /
+                      10.5,
+                  ),
+                )
+              : Math.max(
+                  1,
+                  Math.ceil(levelIndex / 12),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.6 + 1))) *
+                      levelIndex) /
+                      19,
+                  ),
+                );
+          break;
+
+        case "wizard":
+        default: {
+          actionType = roll <= 50 ? "attack" : "defend";
+          const base =
+            actionType === "attack"
+              ? Math.max(
+                  Math.ceil(levelIndex / 9.5),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.4 + 1))) *
+                      levelIndex) /
+                      10.8,
+                  ),
+                )
+              : Math.max(
+                  1,
+                  Math.ceil(levelIndex / 13),
+                  Math.ceil(
+                    (random(1, random(2, Math.ceil(levelIndex / 2.9 + 1))) *
+                      levelIndex) /
+                      21,
+                  ),
+                );
+          value =
+            healthRatio <= 0.33 ? Math.max(1, Math.round(base * 1.1)) : base;
+          break;
+        }
+      }
+
+      return [{ type: actionType, value }];
     }
   }
 }
