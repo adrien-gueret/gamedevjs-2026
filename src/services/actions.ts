@@ -237,12 +237,18 @@ export function startNewBattle(): GameState {
   return setEnemyNextActions();
 }
 
-export function endBattle(): GameState {
+export function endBattle(hasWon: boolean): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
     next.currentRun!.currentBattle = null;
-    next.currentRun!.levelIndex += 1;
+
+    if (hasWon) {
+      next.currentRun!.levelIndex += 1;
+    } else {
+      next.gold = Math.ceil(next.gold / 2);
+    }
+
     return next;
   });
 }

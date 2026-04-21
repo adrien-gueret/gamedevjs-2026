@@ -42,6 +42,7 @@ import {
 import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { random } from "@/services/maths";
+import GoldCounter from "@/components/GoldCounter";
 
 const ACTIVATION_DURATION = 420;
 
@@ -110,6 +111,17 @@ export default function Battle() {
 
   const timeoutRefs = useRef<Array<number | null>>([]);
   const activationTimeoutRefs = useRef<Array<number | null>>([]);
+  const DEFEAT_QUOTES = [
+    "Oh, you die. That's unfortunate.",
+    "You lost. Truly, a surprise to no one.",
+    "Well, that happened. Try not to do it again.",
+    "Death. A classic outcome, really.",
+    "You had potential. Emphasis on 'had'.",
+  ];
+  const defeatQuoteRef = useRef(
+    DEFEAT_QUOTES[Math.floor(Math.random() * DEFEAT_QUOTES.length)],
+  );
+
   const playerCloneRef = useRef<HTMLElement | null>(null);
 
   const playerRef = useRef<KnightHandle>(null);
@@ -561,7 +573,7 @@ export default function Battle() {
   const onHeal = async () => {
     await playerRef.current?.setHealing();
     navigate("/bonus-upgrade");
-    endBattle();
+    endBattle(true);
   };
 
   if (!state.currentRun?.currentBattle) {
@@ -604,7 +616,10 @@ export default function Battle() {
 
         {shouldShowWinScreen && (
           <DelayedRender delay={1000}>
-            <VictoryMessage onHeal={onHeal} onDevilDeal={endBattle} />
+            <VictoryMessage
+              onHeal={onHeal}
+              onDevilDeal={() => endBattle(true)}
+            />
           </DelayedRender>
         )}
       </Screen>
@@ -612,13 +627,52 @@ export default function Battle() {
         <Blackout>
           <h2 className="fade-in">Defeat...</h2>
 
+          <p
+            className="fade-in"
+            style={{ "--animation-delay": "2.5s" } as React.CSSProperties}
+          >
+            "{defeatQuoteRef.current}"
+          </p>
+
+          <hr
+            className="ui-separator fade-in"
+            style={
+              {
+                marginBottom: "24px",
+                "--animation-delay": "2.5s",
+              } as React.CSSProperties
+            }
+          />
+
+          <p
+            className="fade-in"
+            style={{ "--animation-delay": "3s" } as React.CSSProperties}
+          >
+            "Don't worry, I'll resurrect you soon.{" "}
+            {state.gold > 0
+              ? "You can even keep your gold! Just give me half."
+              : null}
+            "
+          </p>
+
+          {state.gold > 0 && (
+            <div
+              className="game-over-gold-container fade-in"
+              style={{ "--animation-delay": "3s" } as React.CSSProperties}
+            >
+              <GoldCounter value={state.gold} />
+              <img src="./images/right-arrow.png" alt="" />
+              <GoldCounter value={Math.ceil(state.gold / 2)} />
+            </div>
+          )}
+
           <Link
             className="fade-in"
-            onClick={endBattle}
-            style={{ "--animation-delay": "2s" } as React.CSSProperties}
+            onClick={() => endBattle(false)}
+            style={{ "--animation-delay": "3.5s" } as React.CSSProperties}
             to="/"
           >
-            Try again
+            Resurrect.
           </Link>
         </Blackout>
       )}

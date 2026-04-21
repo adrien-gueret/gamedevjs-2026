@@ -80,6 +80,18 @@ p {
   animation-play-state: running, paused;
 }
 
+.game-over-gold-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.game-over-gold-container .gold-counter {
+  position: static;
+}
+
 @keyframes floating-choice-item-float {
   0%,
   100% {
