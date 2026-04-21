@@ -29,6 +29,7 @@ import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
 import GoldCounter from "@/components/GoldCounter";
 import ReplacementBonusModal from "@/components/ReplacementBonusModal";
+import Button from "@/components/Button";
 
 const DEAL_PHRASES = [
   "I have some offers you can't refuse...",
@@ -183,9 +184,9 @@ export default function DevilDeal() {
       </div>
 
       <div>
-        <button type="button" onClick={leave}>
+        <Button imageName="leave" type="button" onClick={leave}>
           Leave
-        </button>
+        </Button>
       </div>
 
       <HealthBar

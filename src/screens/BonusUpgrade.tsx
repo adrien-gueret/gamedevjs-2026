@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
+import Button from "@/components/Button";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
 import MachineUpdate from "@/components/MachineUpdate";
@@ -89,9 +90,9 @@ export default function BonusUpgrade() {
         />
       )}
 
-      <button type="button" onClick={leave}>
+      <Button imageName="skip" onClick={leave}>
         Skip
-      </button>
+      </Button>
     </Screen>
   );
 }

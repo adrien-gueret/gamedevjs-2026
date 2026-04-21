@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 
 import { useGameState } from "@/services/gameStore";
+import Button from "@/components/Button";
 import MachineReel from "@/components/MachineReel";
 import MachineSymbol from "@/components/MachineSymbol";
 import Tooltip from "@/components/Tooltip";
@@ -108,13 +109,11 @@ export default function MachineUpdate({
           ))}
         </div>
         {onClose && (
-          <button
-            disabled={hasMadeChoice}
-            className="machine-update-back-button"
-            onClick={onClose}
-          >
-            Back
-          </button>
+          <div className="machine-update-back-button">
+            <Button imageName="back" disabled={hasMadeChoice} onClick={onClose}>
+              Back
+            </Button>
+          </div>
         )}
       </div>
     </div>
