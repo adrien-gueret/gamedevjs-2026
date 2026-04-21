@@ -14,7 +14,7 @@ export default function EnemyLabel({ enemyType }: { enemyType: EnemyType }) {
       return (
         <>
           <b style={{ color: "darkorange" }}>Blob</b> - At the end of each turn,
-          two visible symbols in your machine are{" "}
+          one symbol in your machine is{" "}
           <b style={{ color: "#953297" }}>glued</b>.
         </>
       );

@@ -17,13 +17,14 @@ export const MALUS_SYMBOLS: ReelSymbol[] = [
   "Evil-Heart",
   "Evil-Shield",
   "Evil-Sword",
+  "Glued",
 ];
 
 export function isMalusSymbol(symbol: ReelSymbol): boolean {
   return MALUS_SYMBOLS.includes(symbol);
 }
 
-export function getRandomMalusBonusSymbol(): ReelSymbol {
+export function getRandomMalusSymbol(): ReelSymbol {
   return getRandomElements<ReelSymbol>(MALUS_SYMBOLS, 1)[0];
 }
 
@@ -48,4 +49,25 @@ export function getRandomDevilDeals(): BuyableDevilDeal[] {
   }));
 
   return [...randomPermanentDevilDeals, ...randomRunOnlyDevilDeals];
+}
+
+export function getCorrespondingMalusSymbol<T extends boolean>(
+  symbol: ReelSymbol,
+  randomIfNone?: T,
+): T extends true ? ReelSymbol : ReelSymbol | null {
+  switch (symbol) {
+    case "Sword":
+      return "Evil-Sword";
+
+    case "Shield":
+      return "Evil-Shield";
+
+    case "Heart":
+      return "Evil-Heart";
+
+    default:
+      return (randomIfNone ? getRandomMalusSymbol() : null) as T extends true
+        ? ReelSymbol
+        : ReelSymbol | null;
+  }
 }

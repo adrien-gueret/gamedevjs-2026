@@ -54,6 +54,14 @@ export default function SymbolLabel({ symbol }: { symbol: ReelSymbol }) {
           <b style={{ color: "#953297" }}>the enemy</b>
         </>
       );
+    case "Glued":
+      return (
+        <>
+          This symbol is <b style={{ color: "#953297" }}>glued</b>. Activating
+          it will remove the glue.
+        </>
+      );
+
     case "Sleep":
     default:
       return <>Do nothing</>;

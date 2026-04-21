@@ -144,7 +144,7 @@ export function getEnemyNextActions(
                 )
               : Math.max(
                   1,
-                  Math.ceil(levelIndex / 16),
+                  Math.ceil(levelIndex / 14),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 3 + 1))) *
                       levelIndex) /
@@ -170,7 +170,7 @@ export function getEnemyNextActions(
           value =
             actionType === "attack"
               ? Math.max(
-                  Math.ceil(levelIndex / 10),
+                  Math.ceil(levelIndex / 9),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.5 + 1))) *
                       levelIndex) /
@@ -179,7 +179,7 @@ export function getEnemyNextActions(
                 )
               : Math.max(
                   1,
-                  Math.ceil(levelIndex / 12),
+                  Math.ceil(levelIndex / 10),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.8 + 1))) *
                       levelIndex) /
@@ -200,7 +200,7 @@ export function getEnemyNextActions(
           value =
             actionType === "attack"
               ? Math.max(
-                  Math.ceil(levelIndex / 9),
+                  Math.ceil(levelIndex / 8),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.3 + 1))) *
                       levelIndex) /
@@ -209,7 +209,7 @@ export function getEnemyNextActions(
                 )
               : Math.max(
                   1,
-                  Math.ceil(levelIndex / 12),
+                  Math.ceil(levelIndex / 8),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.6 + 1))) *
                       levelIndex) /
@@ -224,7 +224,7 @@ export function getEnemyNextActions(
           const base =
             actionType === "attack"
               ? Math.max(
-                  Math.ceil(levelIndex / 9.5),
+                  Math.ceil(levelIndex / 8.5),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.4 + 1))) *
                       levelIndex) /
@@ -233,7 +233,7 @@ export function getEnemyNextActions(
                 )
               : Math.max(
                   1,
-                  Math.ceil(levelIndex / 13),
+                  Math.ceil(levelIndex / 10),
                   Math.ceil(
                     (random(1, random(2, Math.ceil(levelIndex / 2.9 + 1))) *
                       levelIndex) /

@@ -94,6 +94,30 @@ export function addSymbolTooReel(
   });
 }
 
+export function glueSymbol(reelIndex: number, symbolIndex: number): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.gluedSymbolsIndexes[reelIndex].push(symbolIndex);
+    return next;
+  });
+}
+
+export function unglueSymbol(
+  reelIndex: number,
+  symbolIndex: number,
+): GameState {
+  return setGameState((prev) => {
+    if (!prev.currentRun) return prev;
+    const next = structuredClone(prev);
+    next.currentRun!.gluedSymbolsIndexes[reelIndex] =
+      next.currentRun!.gluedSymbolsIndexes[reelIndex].filter(
+        (index) => index !== symbolIndex,
+      );
+    return next;
+  });
+}
+
 export function addPassiveEffect(effect: PassiveEffectType): GameState {
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;

@@ -6,7 +6,8 @@ export type ReelSymbol =
   | "Coin"
   | "Evil-Heart"
   | "Evil-Shield"
-  | "Evil-Sword";
+  | "Evil-Sword"
+  | "Glued";
 
 export type EnemyType = "rat" | "blob" | "skeleton" | "wizard";
 
@@ -84,6 +85,7 @@ export type Run = {
   health: Health;
   type: PlayerType;
   reels: ReelSymbol[][];
+  gluedSymbolsIndexes: number[][];
   levelIndex: number;
   passiveEffects: PassiveEffectType[];
   currentBattle: Battle | null;
@@ -92,7 +94,11 @@ export type Run = {
 
 export type ConfigurableBaseRun = Omit<
   Run,
-  "levelIndex" | "currentBattle" | "randomChoices" | "passiveEffects"
+  | "levelIndex"
+  | "currentBattle"
+  | "randomChoices"
+  | "passiveEffects"
+  | "gluedSymbolsIndexes"
 >;
 
 export type GameState = {

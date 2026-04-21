@@ -25,6 +25,9 @@ import {
   healEnemy,
   addEnemyNextActions,
   setHasUsedLockedReel,
+  addSymbolTooReel,
+  setReelSymbol,
+  glueSymbol,
 } from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
@@ -32,8 +35,11 @@ import {
   canEnemyAttack,
   canPlayerAttack,
   isPlayerDefeated,
+  getRandomNotGluedSymbolIndexes,
 } from "@/services/selector";
 import { VictoryMessage } from "@/components/VictoryMessage";
+import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
+import { random } from "@/services/maths";
 
 const symboleToDirectAction: Partial<
   Record<ReelSymbol, (multiplier: number) => void>
@@ -243,6 +249,52 @@ export default function Battle() {
           } else {
             resetPlayerNextActions();
             setEnemyNextActions();
+
+            switch (state.currentRun?.currentBattle?.enemy.type) {
+              case "blob": {
+                const randomSymbolIndexes = getRandomNotGluedSymbolIndexes();
+
+                if (randomSymbolIndexes === null) {
+                  break;
+                }
+
+                glueSymbol(
+                  randomSymbolIndexes.reelIndex,
+                  randomSymbolIndexes.symbolIndex,
+                );
+
+                break;
+              }
+
+              case "skeleton": {
+                const middleReel = reels[1];
+                const symbolIndex =
+                  middleReel.length > 0
+                    ? ((startIndexes[1] ?? 0) + 1) % middleReel.length
+                    : 0;
+
+                const symbol = middleReel[symbolIndex];
+
+                if (!symbol || isMalusSymbol(symbol)) {
+                  break;
+                }
+
+                // TODO: make animation
+                setReelSymbol(1, symbolIndex, getRandomMalusSymbol());
+                break;
+              }
+
+              case "wizard": {
+                // TODO: make animation
+                const malus = getRandomMalusSymbol();
+                addSymbolTooReel(random(0, 2), malus);
+                break;
+              }
+
+              default:
+                break;
+            }
+
             setCanSpin(true);
           }
         } else {

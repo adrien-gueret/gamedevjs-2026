@@ -9,7 +9,7 @@ import SymbolPicker from "@/components/SymbolPicker";
 
 import {
   getRandomDevilDeals,
-  getRandomMalusBonusSymbol,
+  getRandomMalusSymbol,
   getRandomBonusSymbols,
   isMalusSymbol,
 } from "@/services/upgrades";
@@ -140,7 +140,7 @@ export default function DevilDeal() {
 
           forcedMalusTotalRef.current = deal.cost.value;
           setForcedMalusCount(deal.cost.value);
-          setCurrentForcedMalusSymbol(getRandomMalusBonusSymbol());
+          setCurrentForcedMalusSymbol(getRandomMalusSymbol());
           return;
         }
       }
@@ -219,10 +219,10 @@ export default function DevilDeal() {
             } else {
               setForcedMalusCount((count) => count - 1);
 
-              let newRandomSymbol = getRandomMalusBonusSymbol();
+              let newRandomSymbol = getRandomMalusSymbol();
 
               while (newRandomSymbol === currentForcedMalusSymbol) {
-                newRandomSymbol = getRandomMalusBonusSymbol();
+                newRandomSymbol = getRandomMalusSymbol();
               }
 
               setCurrentForcedMalusSymbol(newRandomSymbol);

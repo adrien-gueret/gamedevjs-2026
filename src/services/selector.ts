@@ -1,6 +1,7 @@
 import { getGameState } from "@/services/gameStore";
 import type { DevilDealType } from "@/types/game";
 import { PERMANENT_DEVIL_DEALS } from "@/constants/devilDeals";
+import { getRandomElements } from "./utils";
 
 export function canPlayerAttack(): boolean {
   const currentState = getGameState();
@@ -54,4 +55,53 @@ export function canDevilDealBeInShop(dealType: DevilDealType): boolean {
     : true;
 
   return hasRequiredDeals && !hasUnlockedPermanentDeal(dealType);
+}
+
+export function isSymbolGlued(reelIndex: number, symbolIndex: number): boolean {
+  const currentState = getGameState();
+
+  return (
+    currentState.currentRun?.gluedSymbolsIndexes[reelIndex].includes(
+      symbolIndex,
+    ) ?? false
+  );
+}
+
+export function areAllSymbolsGlued(): boolean {
+  const currentState = getGameState();
+
+  return (
+    currentState.currentRun?.gluedSymbolsIndexes.every(
+      (gluedIndexes, reelIndex) =>
+        gluedIndexes.length ===
+        currentState.currentRun?.reels[reelIndex].length,
+    ) ?? true
+  );
+}
+
+export function getRandomNotGluedSymbolIndexes(): {
+  reelIndex: number;
+  symbolIndex: number;
+} | null {
+  if (areAllSymbolsGlued()) {
+    return null;
+  }
+
+  const currentState = getGameState();
+
+  const notGluedSymbols: { reelIndex: number; symbolIndex: number }[] = [];
+
+  currentState.currentRun!.reels.forEach((reel, reelIndex) => {
+    reel.forEach((_, symbolIndex) => {
+      if (!isSymbolGlued(reelIndex, symbolIndex)) {
+        notGluedSymbols.push({ reelIndex, symbolIndex });
+      }
+    });
+  });
+
+  if (notGluedSymbols.length === 0) {
+    return null;
+  }
+
+  return getRandomElements(notGluedSymbols, 1)[0];
 }
