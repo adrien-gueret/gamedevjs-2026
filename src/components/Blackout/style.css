@@ -1,7 +1,7 @@
 .blackout {
   position: absolute;
   z-index: 10;
-  inset: 0;
+  inset: -9px;
   opacity: 0;
   background-color: #111;
   animation: blackout-fade-in 1s ease-out forwards;
@@ -20,6 +20,13 @@
     -2px -2px 0 #000;
   font-size: 48px;
   margin-bottom: 24px;
+  line-height: 30px;
+}
+
+.blackout h2 span {
+  font-size: 28px;
+  margin-bottom: 24px;
+  opacity: 0.5;
 }
 
 .blackout .fade-in {

@@ -7,6 +7,7 @@
   background: none;
   background-position: top;
   cursor: pointer;
+  display: inline-block;
 }
 
 .button-base:disabled {

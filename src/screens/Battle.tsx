@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import type { ReelSymbol, BetCost } from "@/types/game";
 
@@ -43,6 +43,7 @@ import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { random } from "@/services/maths";
 import GoldCounter from "@/components/GoldCounter";
+import Button from "@/components/Button";
 
 const ACTIVATION_DURATION = 420;
 
@@ -625,7 +626,11 @@ export default function Battle() {
       </Screen>
       {shouldShowLostScreen && (
         <Blackout>
-          <h2 className="fade-in">Defeat...</h2>
+          <h2 className="fade-in">
+            Defeat...
+            <br />
+            <span>(on fight n°{(state.currentRun?.levelIndex ?? 0) + 1})</span>
+          </h2>
 
           <p
             className="fade-in"
@@ -646,7 +651,7 @@ export default function Battle() {
 
           <p
             className="fade-in"
-            style={{ "--animation-delay": "3s" } as React.CSSProperties}
+            style={{ "--animation-delay": "4s" } as React.CSSProperties}
           >
             "Don't worry, I'll resurrect you soon.{" "}
             {state.gold > 0
@@ -658,7 +663,7 @@ export default function Battle() {
           {state.gold > 0 && (
             <div
               className="game-over-gold-container fade-in"
-              style={{ "--animation-delay": "3s" } as React.CSSProperties}
+              style={{ "--animation-delay": "4s" } as React.CSSProperties}
             >
               <GoldCounter value={state.gold} />
               <img src="./images/right-arrow.png" alt="" />
@@ -666,14 +671,19 @@ export default function Battle() {
             </div>
           )}
 
-          <Link
+          <div
             className="fade-in"
-            onClick={() => endBattle(false)}
-            style={{ "--animation-delay": "3.5s" } as React.CSSProperties}
-            to="/"
+            style={{ "--animation-delay": "4.5s" } as React.CSSProperties}
           >
-            Resurrect.
-          </Link>
+            <Button
+              imageName="resurrect"
+              as="link"
+              onClick={() => endBattle(false)}
+              to="/"
+            >
+              Resurrect
+            </Button>
+          </div>
         </Blackout>
       )}
     </>

@@ -6,7 +6,7 @@ import "./style.css";
 type ButtonBaseProps = {
   as?: "link" | "button";
   children: React.ReactNode;
-  imageName: "spin";
+  imageName: "start" | "spin" | "resurrect";
 };
 
 type LinkOnlyProps = ButtonBaseProps &
@@ -23,7 +23,9 @@ const imageNameToButtonSize: Record<
   ButtonBaseProps["imageName"],
   { width: number; height: number }
 > = {
+  start: { width: 135, height: 42 },
   spin: { width: 114, height: 42 },
+  resurrect: { width: 135, height: 42 },
 };
 
 export default function Button({
