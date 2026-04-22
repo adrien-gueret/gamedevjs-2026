@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Screen from "@/components/Screen";
@@ -13,6 +13,7 @@ import type { ConfigurableBaseRun, PlayerType } from "@/types/game";
 import ChoiceItem from "@/components/ChoiceItem";
 import CharacterDescription from "@/components/CharacterDescription";
 import Sprite from "@/components/Sprite";
+import { generateBaseRunFromString } from "@/services/customRun";
 
 export default function Start() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export default function Start() {
       ),
       details: (
         <>
-          A brave knight who was imprisoned. The Devil offered his help by
+          This brave knight was imprisoned. The Devil offered his help by
           granting him great power... based on a 9x9 slot machine!
         </>
       ),
@@ -64,11 +65,11 @@ export default function Start() {
       ),
       details: (
         <>
-          An ancient knight, tricked by the Devil... It starts the run without
-          full HP, and its 7x7 machine contains some{" "}
+          This ancient knight was tricked by the Devil... He starts the run
+          without full HP, and his 7x7 machine contains some{" "}
           <b style={{ color: "#953297" }}>cursed</b> symbols.
           <br />
-          However, it starts with <b style={{ color: "cyan" }}>
+          However, he starts with <b style={{ color: "cyan" }}>
             1
           </b> passive <b style={{ color: "lightgreen" }}>block</b> effect.
         </>
@@ -86,9 +87,24 @@ export default function Start() {
       ),
       details: (
         <>
-          A powerful mage willing to challenge the Devil. Its 8x8 machine has
-          some <b style={{ color: "gold" }}>improved</b> symbols. The middle
-          reel contains the Wizard's entire treasure, but it's a bit dirty...
+          This wizard seeks revenge on the Devil. His 8x8 machine has some{" "}
+          <b style={{ color: "gold" }}>improved</b> symbols. The middle reel
+          contains his entire treasure, but it's a bit dirty...
+        </>
+      ),
+    },
+    random: {
+      name: (
+        <>
+          <b style={{ color: "darkorange" }}>Randy</b> (
+          <b style={{ color: "cyan" }}>???</b> HP)
+        </>
+      ),
+      details: (
+        <>
+          Nobody knows who he is... not even Randy himself! He woke up in the
+          Devil's prison with no memories... Who knows what kind of machine
+          he'll get this time?
         </>
       ),
     },
@@ -177,6 +193,39 @@ export default function Start() {
           >
             <Sprite
               imgSrc={`./images/characters/wizard_player.png`}
+              tileHeight={32}
+              tileWidth={32}
+              tileSeparationX={1}
+              tileSeparationY={1}
+              animations={[
+                {
+                  name: "base_idle",
+                  tiles: [0, 1],
+                  duration: 750,
+                },
+              ]}
+              defaultAnimation="base_idle"
+              scale={3}
+            />
+          </ChoiceItem>
+        )}
+
+        {hasUnlockedPermanentDeal("unlockRandom") && (
+          <ChoiceItem
+            delay={3}
+            onClick={() =>
+              onPlay(
+                generateBaseRunFromString(
+                  (Date.now() * Math.random()).toString(),
+                  "random",
+                ),
+              )
+            }
+            onMouseEnter={() => setHoverCharacter("random")}
+            onMouseLeave={hideDescription}
+          >
+            <Sprite
+              imgSrc={`./images/characters/random_player.png`}
               tileHeight={32}
               tileWidth={32}
               tileSeparationX={1}

@@ -44,6 +44,11 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     permanent: true,
   },
   {
+    type: "unlockRandom",
+    cost: { value: 4, type: "gold" },
+    permanent: true,
+  },
+  {
     type: "superHeart",
     cost: { value: 12, type: "gold" },
     requirements: ["moreHealth3"],

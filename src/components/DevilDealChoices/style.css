@@ -42,7 +42,7 @@
   height: 96px;
   display: block;
   background-image: url(./images/devil-deal-choice.png);
-  background-size: 1632px 96px;
+  background-size: 1728px 96px;
 }
 
 .deal-choice-button:disabled {
@@ -116,4 +116,8 @@
 
 .deal-choice-supershield {
   background-position: -1536px 0;
+}
+
+.deal-choice-unlockrandom {
+  background-position: -1632px 0;
 }

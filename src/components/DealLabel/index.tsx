@@ -121,6 +121,14 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
           {costLabel}
         </>
       );
+    case "unlockRandom":
+      return (
+        <>
+          Unlock a new character: <b style={{ color: "cyan" }}>Randy</b>. We
+          never know who it will be!
+          {costLabel}
+        </>
+      );
     case "superHeart":
       return (
         <>

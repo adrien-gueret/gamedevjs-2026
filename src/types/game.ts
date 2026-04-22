@@ -15,7 +15,7 @@ export type ReelSymbol =
 
 export type EnemyType = "rat" | "blob" | "skeleton" | "wizard";
 
-export type PlayerType = "knight" | "skeleton" | "wizard";
+export type PlayerType = "knight" | "skeleton" | "wizard" | "random";
 
 export type DevilDealType =
   // Permanent upgrades (only with gold cost)
@@ -27,6 +27,7 @@ export type DevilDealType =
   | "moreHealth3"
   | "unlockSkeleton"
   | "unlockWizard"
+  | "unlockRandom"
   | "superHeart"
   | "superCoin"
   | "superSword"
