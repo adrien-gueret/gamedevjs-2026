@@ -47,7 +47,8 @@ export function canDevilDealBeInShop(dealType: DevilDealType): boolean {
   const deal = PERMANENT_DEVIL_DEALS.find((deal) => deal.type === dealType);
 
   if (!deal) {
-    return true;
+    const currentState = getGameState();
+    return dealType === "passiveWantedToDie" ? currentState.gold > 1 : true;
   }
 
   const hasRequiredDeals = deal.requirements
