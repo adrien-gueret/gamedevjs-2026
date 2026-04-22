@@ -2,8 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
-export default defineConfig({
-  base: "/the-devil-machine/",
+export default defineConfig(({ command }) => ({
+  base: command === "serve" ? "/the-devil-machine/" : "./",
   plugins: [react()],
   resolve: {
     alias: {
@@ -15,4 +15,4 @@ export default defineConfig({
     outDir: "dist",
     assetsDir: "./",
   },
-});
+}));

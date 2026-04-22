@@ -52,8 +52,9 @@ export default function Start() {
       ),
       details: (
         <>
-          This brave knight was imprisoned. The Devil offered his help by
-          granting him great power... based on a 9x9 slot machine!
+          This brave knight is imprisoned. The Devil offered him a deal: a great
+          power… at a terrible cost. Now, every action he takes is determined by
+          a 9x9 slot machine! Will he escape his prison and reclaim his freedom?
         </>
       ),
     },
