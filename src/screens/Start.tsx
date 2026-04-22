@@ -15,9 +15,13 @@ import CharacterDescription from "@/components/CharacterDescription";
 import Sprite from "@/components/Sprite";
 import { generateBaseRunFromString } from "@/services/customRun";
 
+type PossiblePlayer = PlayerType | "ethereum";
+
 export default function Start() {
   const navigate = useNavigate();
-  const [hoverCharacter, setHoverCharacter] = useState<PlayerType | null>(null);
+  const [hoverCharacter, setHoverCharacter] = useState<PossiblePlayer | null>(
+    null,
+  );
 
   const hideDescription = useCallback(() => setHoverCharacter(null), []);
 
@@ -30,7 +34,7 @@ export default function Start() {
         : 0;
 
   const playerTypeToDescription: Record<
-    PlayerType,
+    PossiblePlayer,
     {
       name: React.ReactNode;
       details: React.ReactNode;
@@ -108,6 +112,22 @@ export default function Start() {
         </>
       ),
     },
+    ethereum: {
+      name: (
+        <>
+          <b style={{ color: "darkorange" }}>Ethereum</b> (
+          <b style={{ color: "cyan" }}>???</b> HP)
+        </>
+      ),
+      details: (
+        <>
+          Connect your <b style={{ color: "gold" }}>Ethereum</b> wallet and play
+          as your on-chain avatar! Your machine will be generated based on your
+          wallet's address. Will you be able to escape the Devil's prison and
+          reclaim your freedom?
+        </>
+      ),
+    },
   };
 
   const onPlay = useCallback(
@@ -131,10 +151,46 @@ export default function Start() {
     [navigate, healthBonus],
   );
 
+  const onPlayEthereum = useCallback(async () => {
+    if (!window.ethereum) {
+      return;
+    }
+
+    try {
+      const provider = window.ethereum;
+
+      let accounts = (await provider.request({
+        method: "eth_accounts",
+      })) as string[];
+
+      if (!accounts.length) {
+        accounts = (await provider.request({
+          method: "eth_requestAccounts",
+        })) as string[];
+      }
+
+      const address = accounts[0];
+
+      if (!address) {
+        return;
+      }
+
+      onPlay(generateBaseRunFromString(address));
+    } catch {}
+  }, [onPlay]);
+
   return (
     <Screen>
       <h1>Who are you?</h1>
-      <div style={{ display: "flex", gap: 16, marginTop: 32 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          marginTop: 32,
+          justifyContent: "center",
+          flexWrap: "wrap",
+        }}
+      >
         <ChoiceItem
           onClick={() => onPlay(BASE_RUN_KNIGHT)}
           onMouseEnter={() => setHoverCharacter("knight")}
@@ -212,7 +268,7 @@ export default function Start() {
 
         {hasUnlockedPermanentDeal("unlockRandom") && (
           <ChoiceItem
-            delay={3}
+            delay={4.5}
             onClick={() =>
               onPlay(
                 generateBaseRunFromString(
@@ -226,6 +282,32 @@ export default function Start() {
           >
             <Sprite
               imgSrc={`./images/characters/random_player.png`}
+              tileHeight={32}
+              tileWidth={32}
+              tileSeparationX={1}
+              tileSeparationY={1}
+              animations={[
+                {
+                  name: "base_idle",
+                  tiles: [0, 1],
+                  duration: 750,
+                },
+              ]}
+              defaultAnimation="base_idle"
+              scale={3}
+            />
+          </ChoiceItem>
+        )}
+
+        {Boolean(window.ethereum) && (
+          <ChoiceItem
+            delay={5}
+            onClick={() => onPlayEthereum()}
+            onMouseEnter={() => setHoverCharacter("ethereum")}
+            onMouseLeave={hideDescription}
+          >
+            <Sprite
+              imgSrc={`./images/characters/ethereum_player.png`}
               tileHeight={32}
               tileWidth={32}
               tileSeparationX={1}
