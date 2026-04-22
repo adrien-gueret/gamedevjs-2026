@@ -623,7 +623,13 @@ export default function Battle() {
           gold={state.gold}
         />
         <hr className="ui-separator" />
-        <div className={shouldShowWinScreen ? "slot-machine-panel-fallen" : ""}>
+        <div
+          className={shouldShowWinScreen ? "slot-machine-panel-fallen" : ""}
+          onAnimationEnd={(e) => {
+            if (e.animationName === "fall")
+              e.currentTarget.style.display = "none";
+          }}
+        >
           <SlotMachine
             symbols={reels}
             startIndexes={startIndexes}

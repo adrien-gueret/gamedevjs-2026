@@ -125,12 +125,9 @@ p {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
   }
-  99% {
+  100% {
     transform: translateY(120%) rotate(8deg);
     opacity: 0;
-  }
-  100% {
-    display: none;
   }
 }
 

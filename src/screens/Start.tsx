@@ -86,10 +86,9 @@ export default function Start() {
       ),
       details: (
         <>
-          A powerful mage willing to challenge the Devil. Its 8x8 machine
-          contains some <b style={{ color: "gold" }}>improved</b> symbols. The
-          middle reel contains the Wizard's entire treasure, but it's a bit
-          dirty...
+          A powerful mage willing to challenge the Devil. Its 8x8 machine has
+          some <b style={{ color: "gold" }}>improved</b> symbols. The middle
+          reel contains the Wizard's entire treasure, but it's a bit dirty...
         </>
       ),
     },
