@@ -22,6 +22,7 @@ import {
   spendMaxHealth,
   setReelSymbol,
   removeReelSymbol,
+  killPlayer,
 } from "@/services/actions";
 import { random } from "@/services/maths";
 
@@ -111,7 +112,7 @@ export default function DevilDeal() {
               break;
 
             case "passiveWantedToDie": {
-              spendMaxHealth(Infinity);
+              killPlayer();
               addPassiveEffect("wantedToDie");
               leave();
               break;

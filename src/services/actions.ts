@@ -210,6 +210,17 @@ export function spendMaxHealth(amount: number): GameState {
   });
 }
 
+export function killPlayer() {
+  return setGameState((prev) => {
+    if (!prev.currentRun) {
+      return prev;
+    }
+    const next = structuredClone(prev);
+    next.currentRun!.health.value = 0;
+    return next;
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Run - Battle
 // ---------------------------------------------------------------------------
