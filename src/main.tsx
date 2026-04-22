@@ -25,6 +25,13 @@ if (!("structuredClone" in globalThis)) {
     JSON.parse(JSON.stringify(obj));
 }
 
+if (window.Wavedash) {
+  const Wavedash = await window.Wavedash;
+
+  Wavedash.updateLoadProgressZeroToOne(1);
+  Wavedash.init({ debug: true });
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router />

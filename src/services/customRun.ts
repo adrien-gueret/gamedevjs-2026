@@ -89,7 +89,7 @@ export function generateBaseRunFromString(
     reels.push(reel);
   }
 
-  while (totalSwords < 3) {
+  while (totalSwords < 6) {
     const r = rng.int(0, 2);
     const s = rng.int(0, reels[r].length - 1);
     if (reels[r][s] !== "Sword") {

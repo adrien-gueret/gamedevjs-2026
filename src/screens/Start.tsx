@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Screen from "@/components/Screen";
@@ -14,8 +14,9 @@ import ChoiceItem from "@/components/ChoiceItem";
 import CharacterDescription from "@/components/CharacterDescription";
 import Sprite from "@/components/Sprite";
 import { generateBaseRunFromString } from "@/services/customRun";
+import useWavedash from "@/services/useWavedash";
 
-type PossiblePlayer = PlayerType | "ethereum";
+type PossiblePlayer = PlayerType | "ethereum" | "wavedash";
 
 export default function Start() {
   const navigate = useNavigate();
@@ -32,6 +33,27 @@ export default function Start() {
       : hasUnlockedPermanentDeal("moreHealth1")
         ? 10
         : 0;
+
+  const wavedash = useWavedash();
+
+  const wavedashUser: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  } | null = useMemo(() => {
+    if (!wavedash) {
+      return null;
+    }
+
+    const userId = wavedash.getUserId();
+    const url = wavedash.getUserAvatarUrl(userId, 1);
+
+    return {
+      id: userId,
+      name: wavedash.getUsername(),
+      avatar: url,
+    };
+  }, [wavedash]);
 
   const playerTypeToDescription: Record<
     PossiblePlayer,
@@ -110,6 +132,22 @@ export default function Start() {
           Nobody knows who he is... not even Randy himself! He woke up in the
           Devil's prison with no memories... Who knows what kind of machine
           he'll get this time?
+        </>
+      ),
+    },
+    wavedash: {
+      name: (
+        <>
+          <b style={{ color: "darkorange" }}>{wavedashUser?.name}</b> (
+          <b style={{ color: "cyan" }}>???</b> HP)
+        </>
+      ),
+      details: (
+        <>
+          That's you! Your machine is unique, based on your{" "}
+          <b style={{ color: "gold" }}>Wavedash</b> profile. Will you be a
+          Knight, Skeleton or a Wizard? Only one way to find out... Good luck
+          escaping the Devil's prison!
         </>
       ),
     },
@@ -297,6 +335,47 @@ export default function Start() {
               defaultAnimation="base_idle"
               scale={3}
             />
+          </ChoiceItem>
+        )}
+
+        {wavedashUser && (
+          <ChoiceItem
+            delay={5}
+            onClick={() => onPlay(generateBaseRunFromString(wavedashUser.id))}
+            onMouseEnter={() => setHoverCharacter("wavedash")}
+            onMouseLeave={hideDescription}
+          >
+            {wavedashUser.avatar ? (
+              <div style={{ width: 96, height: 96 }}>
+                <img
+                  src={wavedashUser.avatar}
+                  style={{
+                    objectFit: "contain",
+                    width: "100%",
+                    height: "100%",
+                    display: "block",
+                  }}
+                  alt=""
+                />
+              </div>
+            ) : (
+              <Sprite
+                imgSrc={`./images/characters/random_player.png`}
+                tileHeight={32}
+                tileWidth={32}
+                tileSeparationX={1}
+                tileSeparationY={1}
+                animations={[
+                  {
+                    name: "base_idle",
+                    tiles: [0, 1],
+                    duration: 750,
+                  },
+                ]}
+                defaultAnimation="base_idle"
+                scale={3}
+              />
+            )}
           </ChoiceItem>
         )}
 
