@@ -1,0 +1,22 @@
+.character-description-container {
+  border: 32px solid transparent;
+  border-image-source: url(./images/machine-borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+  margin-top: 24px;
+  width: 450px;
+  height: 150px;
+}
+
+.character-description-name {
+  font-size: 24px;
+  text-shadow: 1px 1px 0 #000;
+  color: #fff;
+}
+
+.character-description-details {
+  font-size: 18px;
+  color: #c3bdc0;
+  text-shadow: 1px 1px 0 #382f35;
+}
