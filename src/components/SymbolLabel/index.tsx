@@ -9,10 +9,24 @@ export default function SymbolLabel({ symbol }: { symbol: ReelSymbol }) {
           <b style={{ color: "red" }}>attack</b>
         </>
       );
+    case "Super-Sword":
+      return (
+        <>
+          Gain <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "red" }}>attack</b>
+        </>
+      );
     case "Shield":
       return (
         <>
           Gain <b style={{ color: "cyan" }}>1</b>{" "}
+          <b style={{ color: "lightgreen" }}>block</b>
+        </>
+      );
+    case "Super-Shield":
+      return (
+        <>
+          Gain <b style={{ color: "cyan" }}>2</b>{" "}
           <b style={{ color: "lightgreen" }}>block</b>
         </>
       );
@@ -23,10 +37,24 @@ export default function SymbolLabel({ symbol }: { symbol: ReelSymbol }) {
           <b style={{ color: "gold" }}>gold</b>
         </>
       );
+    case "Super-Coin":
+      return (
+        <>
+          Gain <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "gold" }}>gold</b>
+        </>
+      );
     case "Heart":
       return (
         <>
           Heal <b style={{ color: "cyan" }}>1</b>{" "}
+          <b style={{ color: "lightcoral" }}>health</b>
+        </>
+      );
+    case "Super-Heart":
+      return (
+        <>
+          Heal <b style={{ color: "cyan" }}>2</b>{" "}
           <b style={{ color: "lightcoral" }}>health</b>
         </>
       );

@@ -21,7 +21,8 @@
 }
 
 .machine-update-question .machine-symbol {
-  margin: 0 -12px;
+  margin: 0 -12px 16px 0;
+  transform: translateY(16px);
 }
 
 .machine-update-back-button {

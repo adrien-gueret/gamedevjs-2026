@@ -27,16 +27,32 @@
   background-image: url(./images/slots/sword.png);
 }
 
+.machine-symbol-super-sword {
+  background-image: url(./images/slots/super-sword.png);
+}
+
 .machine-symbol-shield {
   background-image: url(./images/slots/shield.png);
+}
+
+.machine-symbol-super-shield {
+  background-image: url(./images/slots/super-shield.png);
 }
 
 .machine-symbol-heart {
   background-image: url(./images/slots/heart.png);
 }
 
+.machine-symbol-super-heart {
+  background-image: url(./images/slots/super-heart.png);
+}
+
 .machine-symbol-coin {
   background-image: url(./images/slots/coin.png);
+}
+
+.machine-symbol-super-coin {
+  background-image: url(./images/slots/super-coin.png);
 }
 
 .machine-symbol-sleep {

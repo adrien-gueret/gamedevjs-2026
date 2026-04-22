@@ -122,7 +122,7 @@ export default function DevilDeal() {
               break;
 
             case "replaceReelSymbol":
-              setSymbolsForReplacementBonus(getRandomBonusSymbols(5));
+              setSymbolsForReplacementBonus(getRandomBonusSymbols(4));
               break;
           }
         }

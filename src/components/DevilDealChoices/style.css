@@ -42,7 +42,7 @@
   height: 96px;
   display: block;
   background-image: url(./images/devil-deal-choice.png);
-  background-size: 1248px 96px;
+  background-size: 1632px 96px;
 }
 
 .deal-choice-button:disabled {
@@ -100,4 +100,20 @@
 
 .deal-choice-passivewantedtodie {
   background-position: -1152px 0;
+}
+
+.deal-choice-superheart {
+  background-position: -1248px 0;
+}
+
+.deal-choice-supercoin {
+  background-position: -1344px 0;
+}
+
+.deal-choice-supersword {
+  background-position: -1440px 0;
+}
+
+.deal-choice-supershield {
+  background-position: -1536px 0;
 }

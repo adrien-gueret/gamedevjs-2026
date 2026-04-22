@@ -55,10 +55,16 @@ const symboleToDirectAction: Partial<
 > = {
   Sword: (multiplier) =>
     addPlayerNextActions({ type: "attack", value: 1 * multiplier }),
+  "Super-Sword": (multiplier) =>
+    addPlayerNextActions({ type: "attack", value: 2 * multiplier }),
   Shield: (multiplier) =>
     addPlayerNextActions({ type: "defend", value: 1 * multiplier }),
+  "Super-Shield": (multiplier) =>
+    addPlayerNextActions({ type: "defend", value: 2 * multiplier }),
   Coin: addGold,
+  "Super-Coin": (multiplier) => addGold(2 * multiplier),
   Heart: healPlayer,
+  "Super-Heart": (multiplier) => healPlayer(2 * multiplier),
   "Evil-Heart": healEnemy,
   "Evil-Sword": (multiplier) =>
     addEnemyNextActions({ type: "attack", value: 1 * multiplier }),

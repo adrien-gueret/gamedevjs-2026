@@ -44,6 +44,30 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     permanent: true,
   },
   {
+    type: "superHeart",
+    cost: { value: 12, type: "gold" },
+    requirements: ["moreHealth3"],
+    permanent: true,
+  },
+  {
+    type: "superCoin",
+    cost: { value: 12, type: "gold" },
+    requirements: ["lockReel"],
+    permanent: true,
+  },
+  {
+    type: "superSword",
+    cost: { value: 12, type: "gold" },
+    requirements: ["unlockWizard"],
+    permanent: true,
+  },
+  {
+    type: "superShield",
+    cost: { value: 12, type: "gold" },
+    requirements: ["unlockSkeleton"],
+    permanent: true,
+  },
+  {
     type: "destroyReelSymbol",
     cost: [
       { value: 5, type: "health" },

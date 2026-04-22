@@ -35,7 +35,7 @@ export default function BonusUpgrade() {
 
   useEffect(() => {
     if (!storedSymbols.length && !isLeaving.current) {
-      const newSymbols = getRandomBonusSymbols();
+      const newSymbols = getRandomBonusSymbols(2);
       setRandomChoices(newSymbols);
     }
   }, [storedSymbols]);

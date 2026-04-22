@@ -121,6 +121,38 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
           {costLabel}
         </>
       );
+    case "superHeart":
+      return (
+        <>
+          Unlock the <b style={{ color: "lightcoral" }}>improved heart</b>{" "}
+          symbol, which heals <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "lightcoral" }}>health</b>.{costLabel}
+        </>
+      );
+    case "superCoin":
+      return (
+        <>
+          Unlock the <b style={{ color: "gold" }}>banknote</b> symbol, which
+          gives <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "gold" }}>gold</b>.{costLabel}
+        </>
+      );
+    case "superSword":
+      return (
+        <>
+          Unlock the <b style={{ color: "red" }}>improved sword</b> symbol,
+          which gives <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "red" }}>attack</b>.{costLabel}
+        </>
+      );
+    case "superShield":
+      return (
+        <>
+          Unlock the <b style={{ color: "lightgreen" }}>improved shield</b>{" "}
+          symbol, which gives <b style={{ color: "cyan" }}>2</b>{" "}
+          <b style={{ color: "lightgreen" }}>block</b>.{costLabel}
+        </>
+      );
     case "destroyReelSymbol":
       return (
         <>
