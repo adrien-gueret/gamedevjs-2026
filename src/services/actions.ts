@@ -152,6 +152,7 @@ export function addPermanentBonus(effect: DevilDealType): GameState {
     next.unlockedPermanentDeals.push(effect);
 
     if (["moreHealth1", "moreHealth2", "moreHealth3"].includes(effect)) {
+      next.currentRun!.health.value += 10;
       next.currentRun!.health.max += 10;
     }
 
@@ -213,8 +214,13 @@ export function spendMaxHealth(amount: number): GameState {
       return prev;
     }
     const next = structuredClone(prev);
-    next.currentRun!.health.value -= amount;
+
     next.currentRun!.health.max -= amount;
+    next.currentRun!.health.value = Math.min(
+      next.currentRun!.health.value,
+      next.currentRun!.health.max,
+    );
+
     return next;
   });
 }
