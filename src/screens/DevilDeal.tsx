@@ -52,6 +52,7 @@ export default function DevilDeal() {
   const navigate = useNavigate();
   const isLeaving = useRef(false);
   const concludeDeal = useRef<() => void | null>(null);
+  const isShopInitialized = useRef(false);
 
   const forcedMalusTotalRef = useRef(0);
   const [forcedMalusCount, setForcedMalusCount] = useState(0);
@@ -73,6 +74,10 @@ export default function DevilDeal() {
   const phrase = useRef(DEAL_PHRASES[random(0, DEAL_PHRASES.length - 1)]);
 
   useEffect(() => {
+    if (isShopInitialized.current) {
+      return;
+    }
+    isShopInitialized.current = true;
     if (!storedDeals.length && !isLeaving.current) {
       const newDeals = getRandomDevilDeals();
       setRandomChoices(newDeals);
