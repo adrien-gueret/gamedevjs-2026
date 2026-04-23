@@ -43,6 +43,7 @@ import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { useWavedashLeaderboard } from "@/services/wavedash";
 import { random } from "@/services/maths";
+import { playBackgroundMusic } from "@/services/backgroundMusic";
 import GoldCounter from "@/components/GoldCounter";
 import Button from "@/components/Button";
 
@@ -127,6 +128,12 @@ export default function Battle() {
   const [canSpin, setCanSpin] = useState(
     !shouldShowLostScreen && !shouldShowWinScreen,
   );
+
+  useEffect(() => {
+    if (shouldShowLostScreen) {
+      playBackgroundMusic("gameover");
+    }
+  }, [shouldShowLostScreen]);
 
   const [isMiddleReelLocked, setIsMiddleReelLocked] = useState(false);
 

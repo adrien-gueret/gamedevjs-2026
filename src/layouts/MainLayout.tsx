@@ -8,6 +8,7 @@ import {
 
 import { getGameState } from "@/services/gameStore";
 import { setCurrentPathname } from "@/services/actions";
+import { playBackgroundMusicForPathname } from "@/services/backgroundMusic";
 
 function RouterSync() {
   const location = useLocation();
@@ -15,6 +16,8 @@ function RouterSync() {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    playBackgroundMusicForPathname(location.pathname);
+
     if (isFirstRender.current) {
       isFirstRender.current = false;
       const savedPathname = getGameState().currentPathname;
