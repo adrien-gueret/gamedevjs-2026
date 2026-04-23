@@ -1,3 +1,5 @@
+import { getCurrentPathname } from "@/services/selector";
+
 export type BackgroundMusicTrack = "title" | "battle" | "shop" | "gameover";
 
 const trackToAudioId: Record<BackgroundMusicTrack, string> = {
@@ -8,6 +10,7 @@ const trackToAudioId: Record<BackgroundMusicTrack, string> = {
 };
 
 let currentTrack: BackgroundMusicTrack | null = null;
+let isEnabled = false;
 
 function getAudio(track: BackgroundMusicTrack): HTMLAudioElement | null {
   const audio = document.getElementById(trackToAudioId[track]);
@@ -61,11 +64,38 @@ export function playBackgroundMusic(track: BackgroundMusicTrack): void {
   }
 
   currentTrack = track;
+
+  if (!isEnabled) {
+    return;
+  }
+
   void activeAudio.play().catch(() => {
     if (currentTrack === track) {
       currentTrack = null;
     }
   });
+}
+
+export function setAudioEnabled(enabled: boolean): void {
+  if (isEnabled === enabled) {
+    return;
+  }
+
+  isEnabled = enabled;
+
+  if (!enabled) {
+    if (currentTrack !== null) {
+      getAudio(currentTrack)?.pause();
+    }
+    return;
+  }
+
+  if (currentTrack === null) {
+    playBackgroundMusicForPathname(getCurrentPathname());
+  } else {
+    const audio = getAudio(currentTrack);
+    void audio?.play().catch(() => {});
+  }
 }
 
 export function playBackgroundMusicForPathname(pathname: string): void {

@@ -110,6 +110,7 @@ export type ConfigurableBaseRun = Omit<
 export type GameState = {
   gold: number;
   unlockedPermanentDeals: DevilDealType[];
+  audio: boolean;
   currentPathname: string;
   currentRun: Run | null;
 };

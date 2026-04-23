@@ -1,0 +1,16 @@
+.audio-button {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 64px;
+  height: 64px;
+  z-index: 99;
+}
+
+.audio-button button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}

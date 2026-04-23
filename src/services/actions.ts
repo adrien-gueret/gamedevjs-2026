@@ -36,6 +36,14 @@ function getPassiveEffectNextActions(state: GameState): NextAction[] {
   return nextActions;
 }
 
+export function toggleAudio(forcedValue?: boolean): GameState {
+  return setGameState((prev) => ({
+    ...prev,
+    audio:
+      forcedValue !== undefined ? Boolean(forcedValue) : !Boolean(prev.audio),
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // Run - Global
 // ---------------------------------------------------------------------------

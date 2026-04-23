@@ -6,12 +6,14 @@ import { getKey, storeKey } from "./store";
 
 const DEFAULT_STATE: GameState = {
   gold: 0,
+  audio: false,
   unlockedPermanentDeals: [],
   currentPathname: "/",
   currentRun: null,
 };
 
 let state: GameState = getKey("gameState") ?? DEFAULT_STATE;
+state.audio = false; // Ensure audio is always off on page load
 const listeners = new Set<() => void>();
 
 function notify() {

@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import AudioButton from "@/components/AudioButton";
+
 import "./index.css";
 import Router from "./Router";
 
@@ -51,5 +53,6 @@ createRoot(document.getElementById("root")!).render(
       <source src="./audio/gameover.ogg" type="audio/ogg" />
       <source src="./audio/gameover.mp3" type="audio/mpeg" />
     </audio>
+    <AudioButton />
   </StrictMode>,
 );

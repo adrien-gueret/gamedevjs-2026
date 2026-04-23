@@ -106,3 +106,8 @@ export function getRandomNotGluedSymbolIndexes(): {
 
   return getRandomElements(notGluedSymbols, 1)[0];
 }
+
+export function getCurrentPathname(): string {
+  const currentState = getGameState();
+  return currentState.currentPathname;
+}
