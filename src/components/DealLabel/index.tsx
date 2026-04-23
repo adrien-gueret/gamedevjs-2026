@@ -29,12 +29,25 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
       );
       break;
 
+    case "maxhealth":
+      costLabel = (
+        <>
+          <hr />
+          Cost: <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
+          <b style={{ color: "lightcoral" }}>MAXIMUM health</b>
+          {notAffordable}
+        </>
+      );
+      break;
+
     case "health":
       costLabel = (
         <>
           <hr />
           Cost: <b style={{ color: "cyan" }}>{cost.value}</b>{" "}
-          <b style={{ color: "lightcoral" }}>MAX health</b>
+          <b style={{ color: "pink" }}>
+            health point{cost.value > 1 ? "s" : ""}
+          </b>
           {notAffordable}
         </>
       );

@@ -75,7 +75,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "destroyReelSymbol",
     cost: [
-      { value: 5, type: "health" },
+      { value: 5, type: "maxhealth" },
+      { value: 8, type: "health" },
       { value: 4, type: "gold" },
       { value: 2, type: "reel" },
     ],
@@ -84,7 +85,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "replaceReelSymbol",
     cost: [
-      { value: 3, type: "health" },
+      { value: 3, type: "maxhealth" },
+      { value: 5, type: "health" },
       { value: 2, type: "gold" },
       { value: 2, type: "reel" },
     ],
@@ -93,7 +95,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "passiveDefense",
     cost: [
-      { value: 5, type: "health" },
+      { value: 5, type: "maxhealth" },
+      { value: 9, type: "health" },
       { value: 4, type: "gold" },
       { value: 1, type: "reel" },
     ],
@@ -102,7 +105,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "passiveAttack",
     cost: [
-      { value: 5, type: "health" },
+      { value: 5, type: "maxhealth" },
+      { value: 9, type: "health" },
       { value: 4, type: "gold" },
       { value: 1, type: "reel" },
     ],

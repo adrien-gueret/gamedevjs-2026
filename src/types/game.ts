@@ -41,7 +41,7 @@ export type DevilDealType =
 
 export type PassiveEffectType = "attack" | "defend" | "wantedToDie";
 
-export type DevilDealCostType = "health" | "gold" | "reel";
+export type DevilDealCostType = "maxhealth" | "gold" | "reel" | "health";
 
 export type DevilDealCost = {
   type: DevilDealCostType;

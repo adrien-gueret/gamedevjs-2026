@@ -23,6 +23,7 @@ import {
   setReelSymbol,
   removeReelSymbol,
   killPlayer,
+  takeDamage,
 } from "@/services/actions";
 import { random } from "@/services/maths";
 
@@ -139,8 +140,12 @@ export default function DevilDeal() {
           spendGold(deal.cost.value);
           break;
 
-        case "health":
+        case "maxhealth":
           spendMaxHealth(deal.cost.value);
+          break;
+
+        case "health":
+          takeDamage(deal.cost.value);
           break;
 
         case "reel": {

@@ -27,14 +27,17 @@ export default function DevilDealChoices({
         case "gold":
           return state.gold >= deal.cost.value;
 
-        case "health":
+        case "maxhealth":
           return (state.currentRun?.health.max ?? 0) > deal.cost.value;
+
+        case "health":
+          return (state.currentRun?.health.value ?? 0) > deal.cost.value;
 
         default:
           return true;
       }
     },
-    [state.gold, state.currentRun?.health.value],
+    [state.gold, state.currentRun?.health.max, state.currentRun?.health.value],
   );
 
   return (
