@@ -6,6 +6,9 @@ interface WavedashApi {
   getUserId(): string;
   getUserAvatarUrl(userId: string, size: number): string | null;
   getUsername(): string;
+
+  setAchievement(achievementId: string): void;
+  storeStats(): void;
 }
 
 interface Window {

@@ -137,6 +137,15 @@ export function addPassiveEffect(effect: PassiveEffectType): GameState {
 }
 
 export function addPermanentBonus(effect: DevilDealType): GameState {
+  if (window.Wavedash) {
+    (async () => {
+      const Wavedash = await window.Wavedash!;
+
+      Wavedash.setAchievement(effect);
+      Wavedash.storeStats();
+    })();
+  }
+
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
