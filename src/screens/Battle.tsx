@@ -41,6 +41,7 @@ import {
 } from "@/services/selector";
 import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
+import { useWavedashLeaderboard } from "@/services/wavedash";
 import { random } from "@/services/maths";
 import GoldCounter from "@/components/GoldCounter";
 import Button from "@/components/Button";
@@ -106,6 +107,19 @@ export default function Battle() {
 
   const [shouldShowLostScreen, setShouldShowLostScreen] =
     useState(isPlayerDefeated());
+
+  const wavedashLeaderboard = useWavedashLeaderboard();
+  const [wavedashRank, setWavedashRank] = useState<number | null>(null);
+
+  const levelRenderedIndex = (state.currentRun?.levelIndex ?? 0) + 1;
+
+  useEffect(() => {
+    if (!shouldShowLostScreen || !wavedashLeaderboard.leaderboard) {
+      return;
+    }
+
+    wavedashLeaderboard.setScore(levelRenderedIndex).then(setWavedashRank);
+  }, [shouldShowLostScreen, wavedashLeaderboard, levelRenderedIndex]);
 
   const [shouldShowWinScreen, setShouldShowWinScreen] =
     useState(isEnemyDefeated());
@@ -661,7 +675,13 @@ export default function Battle() {
           <h2 className="fade-in">
             Defeat...
             <br />
-            <span>(on fight n°{(state.currentRun?.levelIndex ?? 0) + 1})</span>
+            <span>On fight n°{levelRenderedIndex}</span>
+            {wavedashRank !== null && (
+              <span>
+                {" "}
+                - Your Rank: <b style={{ color: "cyan" }}>{wavedashRank}</b>
+              </span>
+            )}
           </h2>
 
           <p

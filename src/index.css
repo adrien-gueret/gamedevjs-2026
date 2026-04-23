@@ -92,6 +92,48 @@ p {
   position: static;
 }
 
+.leaderboard-table-container {
+  width: 60%;
+  margin: 24px 0;
+  border: 32px solid transparent;
+  border-image-source: url(./images/machine-borders.png);
+  border-image-slice: 32 fill;
+  border-image-width: 32px;
+  border-image-repeat: round;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.leaderboard-table {
+  text-align: center;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.leaderboard-table td,
+.leaderboard-table th {
+  padding: 12px 0;
+}
+
+.leaderboard-table thead {
+  font-size: 25px;
+  position: sticky;
+  top: 0;
+  background: #4c4449;
+}
+
+.leaderboard-table tbody {
+  font-size: 20px;
+}
+
+.leaderboard-table tbody td:not(:first-child, :last-child) {
+  border-top: 3px solid;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 @keyframes floating-choice-item-float {
   0%,
   100% {

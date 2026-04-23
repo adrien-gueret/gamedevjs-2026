@@ -6,7 +6,14 @@ import "./style.css";
 type ButtonBaseProps = {
   as?: "link" | "button";
   children: React.ReactNode;
-  imageName: "start" | "spin" | "resurrect" | "skip" | "back" | "leave";
+  imageName:
+    | "start"
+    | "spin"
+    | "resurrect"
+    | "skip"
+    | "back"
+    | "leave"
+    | "leaderboard";
 };
 
 type LinkOnlyProps = ButtonBaseProps &
@@ -29,6 +36,7 @@ const imageNameToButtonSize: Record<
   skip: { width: 114, height: 42 },
   back: { width: 114, height: 42 },
   leave: { width: 135, height: 42 },
+  leaderboard: { width: 222, height: 42 },
 };
 
 export default function Button({

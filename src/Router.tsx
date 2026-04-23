@@ -8,6 +8,7 @@ import Start from "@/screens/Start";
 import Battle from "@/screens/Battle";
 import BonusUpgrade from "@/screens/BonusUpgrade";
 import DevilDeal from "@/screens/DevilDeal";
+import Leaderboard from "@/screens/Leaderboard";
 
 const router = createHashRouter([
   {
@@ -19,6 +20,7 @@ const router = createHashRouter([
       { path: "battle", Component: Battle },
       { path: "bonus-upgrade", Component: BonusUpgrade },
       { path: "devil-deal", Component: DevilDeal },
+      { path: "leaderboard", Component: Leaderboard },
     ],
   },
 ]);

@@ -110,7 +110,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   },
   {
     type: "passiveWantedToDie",
-    cost: [{ value: 8, type: "health" }],
+    cost: [{ value: 10, type: "health" }],
     permanent: false,
   },
 ];

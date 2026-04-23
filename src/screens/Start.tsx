@@ -14,7 +14,7 @@ import ChoiceItem from "@/components/ChoiceItem";
 import CharacterDescription from "@/components/CharacterDescription";
 import Sprite from "@/components/Sprite";
 import { generateBaseRunFromString } from "@/services/customRun";
-import useWavedash from "@/services/useWavedash";
+import { useWavedash } from "@/services/wavedash";
 
 type PossiblePlayer = PlayerType | "ethereum" | "wavedash";
 
@@ -146,7 +146,7 @@ export default function Start() {
         <>
           That's you! Your machine is unique, based on your{" "}
           <b style={{ color: "gold" }}>Wavedash</b> profile. Will you be a
-          Knight, Skeleton or a Wizard? Only one way to find out... Good luck
+          Knight, a Skeleton or a Wizard? Only one way to find out... Good luck
           escaping the Devil's prison!
         </>
       ),
