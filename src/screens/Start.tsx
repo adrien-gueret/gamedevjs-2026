@@ -161,9 +161,9 @@ export default function Start() {
       details: (
         <>
           Connect your <b style={{ color: "gold" }}>Ethereum</b> wallet and play
-          as your on-chain avatar! Your machine will be generated based on your
-          wallet's address. Will you be able to escape the Devil's prison and
-          reclaim your freedom?
+          as your on-chain avatar! Your machine and skin will be generated based
+          on your wallet's address. Will you be able to escape the Devil's
+          prison and reclaim your freedom?
         </>
       ),
     },
