@@ -32,6 +32,7 @@ export type DevilDealType =
   | "superCoin"
   | "superSword"
   | "superShield"
+  | "unlockRerollDeals"
   // Run-only upgrades
   | "destroyReelSymbol"
   | "replaceReelSymbol"

@@ -215,6 +215,13 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
           {costLabel}
         </>
       );
+    case "unlockRerollDeals":
+      return (
+        <>
+          Add the possibility to request new deals in the shops.
+          {costLabel}
+        </>
+      );
     case "rerollDeals":
       return (
         <>

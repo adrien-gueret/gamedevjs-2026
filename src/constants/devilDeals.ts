@@ -4,7 +4,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   { type: "betterBet1", cost: { value: 2, type: "gold" }, permanent: true },
   {
     type: "betterBet2",
-    cost: { value: 6, type: "gold" },
+    cost: { value: 12, type: "gold" },
     requirements: ["betterBet1"],
     permanent: true,
   },
@@ -12,6 +12,12 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     type: "lockReel",
     cost: { value: 6, type: "gold" },
     requirements: ["betterBet2"],
+    permanent: true,
+  },
+  {
+    type: "unlockRerollDeals",
+    cost: { value: 8, type: "gold" },
+    requirements: ["betterBet1"],
     permanent: true,
   },
   {

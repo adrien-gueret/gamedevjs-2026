@@ -214,7 +214,9 @@ export default function DevilDeal() {
           title="Temporary Deals"
           subtitle="Benefits from these deals won't follow you after this life."
           deals={runOnlyDeals}
-          canRerollDeals
+          canRerollDeals={state.unlockedPermanentDeals.includes(
+            "unlockRerollDeals",
+          )}
           onBuyDeal={onBuyDeal}
         />
       </div>
