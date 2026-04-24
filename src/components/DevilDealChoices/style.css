@@ -4,6 +4,7 @@
   border-image-slice: 32 fill;
   border-image-width: 32px;
   border-image-repeat: round;
+  position: relative;
 }
 
 .devil-deal-choices-title,
@@ -42,7 +43,7 @@
   height: 96px;
   display: block;
   background-image: url(./images/devil-deal-choice.png);
-  background-size: 1728px 96px;
+  background-size: 1824px 96px;
 }
 
 .deal-choice-button:disabled {
@@ -120,4 +121,15 @@
 
 .deal-choice-unlockrandom {
   background-position: -1632px 0;
+}
+
+.deal-choice-reroll-deals {
+  background-position: -1728px 0;
+}
+
+.deal-reroll-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -99px;
 }

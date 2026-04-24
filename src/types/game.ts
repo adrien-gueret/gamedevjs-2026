@@ -37,7 +37,8 @@ export type DevilDealType =
   | "replaceReelSymbol"
   | "passiveDefense"
   | "passiveAttack"
-  | "passiveWantedToDie";
+  | "passiveWantedToDie"
+  | "rerollDeals";
 
 export type PassiveEffectType = "attack" | "defend" | "wantedToDie";
 

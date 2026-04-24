@@ -215,6 +215,13 @@ export default function DealLabel({ dealType, cost, isAffordable }: Props) {
           {costLabel}
         </>
       );
+    case "rerollDeals":
+      return (
+        <>
+          Request other deals.
+          {costLabel}
+        </>
+      );
 
     default:
       return <>Do nothing</>;

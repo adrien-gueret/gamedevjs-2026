@@ -134,6 +134,20 @@ export default function DevilDeal() {
             case "replaceReelSymbol":
               setSymbolsForReplacementBonus(getRandomBonusSymbols(4));
               break;
+
+            case "rerollDeals":
+              const currentPermanentDeals = storedDeals.filter(
+                (d) => d.permanent,
+              );
+              const newNonPermanentDeals = getRandomDevilDeals().filter(
+                (d) => !d.permanent,
+              );
+              const newDeals = [
+                ...currentPermanentDeals,
+                ...newNonPermanentDeals,
+              ];
+              setRandomChoices(newDeals);
+              break;
           }
         }
       };
@@ -200,6 +214,7 @@ export default function DevilDeal() {
           title="Temporary Deals"
           subtitle="Benefits from these deals won't follow you after this life."
           deals={runOnlyDeals}
+          canRerollDeals
           onBuyDeal={onBuyDeal}
         />
       </div>

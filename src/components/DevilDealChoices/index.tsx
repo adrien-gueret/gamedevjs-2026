@@ -11,6 +11,7 @@ type Props = {
   title: string;
   subtitle: string;
   deals: BuyableDevilDeal[];
+  canRerollDeals?: boolean;
   onBuyDeal: (deal: BuyableDevilDeal) => void;
 };
 
@@ -18,6 +19,7 @@ export default function DevilDealChoices({
   title,
   subtitle,
   deals,
+  canRerollDeals,
   onBuyDeal,
 }: Props) {
   const state = useGameState();
@@ -39,6 +41,17 @@ export default function DevilDealChoices({
     },
     [state.gold, state.currentRun?.health.max, state.currentRun?.health.value],
   );
+
+  const rerollDeal: BuyableDevilDeal | null = canRerollDeals
+    ? {
+        type: "rerollDeals",
+        cost: {
+          type: "gold",
+          value: 2,
+        },
+        permanent: false,
+      }
+    : null;
 
   return (
     <div className="devil-deal-choices">
@@ -78,6 +91,28 @@ export default function DevilDealChoices({
           ))
         )}
       </div>
+      {rerollDeal !== null && (
+        <div className="deal-reroll-container">
+          <Tooltip
+            content="Reroll Deals"
+            label={
+              <DealLabel
+                dealType={rerollDeal.type}
+                cost={rerollDeal.cost}
+                isAffordable={canAffordDeal(rerollDeal)}
+              />
+            }
+          >
+            <button
+              className={`deal-choice-button deal-choice-reroll-deals`}
+              onClick={() => onBuyDeal(rerollDeal)}
+              disabled={!canAffordDeal(rerollDeal)}
+            >
+              {rerollDeal.type}
+            </button>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 }
