@@ -358,10 +358,6 @@ export default function Battle() {
               }
 
               case "skeleton": {
-                if (random(1, 100) > 50) {
-                  break;
-                }
-
                 const middleReel = reels[1];
                 const symbolIndex =
                   middleReel.length > 0
@@ -383,10 +379,6 @@ export default function Battle() {
               }
 
               case "wizard": {
-                if (random(1, 100) > 75) {
-                  break;
-                }
-
                 enemyRef.current?.setSpecialAttack();
                 await sleep(2000);
                 enemyRef.current?.setIdle();

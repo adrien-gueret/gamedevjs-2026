@@ -23,7 +23,7 @@ export default function EnemyLabel({ enemyType }: { enemyType: EnemyType }) {
       return (
         <>
           <b style={{ color: "darkorange" }}>Skeleton</b> - At the end of each
-          turn, has 50% chance to turn the middle symbol of your machine into a{" "}
+          turn, turn the middle symbol of your machine into a{" "}
           <b style={{ color: "#953297" }}>cursed</b> heart.
         </>
       );
@@ -32,8 +32,8 @@ export default function EnemyLabel({ enemyType }: { enemyType: EnemyType }) {
       return (
         <>
           <b style={{ color: "darkorange" }}>Wizard</b> - At the end of each
-          turn, has 75% chance to add a random{" "}
-          <b style={{ color: "#953297" }}>cursed</b> symbol to your machine.
+          turn, add a random <b style={{ color: "#953297" }}>cursed</b> symbol
+          to your machine.
         </>
       );
 
