@@ -148,7 +148,7 @@ export default function Battle() {
     "You had potential. Emphasis on 'had'.",
   ];
   const defeatQuoteRef = useRef(
-    DEFEAT_QUOTES[Math.floor(Math.random() * DEFEAT_QUOTES.length)],
+    DEFEAT_QUOTES[random(0, DEFEAT_QUOTES.length - 1)],
   );
 
   const playerCloneRef = useRef<HTMLElement | null>(null);
@@ -358,6 +358,10 @@ export default function Battle() {
               }
 
               case "skeleton": {
+                if (random(1, 100) > 50) {
+                  break;
+                }
+
                 const middleReel = reels[1];
                 const symbolIndex =
                   middleReel.length > 0
@@ -379,6 +383,10 @@ export default function Battle() {
               }
 
               case "wizard": {
+                if (random(1, 100) > 75) {
+                  break;
+                }
+
                 enemyRef.current?.setSpecialAttack();
                 await sleep(2000);
                 enemyRef.current?.setIdle();
@@ -566,7 +574,7 @@ export default function Battle() {
       if (reelIndex === 1 && isMiddleReelLocked) {
         return startIndexes[1] ?? 0;
       }
-      return Math.floor(Math.random() * reelSymbols.length);
+      return random(0, reelSymbols.length - 1);
     });
 
     const activeReelCount = reels.filter(

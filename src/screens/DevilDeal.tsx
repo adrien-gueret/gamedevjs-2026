@@ -201,14 +201,12 @@ export default function DevilDeal() {
           justifyContent: "center",
         }}
       >
-        {permanentDeals.length > 0 && (
-          <DevilDealChoices
-            title="Permanent Deals"
-            subtitle="Benefits from these deals will last even in the afterlife!"
-            deals={permanentDeals}
-            onBuyDeal={onBuyDeal}
-          />
-        )}
+        <DevilDealChoices
+          title="Permanent Deals"
+          subtitle="Benefits from these deals will last even in the afterlife!"
+          deals={permanentDeals}
+          onBuyDeal={onBuyDeal}
+        />
 
         <DevilDealChoices
           title="Temporary Deals"
