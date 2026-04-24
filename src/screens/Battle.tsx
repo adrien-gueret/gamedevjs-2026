@@ -684,7 +684,10 @@ export default function Battle() {
               setIsMiddleReelLocked((prev) => !prev);
             }}
             onSpin={handleSpin}
-            onBetCostChange={setBetCost}
+            onBetCostChange={(newBetCost) => {
+              playSound("click");
+              setBetCost(newBetCost);
+            }}
             isInteractive={canSpin}
           />
         </div>
