@@ -1,6 +1,14 @@
 import { getCurrentPathname } from "@/services/selector";
 
+import {
+  isAudioEnabled,
+  onAudioEnabledChange,
+  setAudioEnabled as setGlobalAudioEnabled,
+} from "./audio";
+
 export type BackgroundMusicTrack = "title" | "battle" | "shop" | "gameover";
+
+const BACKGROUND_MUSIC_VOLUME = 0.1;
 
 const trackToAudioId: Record<BackgroundMusicTrack, string> = {
   title: "audio-title",
@@ -10,12 +18,12 @@ const trackToAudioId: Record<BackgroundMusicTrack, string> = {
 };
 
 let currentTrack: BackgroundMusicTrack | null = null;
-let isEnabled = false;
 
 function getAudio(track: BackgroundMusicTrack): HTMLAudioElement | null {
   const audio = document.getElementById(trackToAudioId[track]);
 
   if (audio instanceof HTMLAudioElement) {
+    audio.volume = BACKGROUND_MUSIC_VOLUME;
     return audio;
   }
 
@@ -65,7 +73,7 @@ export function playBackgroundMusic(track: BackgroundMusicTrack): void {
 
   currentTrack = track;
 
-  if (!isEnabled) {
+  if (!isAudioEnabled()) {
     return;
   }
 
@@ -77,25 +85,7 @@ export function playBackgroundMusic(track: BackgroundMusicTrack): void {
 }
 
 export function setAudioEnabled(enabled: boolean): void {
-  if (isEnabled === enabled) {
-    return;
-  }
-
-  isEnabled = enabled;
-
-  if (!enabled) {
-    if (currentTrack !== null) {
-      getAudio(currentTrack)?.pause();
-    }
-    return;
-  }
-
-  if (currentTrack === null) {
-    playBackgroundMusicForPathname(getCurrentPathname());
-  } else {
-    const audio = getAudio(currentTrack);
-    void audio?.play().catch(() => {});
-  }
+  setGlobalAudioEnabled(enabled);
 }
 
 export function playBackgroundMusicForPathname(pathname: string): void {
@@ -111,3 +101,20 @@ export function playBackgroundMusicForPathname(pathname: string): void {
 
   playBackgroundMusic("title");
 }
+
+onAudioEnabledChange((enabled) => {
+  if (!enabled) {
+    if (currentTrack !== null) {
+      getAudio(currentTrack)?.pause();
+    }
+    return;
+  }
+
+  if (currentTrack === null) {
+    playBackgroundMusicForPathname(getCurrentPathname());
+    return;
+  }
+
+  const audio = getAudio(currentTrack);
+  void audio?.play().catch(() => {});
+});

@@ -12,6 +12,8 @@ import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
 
 import { setGameState } from "./gameStore";
 import { isSymbolGlued } from "./selector";
+import { isMalusSymbol } from "./upgrades";
+import { playSound } from "./sounds";
 
 function getPassiveEffectNextActions(state: GameState): NextAction[] {
   const passiveEffects = state.currentRun?.passiveEffects ?? [];
@@ -71,6 +73,8 @@ export function setReelSymbol(
   symbolIndex: number,
   newSymbol: ReelSymbol,
 ): GameState {
+  playSound(isMalusSymbol(newSymbol) ? "curseSymbol" : "insertSymbol");
+
   if (isSymbolGlued(reelIndex, symbolIndex)) {
     unglueSymbol(reelIndex, symbolIndex);
   }
@@ -87,6 +91,8 @@ export function removeReelSymbol(
   reelIndex: number,
   symbolIndex: number,
 ): GameState {
+  playSound("removeSymbol");
+
   if (isSymbolGlued(reelIndex, symbolIndex)) {
     unglueSymbol(reelIndex, symbolIndex);
   }
@@ -103,6 +109,8 @@ export function addSymbolTooReel(
   reelIndex: number,
   newSymbol: ReelSymbol,
 ): GameState {
+  playSound(isMalusSymbol(newSymbol) ? "curseSymbol" : "insertSymbol");
+
   return setGameState((prev) => {
     if (!prev.currentRun) return prev;
     const next = structuredClone(prev);
@@ -188,6 +196,9 @@ export function healPlayer(amount: number): GameState {
     const next = structuredClone(prev);
     const health = next.currentRun!.health;
     health.value = Math.min(health.max, health.value + amount);
+
+    playSound("heal");
+
     return next;
   });
 }

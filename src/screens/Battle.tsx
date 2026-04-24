@@ -44,6 +44,7 @@ import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { useWavedashLeaderboard } from "@/services/wavedash";
 import { random } from "@/services/maths";
 import { playBackgroundMusic } from "@/services/backgroundMusic";
+import { playSound, stopSound } from "@/services/sounds";
 import GoldCounter from "@/components/GoldCounter";
 import Button from "@/components/Button";
 
@@ -177,6 +178,17 @@ export default function Battle() {
     symbols: ReelSymbol[],
     positions: ActiveSymbolPosition[],
   ) => {
+    const hasActiveNonSleepSymbols = symbols.some(
+      (symbol) => symbol !== "Sleep",
+    );
+    const hasActiveMalusSymbols = symbols.some(
+      (symbol) => symbol !== "Sleep" && isMalusSymbol(symbol),
+    );
+
+    if (hasActiveNonSleepSymbols) {
+      playSound(hasActiveMalusSymbols ? "activeCursedSymbol" : "activeSymbol");
+    }
+
     const allSame =
       symbols.length > 0 && symbols.every((s) => s === symbols[0]);
     const multiplier = allSame ? 2 : 1;
@@ -299,7 +311,7 @@ export default function Battle() {
         if (canPlayerAttack()) {
           await playerRef.current?.attack(() => {
             enemyRef.current?.setAttacked();
-
+            playSound("hit");
             makeCharacterAttack("player");
           });
         }
@@ -314,6 +326,7 @@ export default function Battle() {
           if (canEnemyAttack()) {
             await enemyRef.current?.attack(() => {
               playerRef.current?.setAttacked();
+              playSound("hit");
               makeCharacterAttack("enemy");
             });
           }
@@ -531,6 +544,8 @@ export default function Battle() {
       return;
     }
 
+    playSound("startSpin");
+
     setCanSpin(false);
     takeDamage(betCost);
 
@@ -565,6 +580,7 @@ export default function Battle() {
     let stoppedReels = 0;
 
     setIsSpinning(true);
+    playSound("spin");
     setSpinningReels(
       reels.map(
         (reelSymbols, reelIndex) =>
@@ -592,11 +608,15 @@ export default function Battle() {
           return nextState;
         });
 
+        playSound("stopSpin");
+
         stoppedReels += 1;
 
         if (stoppedReels >= activeReelCount) {
           window.setTimeout(() => {
             setIsSpinning(false);
+            stopSound("spin");
+
             if (isMiddleReelLocked) {
               setHasUsedLockedReel();
               setIsMiddleReelLocked(false);
@@ -660,6 +680,7 @@ export default function Battle() {
             isMiddleReelLocked={isMiddleReelLocked}
             hasUsedLockedReel={state.currentRun.currentBattle.hasUsedLockedReel}
             onToggleMiddleReelLock={() => {
+              playSound("lock");
               setIsMiddleReelLocked((prev) => !prev);
             }}
             onSpin={handleSpin}

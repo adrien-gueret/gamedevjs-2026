@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 import { toggleAudio } from "@/services/actions";
 import { setAudioEnabled } from "@/services/backgroundMusic";
+import { playSound } from "@/services/sounds";
 
 import { useGameState } from "@/services/gameStore";
 
@@ -18,6 +19,8 @@ export default function AudioButton() {
     if (spriteRef.current) {
       spriteRef.current.setTile(newState.audio ? 0 : 1);
     }
+
+    playSound("click");
   };
 
   return (

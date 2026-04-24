@@ -1,5 +1,6 @@
 import { Link, type LinkProps } from "react-router-dom";
 import { type ButtonHTMLAttributes } from "react";
+import { playSound } from "@/services/sounds";
 
 import "./style.css";
 
@@ -49,26 +50,44 @@ export default function Button({
   const { width, height } = imageNameToButtonSize[imageName];
 
   if (as === "link") {
+    const linkProps = otherProps as Omit<LinkProps, "className">;
+
     return (
       <Link
         className={`button-base`}
         style={{ backgroundImage: imageStyle, width, height }}
-        {...(otherProps as Omit<LinkProps, "className">)}
+        {...linkProps}
+        onClick={(event) => {
+          linkProps.onClick?.(event);
+
+          if (!event.defaultPrevented) {
+            playSound("click");
+          }
+        }}
       >
         {children}
       </Link>
     );
   }
 
+  const buttonProps = otherProps as Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    "className"
+  >;
+
   return (
     <button
       className={`button-base`}
       style={{ backgroundImage: imageStyle, width, height }}
       type="button"
-      {...(otherProps as Omit<
-        ButtonHTMLAttributes<HTMLButtonElement>,
-        "className"
-      >)}
+      {...buttonProps}
+      onClick={(event) => {
+        buttonProps.onClick?.(event);
+
+        if (!event.defaultPrevented && !buttonProps.disabled) {
+          playSound("click");
+        }
+      }}
     >
       {children}
     </button>

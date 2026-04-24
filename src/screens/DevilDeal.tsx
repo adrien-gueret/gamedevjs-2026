@@ -26,6 +26,7 @@ import {
   takeDamage,
 } from "@/services/actions";
 import { random } from "@/services/maths";
+import { playSound } from "@/services/sounds";
 
 import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
@@ -100,6 +101,8 @@ export default function DevilDeal() {
 
   const onBuyDeal = useCallback(
     (deal: BuyableDevilDeal) => {
+      playSound("acceptDeal");
+
       setRandomChoices(storedDeals.filter((d) => d.type !== deal.type));
 
       concludeDeal.current = () => {
