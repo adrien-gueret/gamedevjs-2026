@@ -23,8 +23,8 @@ export default function EnemyLabel({ enemyType }: { enemyType: EnemyType }) {
       return (
         <>
           <b style={{ color: "darkorange" }}>Skeleton</b> - At the end of each
-          turn, the middle symbol of your machine is{" "}
-          <b style={{ color: "#953297" }}>cursed</b>.
+          turn, the middle symbol of your machine is transformed into a{" "}
+          <b style={{ color: "#953297" }}>cursed</b> heart.
         </>
       );
 

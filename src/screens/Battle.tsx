@@ -366,7 +366,7 @@ export default function Battle() {
 
                 const symbol = middleReel[symbolIndex];
 
-                if (!symbol || isMalusSymbol(symbol)) {
+                if (!symbol || symbol === "Evil-Heart") {
                   break;
                 }
 
@@ -374,7 +374,7 @@ export default function Battle() {
                 await sleep(2000);
                 enemyRef.current?.setIdle();
 
-                setReelSymbol(1, symbolIndex, getRandomMalusSymbol());
+                setReelSymbol(1, symbolIndex, "Evil-Heart");
                 break;
               }
 
