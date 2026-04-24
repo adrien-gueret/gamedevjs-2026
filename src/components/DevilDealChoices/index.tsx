@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import Tooltip from "@/components/Tooltip";
 import DealLabel from "@/components/DealLabel";
@@ -23,6 +23,9 @@ export default function DevilDealChoices({
   onBuyDeal,
 }: Props) {
   const state = useGameState();
+
+  const [rerollCost, setRerollCost] = useState(2);
+
   const canAffordDeal = useCallback(
     (deal: BuyableDevilDeal): boolean => {
       switch (deal.cost.type) {
@@ -47,7 +50,7 @@ export default function DevilDealChoices({
         type: "rerollDeals",
         cost: {
           type: "gold",
-          value: 2,
+          value: rerollCost,
         },
         permanent: false,
       }
@@ -105,7 +108,10 @@ export default function DevilDealChoices({
           >
             <button
               className={`deal-choice-button deal-choice-reroll-deals`}
-              onClick={() => onBuyDeal(rerollDeal)}
+              onClick={() => {
+                onBuyDeal(rerollDeal);
+                setRerollCost((prev) => prev + 2);
+              }}
               disabled={!canAffordDeal(rerollDeal)}
             >
               {rerollDeal.type}
