@@ -131,3 +131,253 @@
     filter: brightness(1);
   }
 }
+
+.machine-symbol-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.machine-symbol-burst-glow,
+.machine-symbol-burst-ring,
+.machine-symbol-burst-rays,
+.machine-symbol-burst-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.machine-symbol-burst-glow {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 230, 0.95) 0%,
+    rgba(255, 220, 90, 0.7) 30%,
+    rgba(255, 140, 0, 0.35) 55%,
+    rgba(255, 80, 0, 0) 75%
+  );
+  mix-blend-mode: screen;
+  animation: machine-burst-glow 520ms ease-out forwards;
+}
+
+.machine-symbol-burst-ring {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 245, 180, 0.95);
+  box-shadow:
+    0 0 12px rgba(255, 220, 90, 0.85),
+    inset 0 0 6px rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: machine-burst-ring 600ms ease-out forwards;
+}
+
+.machine-symbol-burst-ring.is-second {
+  animation-delay: 130ms;
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 14px rgba(255, 255, 255, 0.7),
+    inset 0 0 4px rgba(255, 255, 200, 0.5);
+}
+
+.machine-symbol-burst-rays {
+  width: 96px;
+  height: 96px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 245, 180, 0.95) 0deg 8deg,
+    transparent 8deg 45deg
+  );
+  -webkit-mask-image: radial-gradient(
+    circle,
+    transparent 22px,
+    #000 26px,
+    #000 46px,
+    transparent 50px
+  );
+  mask-image: radial-gradient(
+    circle,
+    transparent 22px,
+    #000 26px,
+    #000 46px,
+    transparent 50px
+  );
+  opacity: 0;
+  mix-blend-mode: screen;
+  display: none;
+  animation: machine-burst-rays 700ms ease-out forwards;
+}
+
+.machine-symbol-burst-sparkles {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.machine-symbol-burst-sparkle {
+  --sparkle-angle: calc(var(--sparkle-index) * 45deg);
+  --sparkle-distance: 42px;
+  --sparkle-color: #ffe066;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    var(--sparkle-color) 55%,
+    transparent 100%
+  );
+  box-shadow: 0 0 6px rgba(255, 230, 120, 0.9);
+  opacity: 0;
+  animation: machine-burst-sparkle 720ms ease-out forwards;
+  animation-delay: calc(var(--sparkle-index) * 12ms);
+}
+
+/* Double celebration: enable sparkles + rays, slightly bigger glow */
+.machine-symbol-burst.is-double .machine-symbol-burst-rays,
+.machine-symbol-burst.is-triple .machine-symbol-burst-rays {
+  display: block;
+}
+
+.machine-symbol-burst.is-double .machine-symbol-burst-sparkles,
+.machine-symbol-burst.is-triple .machine-symbol-burst-sparkles {
+  display: block;
+}
+
+.machine-symbol-burst.is-double .machine-symbol-burst-glow {
+  width: 130px;
+  height: 130px;
+  animation-duration: 620ms;
+}
+
+/* Triple celebration: full "wow" mode */
+.machine-symbol-burst.is-triple .machine-symbol-burst-glow {
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 220, 90, 0.85) 22%,
+    rgba(255, 90, 200, 0.55) 50%,
+    rgba(120, 40, 220, 0.25) 70%,
+    rgba(80, 0, 180, 0) 80%
+  );
+  animation-duration: 760ms;
+}
+
+.machine-symbol-burst.is-triple .machine-symbol-burst-rays {
+  width: 130px;
+  height: 130px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 1) 0deg 6deg,
+    rgba(255, 220, 90, 0.95) 6deg 10deg,
+    transparent 10deg 30deg
+  );
+  -webkit-mask-image: radial-gradient(
+    circle,
+    transparent 26px,
+    #000 30px,
+    #000 62px,
+    transparent 66px
+  );
+  mask-image: radial-gradient(
+    circle,
+    transparent 26px,
+    #000 30px,
+    #000 62px,
+    transparent 66px
+  );
+  animation-duration: 820ms;
+}
+
+.machine-symbol-burst.is-triple .machine-symbol-burst-sparkle {
+  --sparkle-distance: 60px;
+  --sparkle-color: #ff7ad6;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  box-shadow: 0 0 10px rgba(255, 130, 220, 0.95);
+}
+
+.machine-symbol-burst.is-triple .machine-symbol-burst-sparkle:nth-child(odd) {
+  --sparkle-color: #fff48a;
+  box-shadow: 0 0 10px rgba(255, 240, 120, 0.95);
+}
+
+.machine-symbol-burst.is-triple .machine-symbol-burst-ring {
+  border-color: rgba(255, 220, 255, 0.95);
+  box-shadow:
+    0 0 16px rgba(255, 130, 220, 0.85),
+    inset 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+@keyframes machine-burst-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.45);
+    opacity: 0;
+  }
+}
+
+@keyframes machine-burst-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes machine-burst-rays {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.45) rotate(60deg);
+    opacity: 0;
+  }
+}
+
+@keyframes machine-burst-sparkle {
+  0% {
+    transform: rotate(var(--sparkle-angle)) translateY(0) scale(0.3);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: rotate(var(--sparkle-angle))
+      translateY(calc(var(--sparkle-distance) * -0.4)) scale(1);
+  }
+  100% {
+    transform: rotate(var(--sparkle-angle))
+      translateY(calc(var(--sparkle-distance) * -1)) scale(0.2);
+    opacity: 0;
+  }
+}
