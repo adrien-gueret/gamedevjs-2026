@@ -21,18 +21,18 @@ If you align three symbols of the same type, **the effect is doubled**.
 
 <img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/sword.png" /> Attack the enemy for one damage  
 <img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/shield.png" /> Block one attack from the enemy  
-<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/coin.png" /> Add one coin gold to your treasure  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/coin.png" /> Add one gold coin to your treasure  
 <img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/heart.png" /> Restore one health point  
-<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/sleep.png" /> Do nothing !
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/sleep.png" /> Do nothing!
 
 ### Cursed symbols
 
 The Devil can offer you some deals, but some require you to corrupt your machine...  
-Some enemy can also curse you!
+Some enemies can also curse you!
 
-<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-sword.png" /> Make the enemy attacks you for one damage  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-sword.png" /> Make the enemy attack you for one damage  
 <img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-shield.png" /> Protect the enemy from one damage  
-<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-heart.png" /> Heal the ennemy
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-heart.png" /> Heal the enemy
 
 It says other symbols exist... Will you find them?
 
@@ -53,23 +53,22 @@ Each enemy has unique behaviors and powers:
 
 ### Rats
 
-Attack without special effect
+Attack without special effects.
 
 ### Blob
 
-Each turn, englue one of your machine symbole to make it useless until it's been activated.
+Each turn, glue one of your machine symbols to make it useless until it is activated.
 
 ### Skeleton
 
-Each turn, transform the middle visible symbol into en Evil Heart.
+Each turn, transform the middle visible symbol into a Cursed Heart symbol.
 
 ### Wizard
 
-Each turn, add a random cursed symbol in your machine.
+Each turn, add a random cursed symbol to your machine.
 
 ## Credits
 
-Code: by me  
-Graphics: by me (except UI borders by https://elvgames.itch.io/free-inventory-asset-pack
-)  
+Code: me  
+Graphics: me (except UI borders from https://elvgames.itch.io/free-inventory-asset-pack)  
 Audio: AI-generated
