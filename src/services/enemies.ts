@@ -107,6 +107,10 @@ export function getEnemyNextActions(
   levelIndex: number,
 ): NextAction[] {
   const healthRatio = enemy.health.value / enemy.health.max;
+  const getMinFromMax = (maxValue: number): number =>
+    Math.max(1, Math.ceil(maxValue / 4));
+  const applyMinFromMax = (rawValue: number, maxValue: number): number =>
+    Math.max(getMinFromMax(maxValue), rawValue);
 
   switch (levelIndex) {
     case 0:
@@ -132,6 +136,14 @@ export function getEnemyNextActions(
       switch (enemy.type) {
         case "rat": {
           actionType = roll <= 80 ? "attack" : "defend";
+          const attackMaxBase = Math.max(
+            Math.ceil(levelIndex / 8),
+            Math.ceil((Math.ceil(levelIndex / 2 + 1) * levelIndex) / 10),
+          );
+          const defendMaxBase = Math.max(
+            Math.ceil(levelIndex / 14),
+            Math.ceil((Math.ceil(levelIndex / 3 + 1) * levelIndex) / 24),
+          );
           const base =
             actionType === "attack"
               ? Math.max(
@@ -151,10 +163,17 @@ export function getEnemyNextActions(
                       24,
                   ),
                 );
-          value =
-            actionType === "attack"
-              ? Math.max(1, Math.round(base * (1 + (1 - healthRatio) * 0.2)))
-              : base;
+          if (actionType === "attack") {
+            const rageMultiplier = 1 + (1 - healthRatio) * 0.2;
+            const rawValue = Math.max(1, Math.round(base * rageMultiplier));
+            const maxValue = Math.max(
+              1,
+              Math.round(attackMaxBase * rageMultiplier),
+            );
+            value = applyMinFromMax(rawValue, maxValue);
+          } else {
+            value = applyMinFromMax(base, defendMaxBase);
+          }
           break;
         }
 
@@ -167,25 +186,35 @@ export function getEnemyNextActions(
               : roll <= 80
                 ? "attack"
                 : "defend";
-          value =
-            actionType === "attack"
-              ? Math.max(
-                  Math.ceil(levelIndex / 9),
-                  Math.ceil(
-                    (random(1, random(2, Math.ceil(levelIndex / 2.5 + 1))) *
-                      levelIndex) /
-                      11,
-                  ),
-                )
-              : Math.max(
-                  1,
-                  Math.ceil(levelIndex / 10),
-                  Math.ceil(
-                    (random(1, random(2, Math.ceil(levelIndex / 2.8 + 1))) *
-                      levelIndex) /
-                      20,
-                  ),
-                );
+          if (actionType === "attack") {
+            const rawValue = Math.max(
+              Math.ceil(levelIndex / 9),
+              Math.ceil(
+                (random(1, random(2, Math.ceil(levelIndex / 2.5 + 1))) *
+                  levelIndex) /
+                  11,
+              ),
+            );
+            const maxValue = Math.max(
+              Math.ceil(levelIndex / 9),
+              Math.ceil((Math.ceil(levelIndex / 2.5 + 1) * levelIndex) / 11),
+            );
+            value = applyMinFromMax(rawValue, maxValue);
+          } else {
+            const rawValue = Math.max(
+              Math.ceil(levelIndex / 10),
+              Math.ceil(
+                (random(1, random(2, Math.ceil(levelIndex / 2.8 + 1))) *
+                  levelIndex) /
+                  20,
+              ),
+            );
+            const maxValue = Math.max(
+              Math.ceil(levelIndex / 10),
+              Math.ceil((Math.ceil(levelIndex / 2.8 + 1) * levelIndex) / 20),
+            );
+            value = applyMinFromMax(rawValue, maxValue);
+          }
           break;
 
         case "skeleton":
@@ -197,30 +226,48 @@ export function getEnemyNextActions(
               : roll <= 80
                 ? "defend"
                 : "attack";
-          value =
-            actionType === "attack"
-              ? Math.max(
-                  Math.ceil(levelIndex / 8),
-                  Math.ceil(
-                    (random(1, random(2, Math.ceil(levelIndex / 2.3 + 1))) *
-                      levelIndex) /
-                      10.5,
-                  ),
-                )
-              : Math.max(
-                  1,
-                  Math.ceil(levelIndex / 8),
-                  Math.ceil(
-                    (random(1, random(2, Math.ceil(levelIndex / 2.6 + 1))) *
-                      levelIndex) /
-                      19,
-                  ),
-                );
+          if (actionType === "attack") {
+            const rawValue = Math.max(
+              Math.ceil(levelIndex / 8),
+              Math.ceil(
+                (random(1, random(2, Math.ceil(levelIndex / 2.3 + 1))) *
+                  levelIndex) /
+                  10.5,
+              ),
+            );
+            const maxValue = Math.max(
+              Math.ceil(levelIndex / 8),
+              Math.ceil((Math.ceil(levelIndex / 2.3 + 1) * levelIndex) / 10.5),
+            );
+            value = applyMinFromMax(rawValue, maxValue);
+          } else {
+            const rawValue = Math.max(
+              Math.ceil(levelIndex / 8),
+              Math.ceil(
+                (random(1, random(2, Math.ceil(levelIndex / 2.6 + 1))) *
+                  levelIndex) /
+                  19,
+              ),
+            );
+            const maxValue = Math.max(
+              Math.ceil(levelIndex / 8),
+              Math.ceil((Math.ceil(levelIndex / 2.6 + 1) * levelIndex) / 19),
+            );
+            value = applyMinFromMax(rawValue, maxValue);
+          }
           break;
 
         case "wizard":
         default: {
           actionType = roll <= 50 ? "attack" : "defend";
+          const attackMaxBase = Math.max(
+            Math.ceil(levelIndex / 8.5),
+            Math.ceil((Math.ceil(levelIndex / 2.4 + 1) * levelIndex) / 10.8),
+          );
+          const defendMaxBase = Math.max(
+            Math.ceil(levelIndex / 10),
+            Math.ceil((Math.ceil(levelIndex / 2.9 + 1) * levelIndex) / 21),
+          );
           const base =
             actionType === "attack"
               ? Math.max(
@@ -240,8 +287,16 @@ export function getEnemyNextActions(
                       21,
                   ),
                 );
-          value =
-            healthRatio <= 0.33 ? Math.max(1, Math.round(base * 1.1)) : base;
+          const isEmpowered = healthRatio <= 0.33;
+          const rawValue = isEmpowered
+            ? Math.max(1, Math.round(base * 1.1))
+            : base;
+          const maxBase =
+            actionType === "attack" ? attackMaxBase : defendMaxBase;
+          const maxValue = isEmpowered
+            ? Math.max(1, Math.round(maxBase * 1.1))
+            : maxBase;
+          value = applyMinFromMax(rawValue, maxValue);
           break;
         }
       }
