@@ -16,6 +16,7 @@ type Props = {
   startIndex?: number;
   isSpinning?: boolean;
   reelIndex?: number;
+  spinSpeedMultiplier?: number;
   activeRows?: Array<{
     rowIndex: number;
     celebrationLevel: "normal" | "double" | "triple";
@@ -32,6 +33,7 @@ export default function MachineReel({
   startIndex = 0,
   isSpinning = false,
   reelIndex = 0,
+  spinSpeedMultiplier = 1,
   activeRows = [],
   shouldShowAllSymbols = false,
   onSymbolClick,
@@ -93,7 +95,8 @@ export default function MachineReel({
     return symbols[symbolIndex];
   });
 
-  const spinDuration = 0.28 + reelIndex * 0.045;
+  const safeSpinSpeedMultiplier = Math.min(1, Math.max(0.5, spinSpeedMultiplier));
+  const spinDuration = (0.28 + reelIndex * 0.045) * safeSpinSpeedMultiplier;
   const reelCycleDistance = reelSize * 66;
 
   const isReelClickable = Boolean(onReelClick);

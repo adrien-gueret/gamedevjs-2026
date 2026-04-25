@@ -20,6 +20,7 @@ type Props = {
     rowIndex: number;
     celebrationLevel: "normal" | "double" | "triple";
   }>;
+  spinSpeedMultiplier?: number;
   isMiddleReelLocked: boolean;
   hasUsedLockedReel: boolean;
   onToggleMiddleReelLock: () => void;
@@ -34,6 +35,7 @@ export default function SlotMachine({
   spinningReels,
   betCost,
   activeSymbolPositions,
+  spinSpeedMultiplier = 1,
   isMiddleReelLocked,
   hasUsedLockedReel,
   onToggleMiddleReelLock,
@@ -124,6 +126,7 @@ export default function SlotMachine({
                 !(index === 1 && isMiddleReelLocked)
               }
               reelIndex={index}
+              spinSpeedMultiplier={spinSpeedMultiplier}
               activeRows={activeSymbolPositions
                 .filter((position) => position.reelIndex === index)
                 .map((position) => ({

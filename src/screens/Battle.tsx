@@ -49,6 +49,8 @@ import GoldCounter from "@/components/GoldCounter";
 import Button from "@/components/Button";
 
 const ACTIVATION_DURATION = 420;
+const MIN_SPIN_SPEED_MULTIPLIER = 0.55;
+const SPIN_SPEED_DECAY_LEVELS = 8;
 
 const symboleToDirectAction: Partial<
   Record<
@@ -114,6 +116,10 @@ export default function Battle() {
   const [wavedashRank, setWavedashRank] = useState<number | null>(null);
 
   const levelRenderedIndex = (state.currentRun?.levelIndex ?? 0) + 1;
+  const spinSpeedMultiplier =
+    MIN_SPIN_SPEED_MULTIPLIER +
+    (1 - MIN_SPIN_SPEED_MULTIPLIER) *
+      Math.exp(-(levelRenderedIndex - 1) / SPIN_SPEED_DECAY_LEVELS);
 
   useEffect(() => {
     if (!shouldShowLostScreen || !wavedashLeaderboard.leaderboard) {
@@ -677,6 +683,7 @@ export default function Battle() {
             spinningReels={spinningReels}
             betCost={betCost}
             activeSymbolPositions={activeSymbolPositions}
+            spinSpeedMultiplier={spinSpeedMultiplier}
             isMiddleReelLocked={isMiddleReelLocked}
             hasUsedLockedReel={state.currentRun.currentBattle.hasUsedLockedReel}
             onToggleMiddleReelLock={() => {
