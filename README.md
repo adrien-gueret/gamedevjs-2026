@@ -47,6 +47,10 @@ You can:
 
 Master the balance between risk and control!
 
+### Permanent bonus
+
+The Devil lets you keep some of your gold after each death. Use it to buy powerful upgrades and grow stronger with every run.
+
 ## Enemies
 
 Each enemy has unique behaviors and powers:
