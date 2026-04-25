@@ -4,23 +4,39 @@
 
 You are imprisoned.
 
-The Devil has made you an offer: power in exchange for control.  
-Now, every action you take is decided by a cursed machine.
+The Devil offered you a deal: a great power... at a terrible cost.
 
-A slot machine.
+Now, every action you take is determined by a slot machine.
 
-Spin it, manipulate it, survive... and maybe, just maybe, you’ll escape his prison.
+Will you escape his prison and reclaim your freedom?
 
 ## How to Play
 
-Your actions are determined by a slot machine.
+Your actions are determined by a slot machine.  
+After a spin, 9 symbols (3 columns, 3 lines) are visible: **only symbols on active lines are effective**.
 
-Each spin produces a combination of symbols:
+If you align three symbols of the same type, **the effect is doubled**.
 
-⚔️ Attack your enemy
-🛡️ Defend yourself
+### Basic symbols
 
-_Spinning costs health, so every decision matters._
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/sword.png" /> Attack the enemy for one damage  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/shield.png" /> Block one attack from the enemy  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/coin.png" /> Add one coin gold to your treasure  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/heart.png" /> Restore one health point  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/sleep.png" /> Do nothing !
+
+### Cursed symbols
+
+The Devil can offer you some deals, but some require you to corrupt your machine...  
+Some enemy can also curse you!
+
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-sword.png" /> Make the enemy attacks you for one damage  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-shield.png" /> Protect the enemy from one damage  
+<img align="middle" src="https://adrien-gueret.github.io/gamedevjs-2026/images/slots/evil-heart.png" /> Heal the ennemy
+
+It says other symbols exist... Will you find them?
+
+### Spinning costs health, so every decision matters.
 
 But you are not completely powerless.
 
@@ -29,7 +45,7 @@ You can:
 - Modify your machine by adding or removing symbols
 - Make deals to influence future outcomes
 
-Master the balance between risk and control.
+Master the balance between risk and control!
 
 ## Enemies
 
@@ -53,7 +69,7 @@ Each turn, add a random cursed symbol in your machine.
 
 ## Credits
 
-Code: by me
+Code: by me  
 Graphics: by me (except UI borders by https://elvgames.itch.io/free-inventory-asset-pack
-)
+)  
 Audio: AI-generated
