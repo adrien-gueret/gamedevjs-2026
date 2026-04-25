@@ -52,6 +52,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
   {
     type: "unlockRandom",
     cost: { value: 10, type: "gold" },
+    requirements: ["moreHealth1"],
     permanent: true,
   },
   {
@@ -83,8 +84,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "maxhealth" },
       { value: 8, type: "health" },
-      { value: 4, type: "gold" },
-      { value: 2, type: "reel" },
+      { value: 6, type: "gold" },
+      { value: 1, type: "reel" },
     ],
     permanent: false,
   },
@@ -93,8 +94,8 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 3, type: "maxhealth" },
       { value: 5, type: "health" },
-      { value: 2, type: "gold" },
-      { value: 2, type: "reel" },
+      { value: 6, type: "gold" },
+      { value: 1, type: "reel" },
     ],
     permanent: false,
   },
@@ -103,7 +104,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "maxhealth" },
       { value: 9, type: "health" },
-      { value: 4, type: "gold" },
+      { value: 10, type: "gold" },
       { value: 1, type: "reel" },
     ],
     permanent: false,
@@ -113,7 +114,7 @@ const ALL_DEVIL_DEALS: DevilDeal[] = [
     cost: [
       { value: 5, type: "maxhealth" },
       { value: 9, type: "health" },
-      { value: 4, type: "gold" },
+      { value: 10, type: "gold" },
       { value: 1, type: "reel" },
     ],
     permanent: false,
