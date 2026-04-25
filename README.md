@@ -71,6 +71,24 @@ Each turn, transform the middle visible symbol into a Cursed Heart symbol.
 
 Each turn, add a random cursed symbol to your machine.
 
+## Bonus features
+
+### Ethereum
+
+If you have the <a href="https://metamask.io/">MetaMask</a> extension, you can connect your Ethereum wallet to generate your own unique slot machine.
+
+### Wavedash
+
+This game is also available on Wavedash:
+
+<a href="https://wavedash.com/games/the-devil-s-machine">https://wavedash.com/games/the-devil-s-machine</a>
+
+Some features are exclusive to Wavedash:
+
+- Choose your own character based on your Wavedash account, with a unique slot machine specially forged for you!
+- Unlock achievements.
+- Compare your score with other players on the leaderboard.
+
 ## Credits
 
 Code: me  
