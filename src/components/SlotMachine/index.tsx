@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import type { ReelSymbol, BetCost } from "@/types/game";
 
 import Button from "@/components/Button";
@@ -42,11 +42,26 @@ export default function SlotMachine({
   isInteractive,
 }: Props) {
   const isSpinning = spinningReels.some((isReelSpinning) => isReelSpinning);
+  const canSpin = !isSpinning && !!isInteractive;
   const maxBetCost = hasUnlockedPermanentDeal("betterBet2")
     ? 3
     : hasUnlockedPermanentDeal("betterBet1")
       ? 2
       : 1;
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.code === "Space" || event.key === " ") && canSpin) {
+        event.preventDefault();
+        onSpin();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [canSpin, onSpin]);
 
   return (
     <div className="slot-machine">
@@ -135,7 +150,7 @@ export default function SlotMachine({
         <Button
           imageName="spin"
           onClick={onSpin}
-          disabled={isSpinning || !isInteractive}
+          disabled={!canSpin}
         >
           Spin
         </Button>
