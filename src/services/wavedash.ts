@@ -33,7 +33,7 @@ export function useWavedashLeaderboard() {
       return;
     }
 
-    wavedash.getOrCreateLeaderboard("fights-count", 0, 0).then((result) => {
+    wavedash.getOrCreateLeaderboard("fights-count", 1, 0).then((result) => {
       if (result.success) {
         setLeaderboard(result.data);
       }
