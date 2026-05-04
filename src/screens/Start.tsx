@@ -46,7 +46,7 @@ export default function Start() {
     }
 
     const userId = wavedash.getUserId();
-    const url = wavedash.getUserAvatarUrl(userId, 1);
+    const url = wavedash.getUserAvatarUrl(userId, wavedash.AvatarSize.MEDIUM);
 
     return {
       id: userId,

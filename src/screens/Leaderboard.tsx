@@ -29,7 +29,7 @@ export default function Leaderboard() {
               {leaderboard.map((entry) => {
                 const userAvatarUrl = wavedash!.getUserAvatarUrl(
                   entry.userId,
-                  0,
+                  wavedash!.AvatarSize.SMALL,
                 );
 
                 return (

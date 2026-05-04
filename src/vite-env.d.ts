@@ -25,6 +25,11 @@ interface WavedashLeaderboardEntry {
 }
 
 interface WavedashApi {
+  AvatarSize: {
+    SMALL: number;
+    MEDIUM: number;
+    LARGE: number;
+  };
   updateLoadProgressZeroToOne(progress: number): void;
   init(options: { debug?: boolean }): void;
   getUserId(): string;
