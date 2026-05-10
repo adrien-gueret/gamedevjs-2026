@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { useSounds } from "wavedash-react";
 
 import Tooltip from "@/components/Tooltip";
 
@@ -20,6 +21,7 @@ type Props = {
 export function VictoryMessage({ onHeal, onDevilDeal }: Props) {
   const hasClickedHealRef = useRef(false);
   const state = useGameState();
+  const { playSound } = useSounds();
 
   const maxHealth = state.currentRun?.health.max ?? 0;
   const healAmount = Math.ceil(maxHealth * healAmountPercentage);
@@ -29,6 +31,7 @@ export function VictoryMessage({ onHeal, onDevilDeal }: Props) {
       return;
     }
     hasClickedHealRef.current = true;
+    playSound("heal");
     healPlayer(healAmount);
     onHeal();
   };

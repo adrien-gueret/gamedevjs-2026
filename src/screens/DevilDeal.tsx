@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSounds } from "wavedash-react";
 
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Devil";
@@ -26,7 +27,6 @@ import {
   takeDamage,
 } from "@/services/actions";
 import { random } from "@/services/maths";
-import { playSound } from "@/services/sounds";
 
 import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
@@ -55,6 +55,7 @@ export default function DevilDeal() {
   const isLeaving = useRef(false);
   const concludeDeal = useRef<() => void | null>(null);
   const isShopInitialized = useRef(false);
+  const { playSound } = useSounds();
 
   const forcedMalusTotalRef = useRef(0);
   const [forcedMalusCount, setForcedMalusCount] = useState(0);
@@ -244,6 +245,7 @@ export default function DevilDeal() {
           }
           newSymbol={currentForcedMalusSymbol}
           onSymbolSelect={(reelIndex, symbolIndex) => {
+            playSound("curseSymbol");
             setReelSymbol(reelIndex, symbolIndex, currentForcedMalusSymbol);
           }}
           shouldForbidMalusSelection
@@ -272,6 +274,7 @@ export default function DevilDeal() {
         <MachineUpdate
           variant="remove"
           onSymbolSelect={(reelIndex, symbolIndex) => {
+            playSound("removeSymbol");
             removeReelSymbol(reelIndex, symbolIndex);
           }}
           onComplete={() => {
@@ -295,6 +298,7 @@ export default function DevilDeal() {
               newSymbol={selectedSymbolForReplacementBonus}
               variant="replace"
               onSymbolSelect={(reelIndex, symbolIndex) => {
+                playSound("insertSymbol");
                 setReelSymbol(
                   reelIndex,
                   symbolIndex,

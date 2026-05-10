@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSounds } from "wavedash-react";
 
 import Button from "@/components/Button";
 import Screen from "@/components/Screen";
@@ -28,6 +29,7 @@ const BONUS_PHRASES = [
 export default function BonusUpgrade() {
   const state = useGameState();
   const navigate = useNavigate();
+  const { playSound } = useSounds();
   const storedSymbols = state.currentRun?.randomChoices ?? [];
   const [newSymbol, setNewSymbol] = useState<ReelSymbol | null>(null);
   const phrase = useRef(BONUS_PHRASES[random(0, BONUS_PHRASES.length - 1)]);
@@ -86,6 +88,7 @@ export default function BonusUpgrade() {
           newSymbol={newSymbol}
           variant="add"
           onReelSelect={(reelIndex) => {
+            playSound("insertSymbol");
             addSymbolTooReel(reelIndex, newSymbol);
           }}
           onComplete={leave}

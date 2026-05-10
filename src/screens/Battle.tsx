@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLeaderboard, useSounds, useMusic } from "wavedash-react";
 
 import type { ReelSymbol, BetCost } from "@/types/game";
 
@@ -41,10 +42,7 @@ import {
 } from "@/services/selector";
 import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
-import { useWavedashLeaderboard } from "@/services/wavedash";
 import { random } from "@/services/maths";
-import { playBackgroundMusic } from "@/services/backgroundMusic";
-import { playSound, stopSound } from "@/services/sounds";
 import GoldCounter from "@/components/GoldCounter";
 import Button from "@/components/Button";
 
@@ -94,6 +92,9 @@ export default function Battle() {
   const reels = state.currentRun?.reels ?? [];
   const betCost = state.currentRun?.currentBattle?.betCost ?? 1;
 
+  const { playSound, stopSound } = useSounds();
+  const { playMusic } = useMusic();
+
   const navigate = useNavigate();
 
   const [startIndexes, setStartIndexes] = useState<number[]>(
@@ -112,7 +113,10 @@ export default function Battle() {
   const [shouldShowLostScreen, setShouldShowLostScreen] =
     useState(isPlayerDefeated());
 
-  const wavedashLeaderboard = useWavedashLeaderboard();
+  const wavedashLeaderboard = useLeaderboard("fights-count", {
+    sortOrder: 1,
+    displayType: 0,
+  });
   const [wavedashRank, setWavedashRank] = useState<number | null>(null);
 
   const levelRenderedIndex = (state.currentRun?.levelIndex ?? 0) + 1;
@@ -126,7 +130,13 @@ export default function Battle() {
       return;
     }
 
-    wavedashLeaderboard.setScore(levelRenderedIndex).then(setWavedashRank);
+    wavedashLeaderboard
+      .submitScore(levelRenderedIndex, true)
+      .then((response) => {
+        if (response) {
+          setWavedashRank(response.globalRank);
+        }
+      });
   }, [shouldShowLostScreen, wavedashLeaderboard, levelRenderedIndex]);
 
   const [shouldShowWinScreen, setShouldShowWinScreen] =
@@ -138,9 +148,9 @@ export default function Battle() {
 
   useEffect(() => {
     if (shouldShowLostScreen) {
-      playBackgroundMusic("gameover");
+      playMusic("gameover");
     }
-  }, [shouldShowLostScreen]);
+  }, [shouldShowLostScreen, playMusic]);
 
   const [isMiddleReelLocked, setIsMiddleReelLocked] = useState(false);
 
@@ -380,6 +390,7 @@ export default function Battle() {
                 await sleep(2000);
                 enemyRef.current?.setIdle();
 
+                playSound("curseSymbol");
                 setReelSymbol(1, symbolIndex, "Evil-Heart");
                 break;
               }
@@ -389,6 +400,7 @@ export default function Battle() {
                 await sleep(2000);
                 enemyRef.current?.setIdle();
                 const malus = getRandomMalusSymbol();
+                playSound("curseSymbol");
                 addSymbolTooReel(random(0, 2), malus);
                 break;
               }

@@ -1,5 +1,6 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCurrentUser, UserAvatar } from "wavedash-react";
 
 import Screen from "@/components/Screen";
 import {
@@ -14,7 +15,6 @@ import ChoiceItem from "@/components/ChoiceItem";
 import CharacterDescription from "@/components/CharacterDescription";
 import Sprite from "@/components/Sprite";
 import { generateBaseRunFromString } from "@/services/customRun";
-import { useWavedash } from "@/services/wavedash";
 
 type PossiblePlayer = PlayerType | "ethereum" | "wavedash";
 
@@ -34,26 +34,7 @@ export default function Start() {
         ? 10
         : 0;
 
-  const wavedash = useWavedash();
-
-  const wavedashUser: {
-    id: string;
-    name: string;
-    avatar: string | null;
-  } | null = useMemo(() => {
-    if (!wavedash) {
-      return null;
-    }
-
-    const userId = wavedash.getUserId();
-    const url = wavedash.getUserAvatarUrl(userId, wavedash.AvatarSize.MEDIUM);
-
-    return {
-      id: userId,
-      name: wavedash.getUsername(),
-      avatar: url,
-    };
-  }, [wavedash]);
+  const wavedashUser = useCurrentUser();
 
   const playerTypeToDescription: Record<
     PossiblePlayer,
@@ -138,7 +119,7 @@ export default function Start() {
     wavedash: {
       name: (
         <>
-          <b style={{ color: "darkorange" }}>{wavedashUser?.name}</b> (
+          <b style={{ color: "darkorange" }}>{wavedashUser?.username}</b> (
           <b style={{ color: "cyan" }}>???</b> HP)
         </>
       ),
@@ -345,18 +326,9 @@ export default function Start() {
             onMouseEnter={() => setHoverCharacter("wavedash")}
             onMouseLeave={hideDescription}
           >
-            {wavedashUser.avatar ? (
+            {wavedashUser.avatarUrl ? (
               <div style={{ width: 96, height: 96 }}>
-                <img
-                  src={wavedashUser.avatar}
-                  style={{
-                    objectFit: "contain",
-                    width: "100%",
-                    height: "100%",
-                    display: "block",
-                  }}
-                  alt=""
-                />
+                <UserAvatar size={96} />
               </div>
             ) : (
               <Sprite

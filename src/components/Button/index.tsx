@@ -1,6 +1,6 @@
 import { Link, type LinkProps } from "react-router-dom";
 import { type ButtonHTMLAttributes } from "react";
-import { playSound } from "@/services/sounds";
+import { useSound } from "wavedash-react";
 
 import "./style.css";
 
@@ -46,6 +46,8 @@ export default function Button({
   imageName,
   ...otherProps
 }: Props) {
+  const { playSound } = useSound("click");
+
   const imageStyle = `url(./images/buttons/${imageName}.png)`;
   const { width, height } = imageNameToButtonSize[imageName];
 
@@ -61,7 +63,7 @@ export default function Button({
           linkProps.onClick?.(event);
 
           if (!event.defaultPrevented) {
-            playSound("click");
+            playSound();
           }
         }}
       >
@@ -85,7 +87,7 @@ export default function Button({
         buttonProps.onClick?.(event);
 
         if (!event.defaultPrevented && !buttonProps.disabled) {
-          playSound("click");
+          playSound();
         }
       }}
     >

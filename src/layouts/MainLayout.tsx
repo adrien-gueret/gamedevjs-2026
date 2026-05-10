@@ -5,18 +5,22 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { useMusic } from "wavedash-react";
+
+import AudioButton from "@/components/AudioButton";
 
 import { getGameState } from "@/services/gameStore";
 import { setCurrentPathname } from "@/services/actions";
-import { playBackgroundMusicForPathname } from "@/services/backgroundMusic";
+import { getBackgroundMusicForPathname } from "@/services/backgroundMusic";
 
 function RouterSync() {
   const location = useLocation();
   const navigate = useNavigate();
   const isFirstRender = useRef(true);
+  const { playMusic } = useMusic();
 
   useEffect(() => {
-    playBackgroundMusicForPathname(location.pathname);
+    playMusic(getBackgroundMusicForPathname(location.pathname));
 
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -40,6 +44,7 @@ function MainLayout() {
       <ScrollRestoration />
       <RouterSync />
       <Outlet />
+      <AudioButton />
     </>
   );
 }

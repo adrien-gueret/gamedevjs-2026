@@ -1,21 +1,26 @@
 import Button from "@/components/Button";
-
 import Screen from "@/components/Screen";
 
-import {
-  useWavedash,
-  useWavedashLeaderboardEntries,
-} from "@/services/wavedash";
+import { UserAvatar, useLeaderboardEntries } from "wavedash-react";
 
 export default function Leaderboard() {
-  const wavedash = useWavedash();
-  const leaderboard = useWavedashLeaderboardEntries();
+  const leaderboard = useLeaderboardEntries(
+    "fights-count",
+    {
+      start: 0,
+      count: 20,
+    },
+    {
+      sortOrder: 1,
+      displayType: 0,
+    },
+  );
 
   return (
     <Screen>
       <h1 style={{ fontSize: "48px" }}>Hall of the Damned</h1>
 
-      {leaderboard.length > 0 && (
+      {leaderboard.entries.length > 0 && (
         <div className="leaderboard-table-container">
           <table className="leaderboard-table">
             <thead>
@@ -26,17 +31,12 @@ export default function Leaderboard() {
               </tr>
             </thead>
             <tbody>
-              {leaderboard.map((entry) => {
-                const userAvatarUrl = wavedash!.getUserAvatarUrl(
-                  entry.userId,
-                  wavedash!.AvatarSize.SMALL,
-                );
-
+              {leaderboard.entries.map((entry) => {
                 return (
                   <tr key={entry.userId}>
                     <td>#{entry.globalRank}</td>
                     <td>
-                      {userAvatarUrl && <img src={userAvatarUrl} alt="" />}
+                      <UserAvatar userId={entry.userId} size={64} />
                     </td>
                     <td>{entry.username}</td>
                     <td>{entry.score}</td>

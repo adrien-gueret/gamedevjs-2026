@@ -2,10 +2,20 @@ import Button from "@/components/Button";
 import HomeDevil from "@/components/HomeDevil";
 import Screen from "@/components/Screen";
 
-import { useWavedashLeaderboardEntries } from "@/services/wavedash";
+import { useLeaderboardEntries } from "wavedash-react";
 
 export default function Home() {
-  const leaderboard = useWavedashLeaderboardEntries();
+  const leaderboard = useLeaderboardEntries(
+    "fights-count",
+    {
+      start: 0,
+      count: 20,
+    },
+    {
+      sortOrder: 1,
+      displayType: 0,
+    },
+  );
 
   return (
     <Screen>
@@ -15,7 +25,7 @@ export default function Home() {
           Start
         </Button>
 
-        {leaderboard.length > 0 && (
+        {leaderboard.entries.length > 0 && (
           <div style={{ marginTop: "48px" }}>
             <Button imageName="leaderboard" as="link" to="/leaderboard">
               Hall of the damned
