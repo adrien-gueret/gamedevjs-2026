@@ -8,11 +8,10 @@ import Scene from "@/components/Scene/Devil";
 import MachineUpdate from "@/components/MachineUpdate";
 import SymbolPicker from "@/components/SymbolPicker";
 
-import { getRandomBonusSymbols } from "@/services/upgrades";
-import { useGameState } from "@/services/gameStore";
-import { setRandomChoices, addSymbolTooReel } from "@/services/actions";
+import { useGetRandomBonusSymbols } from "@/services/upgrades";
 import { random } from "@/services/maths";
-import { startNewBattle } from "@/services/actions";
+import { useRandomChoices } from "@/services/selector";
+import { usePersistentActions, usePersistentSelector } from "@/services/state";
 
 import type { ReelSymbol } from "@/types/game";
 
@@ -27,20 +26,32 @@ const BONUS_PHRASES = [
 ];
 
 export default function BonusUpgrade() {
-  const state = useGameState();
   const navigate = useNavigate();
   const { playSound } = useSounds();
-  const storedSymbols = state.currentRun?.randomChoices ?? [];
+  const storedSymbols = useRandomChoices();
   const [newSymbol, setNewSymbol] = useState<ReelSymbol | null>(null);
   const phrase = useRef(BONUS_PHRASES[random(0, BONUS_PHRASES.length - 1)]);
   const isLeaving = useRef(false);
+  const { setRandomChoices, startNewBattle, addSymbolTooReel } =
+    usePersistentActions();
+
+  const getRandomBonusSymbols = useGetRandomBonusSymbols();
 
   useEffect(() => {
     if (!storedSymbols.length && !isLeaving.current) {
       const newSymbols = getRandomBonusSymbols(2);
       setRandomChoices(newSymbols);
     }
-  }, [storedSymbols]);
+  }, [storedSymbols, getRandomBonusSymbols, setRandomChoices]);
+
+  const currentLevelIndex = usePersistentSelector(
+    (state) => state.currentRun?.levelIndex ?? -1,
+  );
+
+  const hasWantedToDie = usePersistentSelector(
+    (state) =>
+      state.currentRun?.passiveEffects.includes("wantedToDie") ?? false,
+  );
 
   const leave = useCallback(() => {
     if (isLeaving.current) {
@@ -50,16 +61,13 @@ export default function BonusUpgrade() {
     startNewBattle();
     setRandomChoices();
     navigate("/battle");
-  }, []);
-
-  const hasWantedToDie =
-    state.currentRun?.passiveEffects.includes("wantedToDie") ?? false;
+  }, [navigate, startNewBattle, setRandomChoices]);
 
   useEffect(() => {
-    if (hasWantedToDie || (state.currentRun?.levelIndex ?? 0) % 2 === 0) {
+    if (hasWantedToDie || (currentLevelIndex ?? 0) % 2 === 0) {
       leave();
     }
-  }, [hasWantedToDie, state.currentRun?.levelIndex, leave]);
+  }, [hasWantedToDie, currentLevelIndex, leave]);
 
   return (
     <Screen>

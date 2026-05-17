@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import MachineReel from "@/components/MachineReel";
 import MachineHearts from "@/components/MachineHearts";
 
-import { hasUnlockedPermanentDeal } from "@/services/selector";
+import { useHasUnlockedPermanentDeal } from "@/services/selector";
 
 import "./style.css";
 import Tooltip from "../Tooltip";
@@ -45,6 +45,9 @@ export default function SlotMachine({
 }: Props) {
   const isSpinning = spinningReels.some((isReelSpinning) => isReelSpinning);
   const canSpin = !isSpinning && !!isInteractive;
+
+  const hasUnlockedPermanentDeal = useHasUnlockedPermanentDeal();
+
   const maxBetCost = hasUnlockedPermanentDeal("betterBet2")
     ? 3
     : hasUnlockedPermanentDeal("betterBet1")
@@ -150,11 +153,7 @@ export default function SlotMachine({
       </div>
 
       <div className="spin-button">
-        <Button
-          imageName="spin"
-          onClick={onSpin}
-          disabled={!canSpin}
-        >
+        <Button imageName="spin" onClick={onSpin} disabled={!canSpin}>
           Spin
         </Button>
       </div>

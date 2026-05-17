@@ -8,8 +8,8 @@ import {
   BASE_RUN_SKELETON,
   BASE_RUN_WIZARD,
 } from "@/constants/baseRun";
-import { startRun, startNewBattle } from "@/services/actions";
-import { hasUnlockedPermanentDeal } from "@/services/selector";
+import { useHasUnlockedPermanentDeal } from "@/services/selector";
+import { usePersistentActions } from "@/services/state";
 import type { ConfigurableBaseRun, PlayerType } from "@/types/game";
 import ChoiceItem from "@/components/ChoiceItem";
 import CharacterDescription from "@/components/CharacterDescription";
@@ -20,11 +20,14 @@ type PossiblePlayer = PlayerType | "ethereum" | "wavedash";
 
 export default function Start() {
   const navigate = useNavigate();
+  const { startRun, startNewBattle } = usePersistentActions();
   const [hoverCharacter, setHoverCharacter] = useState<PossiblePlayer | null>(
     null,
   );
 
   const hideDescription = useCallback(() => setHoverCharacter(null), []);
+
+  const hasUnlockedPermanentDeal = useHasUnlockedPermanentDeal();
 
   const healthBonus = hasUnlockedPermanentDeal("moreHealth3")
     ? 30
@@ -168,7 +171,7 @@ export default function Start() {
       startNewBattle();
       navigate("/battle");
     },
-    [navigate, healthBonus],
+    [navigate, healthBonus, startRun, startNewBattle],
   );
 
   const onPlayEthereum = useCallback(async () => {

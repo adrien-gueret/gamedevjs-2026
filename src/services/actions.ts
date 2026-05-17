@@ -1,7 +1,7 @@
 import type {
   BetCost,
   Run,
-  GameState,
+  PersistentGameState,
   NextAction,
   ReelSymbol,
   PassiveEffectType,
@@ -10,10 +10,9 @@ import type {
 
 import { getNewBattleEnemy, getEnemyNextActions } from "./enemies";
 
-import { setGameState } from "./gameStore";
 import { isSymbolGlued } from "./selector";
 
-function getPassiveEffectNextActions(state: GameState): NextAction[] {
+function getPassiveEffectNextActions(state: PersistentGameState): NextAction[] {
   const passiveEffects = state.currentRun?.passiveEffects ?? [];
 
   const attackCount = passiveEffects.filter(
@@ -36,115 +35,142 @@ function getPassiveEffectNextActions(state: GameState): NextAction[] {
   return nextActions;
 }
 
-export function toggleAudio(forcedValue?: boolean): GameState {
-  return setGameState((prev) => ({
-    ...prev,
-    audio:
-      forcedValue !== undefined ? Boolean(forcedValue) : !Boolean(prev.audio),
-  }));
-}
-
-// ---------------------------------------------------------------------------
-// Run - Global
-// ---------------------------------------------------------------------------
-
-export function startRun(baseRun: Run): GameState {
-  return setGameState((prev) => ({
-    ...prev,
+export function startRun(
+  state: PersistentGameState,
+  baseRun: Run,
+): PersistentGameState {
+  return {
+    ...state,
     currentRun: structuredClone(baseRun),
-  }));
+  };
 }
 
-export function endRun(): GameState {
-  return setGameState((prev) => ({
-    ...prev,
+export function endRun(state: PersistentGameState): PersistentGameState {
+  return {
+    ...state,
     currentRun: null,
-  }));
+  };
 }
 
-export function setCurrentPathname(pathname: string): GameState {
-  return setGameState((prev) => ({ ...prev, currentPathname: pathname }));
+export function setCurrentPathname(
+  state: PersistentGameState,
+  pathname: string,
+): PersistentGameState {
+  return {
+    ...state,
+    currentPathname: pathname,
+  };
 }
 
 export function setReelSymbol(
+  state: PersistentGameState,
   reelIndex: number,
   symbolIndex: number,
   newSymbol: ReelSymbol,
-): GameState {
-  if (isSymbolGlued(reelIndex, symbolIndex)) {
-    unglueSymbol(reelIndex, symbolIndex);
+): PersistentGameState {
+  let next = state;
+  if (isSymbolGlued(next, reelIndex, symbolIndex)) {
+    next = unglueSymbol(next, reelIndex, symbolIndex);
   }
 
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.reels[reelIndex][symbolIndex] = newSymbol;
-    return next;
+  if (!next.currentRun) return next;
+  const newReels = next.currentRun.reels.map((reel, i) => {
+    if (i !== reelIndex) return reel;
+    const copy = [...reel];
+    copy[symbolIndex] = newSymbol;
+    return copy;
   });
+  return {
+    ...next,
+    currentRun: { ...next.currentRun, reels: newReels },
+  };
 }
 
 export function removeReelSymbol(
+  state: PersistentGameState,
   reelIndex: number,
   symbolIndex: number,
-): GameState {
-  if (isSymbolGlued(reelIndex, symbolIndex)) {
-    unglueSymbol(reelIndex, symbolIndex);
+): PersistentGameState {
+  let next = state;
+  if (isSymbolGlued(next, reelIndex, symbolIndex)) {
+    next = unglueSymbol(next, reelIndex, symbolIndex);
   }
 
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.reels[reelIndex].splice(symbolIndex, 1);
-    return next;
-  });
+  if (!next.currentRun) return next;
+  const newReels = next.currentRun.reels.map((reel, i) =>
+    i === reelIndex ? reel.filter((_, j) => j !== symbolIndex) : reel,
+  );
+  return {
+    ...next,
+    currentRun: { ...next.currentRun, reels: newReels },
+  };
 }
 
 export function addSymbolTooReel(
+  state: PersistentGameState,
   reelIndex: number,
   newSymbol: ReelSymbol,
-): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.reels[reelIndex].push(newSymbol);
-    return next;
-  });
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  const newReels = state.currentRun.reels.map((reel, i) =>
+    i === reelIndex ? [...reel, newSymbol] : reel,
+  );
+  return {
+    ...state,
+    currentRun: { ...state.currentRun, reels: newReels },
+  };
 }
 
-export function glueSymbol(reelIndex: number, symbolIndex: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.gluedSymbolsIndexes[reelIndex].push(symbolIndex);
-    return next;
-  });
+export function glueSymbol(
+  state: PersistentGameState,
+  reelIndex: number,
+  symbolIndex: number,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  const newGlued = state.currentRun.gluedSymbolsIndexes.map((indexes, i) =>
+    i === reelIndex ? [...indexes, symbolIndex] : indexes,
+  );
+  return {
+    ...state,
+    currentRun: { ...state.currentRun, gluedSymbolsIndexes: newGlued },
+  };
 }
 
 export function unglueSymbol(
+  state: PersistentGameState,
   reelIndex: number,
   symbolIndex: number,
-): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.gluedSymbolsIndexes[reelIndex] =
-      next.currentRun!.gluedSymbolsIndexes[reelIndex].filter(
-        (index) => index !== symbolIndex,
-      );
-    return next;
-  });
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  const newGlued = state.currentRun.gluedSymbolsIndexes.map((indexes, i) =>
+    i === reelIndex
+      ? indexes.filter((index) => index !== symbolIndex)
+      : indexes,
+  );
+  return {
+    ...state,
+    currentRun: { ...state.currentRun, gluedSymbolsIndexes: newGlued },
+  };
 }
 
-export function addPassiveEffect(effect: PassiveEffectType): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.passiveEffects.push(effect);
-    return next;
-  });
+export function addPassiveEffect(
+  state: PersistentGameState,
+  effect: PassiveEffectType,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      passiveEffects: [...state.currentRun.passiveEffects, effect],
+    },
+  };
 }
 
-export function addPermanentBonus(effect: DevilDealType): GameState {
+export function addPermanentBonus(
+  state: PersistentGameState,
+  effect: DevilDealType,
+): PersistentGameState {
   if (window.Wavedash) {
     (async () => {
       const Wavedash = await window.Wavedash!;
@@ -154,342 +180,469 @@ export function addPermanentBonus(effect: DevilDealType): GameState {
     })();
   }
 
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.unlockedPermanentDeals.push(effect);
+  if (!state.currentRun) return state;
 
-    if (["moreHealth1", "moreHealth2", "moreHealth3"].includes(effect)) {
-      next.currentRun!.health.value += 10;
-      next.currentRun!.health.max += 10;
-    }
+  const addHealth = ["moreHealth1", "moreHealth2", "moreHealth3"].includes(
+    effect,
+  );
 
-    return next;
-  });
+  return {
+    ...state,
+    unlockedPermanentDeals: [...state.unlockedPermanentDeals, effect],
+    currentRun: {
+      ...state.currentRun,
+      health: addHealth
+        ? {
+            value: state.currentRun.health.value + 10,
+            max: state.currentRun.health.max + 10,
+          }
+        : state.currentRun.health,
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Run - Player health
 // ---------------------------------------------------------------------------
 
-export function takeDamage(amount: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    const health = next.currentRun!.health;
-    health.value = Math.max(0, health.value - amount);
-    return next;
-  });
+export function takeDamage(
+  state: PersistentGameState,
+  amount: number,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      health: {
+        ...state.currentRun.health,
+        value: Math.max(0, state.currentRun.health.value - amount),
+      },
+    },
+  };
 }
 
-export function healPlayer(amount: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    const health = next.currentRun!.health;
-    health.value = Math.min(health.max, health.value + amount);
-
-    return next;
-  });
+export function healPlayer(
+  state: PersistentGameState,
+  amount: number,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      health: {
+        ...state.currentRun.health,
+        value: Math.min(
+          state.currentRun.health.max,
+          state.currentRun.health.value + amount,
+        ),
+      },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Run - Gold
 // ---------------------------------------------------------------------------
 
-export function addGold(amount: number = 1): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.gold += amount;
-    return next;
-  });
+export function addGold(
+  state: PersistentGameState,
+  amount: number = 1,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  return {
+    ...state,
+    gold: state.gold + amount,
+  };
 }
 
-export function spendGold(amount: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) {
-      return prev;
-    }
-    const next = structuredClone(prev);
-    next.gold -= amount;
-    return next;
-  });
+export function spendGold(
+  state: PersistentGameState,
+  amount: number,
+): PersistentGameState {
+  if (!state.currentRun) {
+    return state;
+  }
+  return {
+    ...state,
+    gold: state.gold - amount,
+  };
 }
 
-export function spendMaxHealth(amount: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) {
-      return prev;
-    }
-    const next = structuredClone(prev);
-
-    next.currentRun!.health.max -= amount;
-    next.currentRun!.health.value = Math.min(
-      next.currentRun!.health.value,
-      next.currentRun!.health.max,
-    );
-
-    return next;
-  });
+export function spendMaxHealth(
+  state: PersistentGameState,
+  amount: number,
+): PersistentGameState {
+  if (!state.currentRun) {
+    return state;
+  }
+  const newMax = state.currentRun.health.max - amount;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      health: {
+        max: newMax,
+        value: Math.min(state.currentRun.health.value, newMax),
+      },
+    },
+  };
 }
 
-export function killPlayer() {
-  return setGameState((prev) => {
-    if (!prev.currentRun) {
-      return prev;
-    }
-    const next = structuredClone(prev);
-    next.currentRun!.health.value = 0;
-    return next;
-  });
+export function killPlayer(state: PersistentGameState) {
+  if (!state.currentRun) {
+    return state;
+  }
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      health: { ...state.currentRun.health, value: 0 },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Run - Battle
 // ---------------------------------------------------------------------------
 
-export function startNewBattle(): GameState {
-  setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle = {
-      betCost: next.unlockedPermanentDeals.includes("betterBet2")
-        ? 3
-        : next.unlockedPermanentDeals.includes("betterBet1")
-          ? 2
-          : 1,
-      enemy: {
-        ...getNewBattleEnemy(next.currentRun!.levelIndex),
-        nextActions: [],
+export function startNewBattle(
+  state: PersistentGameState,
+): PersistentGameState {
+  if (!state.currentRun) return state;
+  const next: PersistentGameState = {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        betCost: state.unlockedPermanentDeals.includes("betterBet2")
+          ? 3
+          : state.unlockedPermanentDeals.includes("betterBet1")
+            ? 2
+            : 1,
+        enemy: {
+          ...getNewBattleEnemy(state.currentRun.levelIndex),
+          nextActions: [],
+        },
+        playerNextActions: getPassiveEffectNextActions(state),
+        hasUsedLockedReel: false,
       },
-      playerNextActions: getPassiveEffectNextActions(next),
-      hasUsedLockedReel: false,
-    };
-    return next;
-  });
-
-  return setEnemyNextActions();
+    },
+  };
+  return setEnemyNextActions(next);
 }
 
-export function endBattle(hasWon: boolean): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle = null;
+export function endBattle(
+  state: PersistentGameState,
+  hasWon: boolean,
+): PersistentGameState {
+  if (!state.currentRun) return state;
 
-    const hasAskedToDie =
-      next.currentRun!.passiveEffects.includes("wantedToDie");
+  const hasAskedToDie = state.currentRun.passiveEffects.includes("wantedToDie");
 
-    if (hasWon) {
-      next.currentRun!.levelIndex += 1;
-    } else if (!hasAskedToDie) {
-      next.gold = Math.ceil(next.gold / 2);
-    }
-
-    return next;
-  });
+  return {
+    ...state,
+    gold: hasWon || hasAskedToDie ? state.gold : Math.ceil(state.gold / 2),
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: null,
+      levelIndex: hasWon
+        ? state.currentRun.levelIndex + 1
+        : state.currentRun.levelIndex,
+    },
+  };
 }
 
-export function setBetCost(betCost: BetCost): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.betCost = betCost;
-    return next;
-  });
+export function setBetCost(
+  state: PersistentGameState,
+  betCost: BetCost,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: { ...state.currentRun.currentBattle, betCost },
+    },
+  };
 }
 
-export function setHasUsedLockedReel(): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.hasUsedLockedReel = true;
-    return next;
-  });
+export function setHasUsedLockedReel(
+  state: PersistentGameState,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        hasUsedLockedReel: true,
+      },
+    },
+  };
 }
 
-export function addPlayerNextActions(nextAction: NextAction): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    const battle = next.currentRun!.currentBattle!;
-    const existing = battle.playerNextActions.find(
-      (action) => action.type === nextAction.type,
-    );
+export function addPlayerNextActions(
+  state: PersistentGameState,
+  nextAction: NextAction,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  const battle = state.currentRun.currentBattle;
+  const existing = battle.playerNextActions.find(
+    (action) => action.type === nextAction.type,
+  );
 
-    if (!existing) {
-      battle.playerNextActions = battle.playerNextActions.concat(nextAction);
-    } else if (existing.value !== undefined) {
-      existing.value += nextAction.value ?? 0;
-    }
-    return next;
-  });
+  const newPlayerNextActions = existing
+    ? battle.playerNextActions.map((action) =>
+        action.type === nextAction.type && action.value !== undefined
+          ? { ...action, value: action.value + (nextAction.value ?? 0) }
+          : action,
+      )
+    : [...battle.playerNextActions, nextAction];
+
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...battle,
+        playerNextActions: newPlayerNextActions,
+      },
+    },
+  };
 }
 
-export function resetPlayerNextActions(): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.playerNextActions =
-      getPassiveEffectNextActions(next);
-    return next;
-  });
+export function resetPlayerNextActions(
+  state: PersistentGameState,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        playerNextActions: getPassiveEffectNextActions(state),
+      },
+    },
+  };
 }
 
-export function resetEnemyNextActions(): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    next.currentRun!.currentBattle!.enemy.nextActions = [];
-    return next;
-  });
+export function resetEnemyNextActions(
+  state: PersistentGameState,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        enemy: { ...state.currentRun.currentBattle.enemy, nextActions: [] },
+      },
+    },
+  };
 }
 
-export function makeCharacterAttack(attacker: "player" | "enemy"): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    const battle = next.currentRun!.currentBattle!;
+export function makeCharacterAttack(
+  state: PersistentGameState,
+  attacker: "player" | "enemy",
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  const battle = state.currentRun.currentBattle;
 
-    const attackerNextActions =
-      attacker === "player"
-        ? battle.playerNextActions
-        : battle.enemy.nextActions;
+  const attackerNextActions =
+    attacker === "player" ? battle.playerNextActions : battle.enemy.nextActions;
 
-    const attackAction = attackerNextActions.find(
-      (action) => action.type === "attack",
-    );
-    const attackValue = attackAction?.value ?? 0;
+  const attackAction = attackerNextActions.find(
+    (action) => action.type === "attack",
+  );
+  const attackValue = attackAction?.value ?? 0;
 
-    if (!attackValue) {
-      return next;
-    }
+  if (!attackValue) {
+    return state;
+  }
 
-    const defenderNextActions =
-      attacker === "player"
-        ? battle.enemy.nextActions
-        : battle.playerNextActions;
+  const defenderNextActions =
+    attacker === "player" ? battle.enemy.nextActions : battle.playerNextActions;
 
-    const defenseValue = defenderNextActions
-      .filter((action) => action.type === "defend")
-      .reduce((total, action) => total + (action.value ?? 0), 0);
+  const defenseValue = defenderNextActions
+    .filter((action) => action.type === "defend")
+    .reduce((total, action) => total + (action.value ?? 0), 0);
 
-    const newAttackerNextActions = attackerNextActions.filter(
-      (action) => action.type !== "attack",
-    );
+  const newAttackerNextActions = attackerNextActions.filter(
+    (action) => action.type !== "attack",
+  );
 
-    // Remove attack action from attacker
+  const removeDefenseFromDefender = () =>
+    defenderNextActions.filter((action) => action.type !== "defend");
+
+  let newPlayerNextActions: NextAction[];
+  let newEnemyNextActions: NextAction[];
+  let newPlayerHealth = state.currentRun.health;
+  let newEnemyHealth = battle.enemy.health;
+
+  if (attacker === "player") {
+    newPlayerNextActions = newAttackerNextActions;
+    newEnemyNextActions = battle.enemy.nextActions;
+  } else {
+    newPlayerNextActions = battle.playerNextActions;
+    newEnemyNextActions = newAttackerNextActions;
+  }
+
+  if (attackValue > defenseValue) {
     if (attacker === "player") {
-      battle.playerNextActions = newAttackerNextActions;
+      newEnemyNextActions = removeDefenseFromDefender();
     } else {
-      battle.enemy.nextActions = newAttackerNextActions;
+      newPlayerNextActions = removeDefenseFromDefender();
     }
+    const damage = Math.max(0, attackValue - defenseValue);
 
-    const removeDefenseFromDefender = () => {
-      const newDefenderNextActions = defenderNextActions.filter(
-        (action) => action.type !== "defend",
-      );
-
-      if (attacker === "player") {
-        battle.enemy.nextActions = newDefenderNextActions;
-      } else {
-        battle.playerNextActions = newDefenderNextActions;
+    if (attacker === "player") {
+      newEnemyHealth = {
+        ...battle.enemy.health,
+        value: Math.max(0, battle.enemy.health.value - damage),
+      };
+    } else {
+      newPlayerHealth = {
+        ...state.currentRun.health,
+        value: Math.max(0, state.currentRun.health.value - damage),
+      };
+    }
+  } else if (attackValue === defenseValue) {
+    if (attacker === "player") {
+      newEnemyNextActions = removeDefenseFromDefender();
+    } else {
+      newPlayerNextActions = removeDefenseFromDefender();
+    }
+  } else {
+    const reduceDefense = (action: NextAction) => {
+      if (action.type === "defend") {
+        return {
+          ...action,
+          value: Math.max(0, (action.value ?? 0) - attackValue),
+        };
       }
+      return action;
     };
 
-    if (attackValue > defenseValue) {
-      removeDefenseFromDefender();
-      const damage = Math.max(0, attackValue - defenseValue);
-
-      if (attacker === "player") {
-        battle.enemy.health.value = Math.max(
-          0,
-          battle.enemy.health.value - damage,
-        );
-      } else {
-        next.currentRun!.health.value = Math.max(
-          0,
-          next.currentRun!.health.value - damage,
-        );
-      }
+    if (attacker === "player") {
+      newEnemyNextActions = battle.enemy.nextActions.map(reduceDefense);
     } else {
-      if (attackValue === defenseValue) {
-        removeDefenseFromDefender();
-      } else {
-        const reduceDefense = (action: NextAction) => {
-          if (action.type === "defend") {
-            return {
-              ...action,
-              value: Math.max(0, (action.value ?? 0) - attackValue),
-            };
-          }
-          return action;
-        };
-
-        if (attacker === "player") {
-          battle.enemy.nextActions =
-            battle.enemy.nextActions.map(reduceDefense);
-        } else {
-          battle.playerNextActions =
-            battle.playerNextActions.map(reduceDefense);
-        }
-      }
+      newPlayerNextActions = battle.playerNextActions.map(reduceDefense);
     }
+  }
 
-    return next;
-  });
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      health: newPlayerHealth,
+      currentBattle: {
+        ...battle,
+        playerNextActions: newPlayerNextActions,
+        enemy: {
+          ...battle.enemy,
+          health: newEnemyHealth,
+          nextActions: newEnemyNextActions,
+        },
+      },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Run - Battle Enemy
 // ---------------------------------------------------------------------------
 
-export function healEnemy(amount: number): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    const health = next.currentRun!.currentBattle!.enemy.health;
-    health.value = Math.min(health.max, health.value + amount);
-    return next;
-  });
+export function healEnemy(
+  state: PersistentGameState,
+  amount: number,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  const enemyHealth = state.currentRun.currentBattle.enemy.health;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        enemy: {
+          ...state.currentRun.currentBattle.enemy,
+          health: {
+            ...enemyHealth,
+            value: Math.min(enemyHealth.max, enemyHealth.value + amount),
+          },
+        },
+      },
+    },
+  };
 }
 
-export function setEnemyNextActions(): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    const enemy = next.currentRun!.currentBattle!.enemy;
-    enemy.nextActions = getEnemyNextActions(enemy, next.currentRun!.levelIndex);
-    return next;
-  });
+export function setEnemyNextActions(
+  state: PersistentGameState,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  const enemy = state.currentRun.currentBattle.enemy;
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        enemy: {
+          ...enemy,
+          nextActions: getEnemyNextActions(enemy, state.currentRun.levelIndex),
+        },
+      },
+    },
+  };
 }
 
-export function addEnemyNextActions(nextAction: NextAction): GameState {
-  return setGameState((prev) => {
-    if (!prev.currentRun?.currentBattle) return prev;
-    const next = structuredClone(prev);
-    const battle = next.currentRun!.currentBattle!;
-    const existing = battle.enemy.nextActions.find(
-      (action) => action.type === nextAction.type,
-    );
+export function addEnemyNextActions(
+  state: PersistentGameState,
+  nextAction: NextAction,
+): PersistentGameState {
+  if (!state.currentRun?.currentBattle) return state;
+  const enemy = state.currentRun.currentBattle.enemy;
+  const existing = enemy.nextActions.find(
+    (action) => action.type === nextAction.type,
+  );
 
-    if (!existing) {
-      battle.enemy.nextActions = battle.enemy.nextActions.concat(nextAction);
-    } else if (existing.value !== undefined) {
-      existing.value += nextAction.value ?? 0;
-    }
-    return next;
-  });
+  const newNextActions = existing
+    ? enemy.nextActions.map((action) =>
+        action.type === nextAction.type && action.value !== undefined
+          ? { ...action, value: action.value + (nextAction.value ?? 0) }
+          : action,
+      )
+    : [...enemy.nextActions, nextAction];
+
+  return {
+    ...state,
+    currentRun: {
+      ...state.currentRun,
+      currentBattle: {
+        ...state.currentRun.currentBattle,
+        enemy: { ...enemy, nextActions: newNextActions },
+      },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Run - Random choices
 // ---------------------------------------------------------------------------
 
-export function setRandomChoices(randomChoices: any[] = []): GameState {
-  return setGameState((prev) => ({
-    ...prev,
-    currentRun: prev.currentRun ? { ...prev.currentRun, randomChoices } : null,
-  }));
+export function setRandomChoices(
+  state: PersistentGameState,
+  randomChoices: any[] = [],
+): PersistentGameState {
+  return {
+    ...state,
+    currentRun: state.currentRun
+      ? { ...state.currentRun, randomChoices }
+      : null,
+  };
 }

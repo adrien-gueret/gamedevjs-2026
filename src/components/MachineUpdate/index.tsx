@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
 
-import { useGameState } from "@/services/gameStore";
 import Button from "@/components/Button";
 import MachineReel from "@/components/MachineReel";
 import MachineSymbol from "@/components/MachineSymbol";
 import Tooltip from "@/components/Tooltip";
 import SymbolLabel from "@/components/SymbolLabel";
+
+import { useCurrentRunReels } from "@/services/selector";
 
 import { sleep } from "@/services/utils";
 import type { ReelSymbol } from "@/types/game";
@@ -33,7 +34,6 @@ export default function MachineUpdate({
   shouldForbidMalusSelection,
   variant,
 }: Props) {
-  const state = useGameState();
   const [hasMadeChoice, setHasMadeChoice] = useState(false);
 
   const variantToDescriptionMap: Record<typeof variant, ReactNode> = {
@@ -58,6 +58,8 @@ export default function MachineUpdate({
     ),
   };
 
+  const reels = useCurrentRunReels();
+
   return (
     <div className="machine-update">
       <div className="slot-machine">
@@ -71,7 +73,7 @@ export default function MachineUpdate({
           {variantToDescriptionMap[variant]}
         </div>
         <div className="machine-update-reels">
-          {state.currentRun?.reels.map((reelSymbols, index) => (
+          {reels.map((reelSymbols, index) => (
             <MachineReel
               key={index}
               symbols={reelSymbols}

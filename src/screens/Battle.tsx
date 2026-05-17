@@ -11,35 +11,23 @@ import type { PlayerHandle } from "@/components/Player";
 import SlotMachine from "@/components/SlotMachine";
 import Screen from "@/components/Screen";
 import Scene from "@/components/Scene/Battle";
-import { useGameState } from "@/services/gameStore";
-import {
-  takeDamage,
-  setBetCost,
-  addPlayerNextActions,
-  makeCharacterAttack,
-  setEnemyNextActions,
-  resetPlayerNextActions,
-  resetEnemyNextActions,
-  addGold,
-  endBattle,
-  healPlayer,
-  healEnemy,
-  addEnemyNextActions,
-  setHasUsedLockedReel,
-  addSymbolTooReel,
-  setReelSymbol,
-  glueSymbol,
-  unglueSymbol,
-} from "@/services/actions";
 import { sleep } from "@/services/utils";
 import {
-  isEnemyDefeated,
-  canEnemyAttack,
-  canPlayerAttack,
-  isPlayerDefeated,
-  getRandomNotGluedSymbolIndexes,
-  isSymbolGlued,
+  useIsEnemyDefeated,
+  useCanEnemyAttack,
+  useCanPlayerAttack,
+  useIsPlayerDefeated,
+  useGetRandomNotGluedSymbolIndexes,
+  useIsSymbolGlued,
+  useHealth,
+  useCurrentRunReels,
+  useGold,
 } from "@/services/selector";
+import {
+  usePersistentActions,
+  usePersistentSelector,
+  usePersistentSelectorShallow,
+} from "@/services/state";
 import { VictoryMessage } from "@/components/VictoryMessage";
 import { getRandomMalusSymbol, isMalusSymbol } from "@/services/upgrades";
 import { random } from "@/services/maths";
@@ -49,31 +37,6 @@ import Button from "@/components/Button";
 const ACTIVATION_DURATION = 420;
 const MIN_SPIN_SPEED_MULTIPLIER = 0.55;
 const SPIN_SPEED_DECAY_LEVELS = 8;
-
-const symboleToDirectAction: Partial<
-  Record<
-    ReelSymbol,
-    (multiplier: number, reelIndex: number, symbolIndex: number) => void
-  >
-> = {
-  Sword: (multiplier) =>
-    addPlayerNextActions({ type: "attack", value: 1 * multiplier }),
-  "Super-Sword": (multiplier) =>
-    addPlayerNextActions({ type: "attack", value: 2 * multiplier }),
-  Shield: (multiplier) =>
-    addPlayerNextActions({ type: "defend", value: 1 * multiplier }),
-  "Super-Shield": (multiplier) =>
-    addPlayerNextActions({ type: "defend", value: 2 * multiplier }),
-  Coin: addGold,
-  "Super-Coin": (multiplier) => addGold(2 * multiplier),
-  Heart: healPlayer,
-  "Super-Heart": (multiplier) => healPlayer(2 * multiplier),
-  "Evil-Heart": healEnemy,
-  "Evil-Sword": (multiplier) =>
-    addEnemyNextActions({ type: "attack", value: 1 * multiplier }),
-  "Evil-Shield": (multiplier) =>
-    addEnemyNextActions({ type: "defend", value: 1 * multiplier }),
-};
 
 type Payline = {
   name: "middle" | "top" | "bottom" | "diagonal-down" | "diagonal-up";
@@ -87,10 +50,56 @@ type ActiveSymbolPosition = {
 };
 
 export default function Battle() {
-  const state = useGameState();
-  const health = state.currentRun?.health ?? { value: 0, max: 10 };
-  const reels = state.currentRun?.reels ?? [];
-  const betCost = state.currentRun?.currentBattle?.betCost ?? 1;
+  const {
+    takeDamage,
+    setBetCost,
+    addPlayerNextActions,
+    makeCharacterAttack,
+    setEnemyNextActions,
+    resetPlayerNextActions,
+    resetEnemyNextActions,
+    addGold,
+    endBattle,
+    healPlayer,
+    healEnemy,
+    addEnemyNextActions,
+    setHasUsedLockedReel,
+    addSymbolTooReel,
+    setReelSymbol,
+    glueSymbol,
+    unglueSymbol,
+  } = usePersistentActions();
+
+  const symboleToDirectAction: Partial<
+    Record<
+      ReelSymbol,
+      (multiplier: number, reelIndex: number, symbolIndex: number) => void
+    >
+  > = {
+    Sword: (multiplier) =>
+      addPlayerNextActions({ type: "attack", value: 1 * multiplier }),
+    "Super-Sword": (multiplier) =>
+      addPlayerNextActions({ type: "attack", value: 2 * multiplier }),
+    Shield: (multiplier) =>
+      addPlayerNextActions({ type: "defend", value: 1 * multiplier }),
+    "Super-Shield": (multiplier) =>
+      addPlayerNextActions({ type: "defend", value: 2 * multiplier }),
+    Coin: addGold,
+    "Super-Coin": (multiplier) => addGold(2 * multiplier),
+    Heart: healPlayer,
+    "Super-Heart": (multiplier) => healPlayer(2 * multiplier),
+    "Evil-Heart": healEnemy,
+    "Evil-Sword": (multiplier) =>
+      addEnemyNextActions({ type: "attack", value: 1 * multiplier }),
+    "Evil-Shield": (multiplier) =>
+      addEnemyNextActions({ type: "defend", value: 1 * multiplier }),
+  };
+
+  const health = useHealth();
+  const reels = useCurrentRunReels();
+  const betCost = usePersistentSelector(
+    (state) => state.currentRun?.currentBattle?.betCost ?? 1,
+  );
 
   const { playSound, stopSound } = useSounds();
   const { playMusic } = useMusic();
@@ -110,8 +119,14 @@ export default function Battle() {
     ActiveSymbolPosition[]
   >([]);
 
+  const isPlayerDefeated = useIsPlayerDefeated();
+
+  const levelIndex = usePersistentSelector(
+    (state) => state.currentRun?.levelIndex ?? 0,
+  );
+
   const [shouldShowLostScreen, setShouldShowLostScreen] =
-    useState(isPlayerDefeated());
+    useState(isPlayerDefeated);
 
   const wavedashLeaderboard = useLeaderboard("fights-count", {
     sortOrder: 1,
@@ -119,7 +134,7 @@ export default function Battle() {
   });
   const [wavedashRank, setWavedashRank] = useState<number | null>(null);
 
-  const levelRenderedIndex = (state.currentRun?.levelIndex ?? 0) + 1;
+  const levelRenderedIndex = levelIndex + 1;
   const spinSpeedMultiplier =
     MIN_SPIN_SPEED_MULTIPLIER +
     (1 - MIN_SPIN_SPEED_MULTIPLIER) *
@@ -139,8 +154,9 @@ export default function Battle() {
       });
   }, [shouldShowLostScreen, wavedashLeaderboard, levelRenderedIndex]);
 
+  const isEnemyDefeated = useIsEnemyDefeated();
   const [shouldShowWinScreen, setShouldShowWinScreen] =
-    useState(isEnemyDefeated());
+    useState(isEnemyDefeated);
 
   const [canSpin, setCanSpin] = useState(
     !shouldShowLostScreen && !shouldShowWinScreen,
@@ -266,11 +282,11 @@ export default function Battle() {
 
   const hasRunAutoLoose = useRef(false);
   useEffect(() => {
-    if (isPlayerDefeated() && !hasRunAutoLoose.current) {
+    if (isPlayerDefeated && !hasRunAutoLoose.current) {
       hasRunAutoLoose.current = true;
       battleLost();
     }
-  }, []);
+  }, [isPlayerDefeated, battleLost]);
 
   const battleWon = useCallback(() => {
     stopBattle();
@@ -284,6 +300,28 @@ export default function Battle() {
       playerCloneRef.current?.remove();
     };
   }, []);
+
+  const canPlayerAttack = useCanPlayerAttack();
+  const canEnemyAttack = useCanEnemyAttack();
+  const getRandomNotGluedSymbolIndexes = useGetRandomNotGluedSymbolIndexes();
+  const enemyType = usePersistentSelector(
+    (state) => state.currentRun?.currentBattle?.enemy.type,
+  );
+
+  const canPlayerAttackRef = useRef(canPlayerAttack);
+  const canEnemyAttackRef = useRef(canEnemyAttack);
+  const isEnemyDefeatedRef = useRef(isEnemyDefeated);
+  const isPlayerDefeatedRef = useRef(isPlayerDefeated);
+  const getRandomNotGluedSymbolIndexesRef = useRef(
+    getRandomNotGluedSymbolIndexes,
+  );
+  const enemyTypeRef = useRef(enemyType);
+  canPlayerAttackRef.current = canPlayerAttack;
+  canEnemyAttackRef.current = canEnemyAttack;
+  isEnemyDefeatedRef.current = isEnemyDefeated;
+  isPlayerDefeatedRef.current = isPlayerDefeated;
+  getRandomNotGluedSymbolIndexesRef.current = getRandomNotGluedSymbolIndexes;
+  enemyTypeRef.current = enemyType;
 
   useEffect(() => {
     if (paylinesToActivate.length === 0) {
@@ -319,12 +357,12 @@ export default function Battle() {
       ACTIVATION_DURATION;
     activationTimeoutRefs.current.push(
       window.setTimeout(async () => {
-        if (isPlayerDefeated()) {
+        if (isPlayerDefeatedRef.current) {
           battleLost();
           return;
         }
 
-        if (canPlayerAttack()) {
+        if (canPlayerAttackRef.current) {
           await playerRef.current?.attack(() => {
             enemyRef.current?.setAttacked();
             playSound("hit");
@@ -332,14 +370,14 @@ export default function Battle() {
           });
         }
 
-        if (!isEnemyDefeated()) {
+        if (!isEnemyDefeatedRef.current) {
           await sleep(500);
 
           enemyRef.current?.setIdle();
 
           await sleep(250);
 
-          if (canEnemyAttack()) {
+          if (canEnemyAttackRef.current) {
             await enemyRef.current?.attack(() => {
               playerRef.current?.setAttacked();
               playSound("hit");
@@ -347,15 +385,16 @@ export default function Battle() {
             });
           }
 
-          if (isPlayerDefeated()) {
+          if (isPlayerDefeatedRef.current) {
             battleLost();
           } else {
             resetPlayerNextActions();
             setEnemyNextActions();
 
-            switch (state.currentRun?.currentBattle?.enemy.type) {
+            switch (enemyTypeRef.current) {
               case "blob": {
-                const randomSymbolIndexes = getRandomNotGluedSymbolIndexes();
+                const randomSymbolIndexes =
+                  getRandomNotGluedSymbolIndexesRef.current();
 
                 if (randomSymbolIndexes === null) {
                   break;
@@ -424,6 +463,8 @@ export default function Battle() {
       clearActivationTimers();
     };
   }, [paylinesToActivate]);
+
+  const isSymbolGlued = useIsSymbolGlued();
 
   const getDisplayedSymbolsFromFinalIndexes = (finalIndexes: number[]) => {
     return reels.map((reelSymbols, reelIndex) => {
@@ -658,28 +699,37 @@ export default function Battle() {
     endBattle(true);
   };
 
-  if (!state.currentRun?.currentBattle) {
+  const currentBattle = usePersistentSelectorShallow(
+    (state) => state.currentRun?.currentBattle,
+  );
+  const passiveEffects = usePersistentSelectorShallow(
+    (state) => state.currentRun?.passiveEffects ?? [],
+  );
+  const gold = useGold();
+  const currentRunType = usePersistentSelector(
+    (state) => state.currentRun?.type,
+  );
+
+  if (!currentBattle) {
     return null;
   }
 
-  const hasAskedToDie =
-    state.currentRun?.passiveEffects.includes("wantedToDie") ?? false;
+  const hasAskedToDie = passiveEffects.includes("wantedToDie") ?? false;
 
   return (
     <>
       <Screen>
         <Scene
-          levelIndex={state.currentRun.levelIndex}
+          levelIndex={levelIndex}
           player={{
             health,
-            playerNextActions:
-              state.currentRun.currentBattle.playerNextActions || [],
-            type: state.currentRun.type,
+            playerNextActions: currentBattle.playerNextActions || [],
+            type: currentRunType!,
           }}
-          enemy={state.currentRun.currentBattle.enemy!}
+          enemy={currentBattle.enemy!}
           playerRef={playerRef}
           enemyRef={enemyRef}
-          gold={state.gold}
+          gold={gold}
         />
         <hr className="ui-separator" />
         <div
@@ -697,7 +747,7 @@ export default function Battle() {
             activeSymbolPositions={activeSymbolPositions}
             spinSpeedMultiplier={spinSpeedMultiplier}
             isMiddleReelLocked={isMiddleReelLocked}
-            hasUsedLockedReel={state.currentRun.currentBattle.hasUsedLockedReel}
+            hasUsedLockedReel={currentBattle.hasUsedLockedReel}
             onToggleMiddleReelLock={() => {
               playSound("lock");
               setIsMiddleReelLocked((prev) => !prev);
@@ -756,22 +806,22 @@ export default function Battle() {
             style={{ "--animation-delay": "4s" } as React.CSSProperties}
           >
             "Don't worry, I'll resurrect you soon.{" "}
-            {state.gold > 0
+            {gold > 0
               ? `You can even keep your gold!${hasAskedToDie ? "" : " Just give me half."}`
               : null}
             "
           </p>
 
-          {state.gold > 0 && (
+          {gold > 0 && (
             <div
               className="game-over-gold-container fade-in"
               style={{ "--animation-delay": "4s" } as React.CSSProperties}
             >
-              <GoldCounter value={state.gold} />
+              <GoldCounter value={gold} />
               {!hasAskedToDie && (
                 <>
                   <img src="./images/right-arrow.png" alt="" />
-                  <GoldCounter value={Math.ceil(state.gold / 2)} />
+                  <GoldCounter value={Math.ceil(gold / 2)} />
                 </>
               )}
             </div>
@@ -784,7 +834,11 @@ export default function Battle() {
             <Button
               imageName="resurrect"
               as="link"
-              onClick={() => endBattle(false)}
+              onClick={() => {
+                playerCloneRef.current?.remove();
+                playerCloneRef.current = null;
+                endBattle(false);
+              }}
               to="/"
             >
               Resurrect

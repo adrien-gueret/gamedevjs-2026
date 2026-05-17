@@ -4,17 +4,14 @@ import { useSound, useAudio, useMusic } from "wavedash-react";
 
 import Sprite, { type SpriteHandle } from "@/components/Sprite";
 
-import { useGameState } from "@/services/gameStore";
-
 import "./style.css";
 import { getBackgroundMusicForPathname } from "@/services/backgroundMusic";
 
 export default function AudioButton() {
-  const state = useGameState();
   const location = useLocation();
   const spriteRef = useRef<SpriteHandle>(null);
   const { playSound } = useSound("click");
-  const { toggleAudio } = useAudio();
+  const { toggleAudio, isAudioEnabled } = useAudio();
   const { playMusic } = useMusic();
 
   const handleClick = () => {
@@ -38,7 +35,7 @@ export default function AudioButton() {
           tileWidth={32}
           tileSeparationX={0}
           tileSeparationY={0}
-          defaultTile={state.audio ? 0 : 1}
+          defaultTile={isAudioEnabled() ? 0 : 1}
           scale={2}
         />
       </button>

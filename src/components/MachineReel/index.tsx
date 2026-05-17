@@ -7,7 +7,7 @@ import MachineSymbol from "@/components/MachineSymbol";
 import Tooltip from "@/components/Tooltip";
 
 import { isMalusSymbol } from "@/services/upgrades";
-import { isSymbolGlued } from "@/services/selector";
+import { useIsSymbolGlued } from "@/services/selector";
 
 import "./style.css";
 
@@ -49,6 +49,7 @@ export default function MachineReel({
   const [lastReplacedIndex, setLastReplacedIndex] = useState<number | null>(
     null,
   );
+  const isSymbolGlued = useIsSymbolGlued();
 
   useEffect(() => {
     if (wasSpinningRef.current && !isSpinning) {
@@ -95,7 +96,10 @@ export default function MachineReel({
     return symbols[symbolIndex];
   });
 
-  const safeSpinSpeedMultiplier = Math.min(1, Math.max(0.5, spinSpeedMultiplier));
+  const safeSpinSpeedMultiplier = Math.min(
+    1,
+    Math.max(0.5, spinSpeedMultiplier),
+  );
   const spinDuration = (0.28 + reelIndex * 0.045) * safeSpinSpeedMultiplier;
   const reelCycleDistance = reelSize * 66;
 

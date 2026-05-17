@@ -1,113 +1,175 @@
-import { getGameState } from "@/services/gameStore";
-import type { DevilDealType } from "@/types/game";
+import { useCallback } from "react";
+import type { DevilDealType, PersistentGameState } from "@/types/game";
 import { PERMANENT_DEVIL_DEALS } from "@/constants/devilDeals";
+import {
+  usePersistentSelector,
+  usePersistentSelectorShallow,
+} from "@/services/state";
+
 import { getRandomElements } from "./utils";
 
-export function canPlayerAttack(): boolean {
-  const currentState = getGameState();
-  const attackAction =
-    currentState.currentRun?.currentBattle?.playerNextActions.find(
-      (action) => action.type === "attack",
-    );
+export function useCanPlayerAttack(): boolean {
+  const playerNextActions = usePersistentSelectorShallow(
+    (state) => state.currentRun?.currentBattle?.playerNextActions ?? [],
+  );
+
+  const attackAction = playerNextActions.find(
+    (action) => action.type === "attack",
+  );
   const attackValue = attackAction?.value ?? 0;
 
   return attackValue > 0;
 }
 
-export function canEnemyAttack(): boolean {
-  const currentState = getGameState();
-  const attackAction =
-    currentState.currentRun?.currentBattle?.enemy.nextActions.find(
-      (action) => action.type === "attack",
-    );
+export function useCanEnemyAttack(): boolean {
+  const enemyNextActions = usePersistentSelectorShallow(
+    (state) => state.currentRun?.currentBattle?.enemy.nextActions ?? [],
+  );
+
+  const attackAction = enemyNextActions.find(
+    (action) => action.type === "attack",
+  );
   const attackValue = attackAction?.value ?? 0;
 
   return attackValue > 0;
 }
 
-export function isEnemyDefeated(): boolean {
-  const currentState = getGameState();
-  const enemyHealth =
-    currentState.currentRun?.currentBattle?.enemy.health.value ?? 0;
+export function useIsEnemyDefeated(): boolean {
+  const enemyHealth = usePersistentSelectorShallow(
+    (state) => state.currentRun?.currentBattle?.enemy.health.value ?? 0,
+  );
+
   return enemyHealth <= 0;
 }
 
-export function isPlayerDefeated(): boolean {
-  const currentState = getGameState();
-  const playerHealth = currentState.currentRun?.health.value ?? 0;
-  return playerHealth <= 0;
+export function useIsPlayerDefeated(): boolean {
+  const health = useHealth();
+  return health.value <= 0;
 }
 
-export function hasUnlockedPermanentDeal(dealType: DevilDealType): boolean {
-  const currentState = getGameState();
-  return currentState.unlockedPermanentDeals.includes(dealType);
+export function useHasUnlockedPermanentDeal() {
+  const unlockedPermanentDeals = usePersistentSelectorShallow(
+    (state) => state.unlockedPermanentDeals,
+  );
+
+  return useCallback(
+    (dealType: DevilDealType) => {
+      return unlockedPermanentDeals.includes(dealType);
+    },
+    [unlockedPermanentDeals],
+  );
 }
 
-export function canDevilDealBeInShop(dealType: DevilDealType): boolean {
-  const deal = PERMANENT_DEVIL_DEALS.find((deal) => deal.type === dealType);
-
-  if (!deal) {
-    const currentState = getGameState();
-    return dealType === "passiveWantedToDie" ? currentState.gold > 1 : true;
-  }
-
-  const hasRequiredDeals = deal.requirements
-    ? deal.requirements.every(hasUnlockedPermanentDeal)
-    : true;
-
-  return hasRequiredDeals && !hasUnlockedPermanentDeal(dealType);
+export function useGold() {
+  return usePersistentSelector((state) => state.gold);
 }
 
-export function isSymbolGlued(reelIndex: number, symbolIndex: number): boolean {
-  const currentState = getGameState();
+export function useHealth() {
+  return usePersistentSelectorShallow((state) => ({
+    value: state.currentRun?.health.value ?? 0,
+    max: state.currentRun?.health.max ?? 0,
+  }));
+}
 
+export function useRandomChoices() {
+  return usePersistentSelectorShallow(
+    (state) => state.currentRun?.randomChoices ?? [],
+  );
+}
+
+export function useCanDevilDealBeInShop() {
+  const hasUnlockedPermanentDeal = useHasUnlockedPermanentDeal();
+  const gold = useGold();
+
+  return useCallback(
+    (dealType: DevilDealType) => {
+      const deal = PERMANENT_DEVIL_DEALS.find((deal) => deal.type === dealType);
+
+      if (!deal) {
+        return dealType === "passiveWantedToDie" ? gold > 1 : true;
+      }
+
+      const hasRequiredDeals = deal.requirements
+        ? deal.requirements.every((req) => hasUnlockedPermanentDeal(req))
+        : true;
+
+      return hasRequiredDeals && !hasUnlockedPermanentDeal(dealType);
+    },
+    [hasUnlockedPermanentDeal, gold],
+  );
+}
+
+export function useGlueSymbolsIndexes() {
+  return usePersistentSelectorShallow(
+    (state) => state.currentRun?.gluedSymbolsIndexes,
+  );
+}
+
+export function isSymbolGlued(
+  currentState: PersistentGameState,
+  reelIndex: number,
+  symbolIndex: number,
+): boolean {
   return (
-    currentState.currentRun?.gluedSymbolsIndexes[reelIndex].includes(
+    currentState.currentRun?.gluedSymbolsIndexes?.[reelIndex]?.includes(
       symbolIndex,
     ) ?? false
   );
 }
 
-export function areAllSymbolsGlued(): boolean {
-  const currentState = getGameState();
+export function useIsSymbolGlued() {
+  const gluedSymbolsIndexes = useGlueSymbolsIndexes();
 
-  return (
-    currentState.currentRun?.gluedSymbolsIndexes.every(
-      (gluedIndexes, reelIndex) =>
-        gluedIndexes.length ===
-        currentState.currentRun?.reels[reelIndex].length,
-    ) ?? true
+  return useCallback(
+    (reelIndex: number, symbolIndex: number) => {
+      return gluedSymbolsIndexes?.[reelIndex]?.includes(symbolIndex) ?? false;
+    },
+    [gluedSymbolsIndexes],
   );
 }
 
-export function getRandomNotGluedSymbolIndexes(): {
+export function useCurrentRunReels() {
+  return usePersistentSelectorShallow((state) => state.currentRun?.reels ?? []);
+}
+
+export function useGetRandomNotGluedSymbolIndexes(): () => {
   reelIndex: number;
   symbolIndex: number;
 } | null {
-  if (areAllSymbolsGlued()) {
-    return null;
-  }
+  const isSymbolGlued = useIsSymbolGlued();
+  const areAllSymbolsGlued = usePersistentSelectorShallow(
+    (currentState) =>
+      currentState.currentRun?.gluedSymbolsIndexes.every(
+        (gluedIndexes, reelIndex) =>
+          gluedIndexes.length ===
+          currentState.currentRun?.reels[reelIndex].length,
+      ) ?? true,
+  );
+  const reels = useCurrentRunReels();
 
-  const currentState = getGameState();
+  return useCallback(() => {
+    if (areAllSymbolsGlued) {
+      return null;
+    }
 
-  const notGluedSymbols: { reelIndex: number; symbolIndex: number }[] = [];
+    const notGluedSymbols: { reelIndex: number; symbolIndex: number }[] = [];
 
-  currentState.currentRun!.reels.forEach((reel, reelIndex) => {
-    reel.forEach((_, symbolIndex) => {
-      if (!isSymbolGlued(reelIndex, symbolIndex)) {
-        notGluedSymbols.push({ reelIndex, symbolIndex });
-      }
+    reels.forEach((reel, reelIndex) => {
+      reel.forEach((_, symbolIndex) => {
+        if (!isSymbolGlued(reelIndex, symbolIndex)) {
+          notGluedSymbols.push({ reelIndex, symbolIndex });
+        }
+      });
     });
-  });
 
-  if (notGluedSymbols.length === 0) {
-    return null;
-  }
+    if (notGluedSymbols.length === 0) {
+      return null;
+    }
 
-  return getRandomElements(notGluedSymbols, 1)[0];
+    return getRandomElements(notGluedSymbols, 1)[0];
+  }, [areAllSymbolsGlued, isSymbolGlued, reels]);
 }
 
-export function getCurrentPathname(): string {
-  const currentState = getGameState();
-  return currentState.currentPathname;
+export function useCurrentPathname(): string {
+  return usePersistentSelector((state) => state.currentPathname);
 }

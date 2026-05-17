@@ -1,9 +1,10 @@
 import Screen from "@/components/Screen";
 import { Link } from "react-router-dom";
 
-import { setCurrentPathname } from "@/services/actions";
+import { usePersistentActions } from "@/services/state";
 
 export default function Error() {
+  const { setCurrentPathname } = usePersistentActions();
   return (
     <Screen>
       <h2>An error occurred</h2>

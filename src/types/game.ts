@@ -109,10 +109,9 @@ export type ConfigurableBaseRun = Omit<
   "levelIndex" | "currentBattle" | "randomChoices"
 >;
 
-export type GameState = {
+export type PersistentGameState = {
   gold: number;
   unlockedPermanentDeals: DevilDealType[];
-  audio: boolean;
   currentPathname: string;
   currentRun: Run | null;
 };

@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
 
+import { useGold, useHealth } from "@/services/selector";
+
 import Tooltip from "@/components/Tooltip";
 import DealLabel from "@/components/DealLabel";
-import { useGameState } from "@/services/gameStore";
 import type { BuyableDevilDeal } from "@/types/game";
 
 import "./style.css";
@@ -22,27 +23,27 @@ export default function DevilDealChoices({
   canRerollDeals,
   onBuyDeal,
 }: Props) {
-  const state = useGameState();
-
   const [rerollCost, setRerollCost] = useState(2);
+  const gold = useGold();
+  const health = useHealth();
 
   const canAffordDeal = useCallback(
     (deal: BuyableDevilDeal): boolean => {
       switch (deal.cost.type) {
         case "gold":
-          return state.gold >= deal.cost.value;
+          return gold >= deal.cost.value;
 
         case "maxhealth":
-          return (state.currentRun?.health.max ?? 0) > deal.cost.value;
+          return (health.max ?? 0) > deal.cost.value;
 
         case "health":
-          return (state.currentRun?.health.value ?? 0) > deal.cost.value;
+          return (health.value ?? 0) > deal.cost.value;
 
         default:
           return true;
       }
     },
-    [state.gold, state.currentRun?.health.max, state.currentRun?.health.value],
+    [gold, health.value, health.max],
   );
 
   const rerollDeal: BuyableDevilDeal | null = canRerollDeals

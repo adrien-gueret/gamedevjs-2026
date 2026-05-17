@@ -9,24 +9,20 @@ import MachineUpdate from "@/components/MachineUpdate";
 import SymbolPicker from "@/components/SymbolPicker";
 
 import {
-  getRandomDevilDeals,
+  useGetRandomDevilDeals,
+  useGetRandomBonusSymbols,
   getRandomMalusSymbol,
-  getRandomBonusSymbols,
   isMalusSymbol,
 } from "@/services/upgrades";
-import { useGameState } from "@/services/gameStore";
-import {
-  addPermanentBonus,
-  addPassiveEffect,
-  setRandomChoices,
-  spendGold,
-  spendMaxHealth,
-  setReelSymbol,
-  removeReelSymbol,
-  killPlayer,
-  takeDamage,
-} from "@/services/actions";
+import { usePersistentActions } from "@/services/state";
 import { random } from "@/services/maths";
+import {
+  useRandomChoices,
+  useCurrentRunReels,
+  useHasUnlockedPermanentDeal,
+  useGold,
+  useHealth,
+} from "@/services/selector";
 
 import type { BuyableDevilDeal, ReelSymbol } from "@/types/game";
 import HealthBar from "@/components/HealthBar";
@@ -50,12 +46,24 @@ const MALUS_DIALOGS = [
 ];
 
 export default function DevilDeal() {
-  const state = useGameState();
+  const {
+    addPermanentBonus,
+    addPassiveEffect,
+    setRandomChoices,
+    spendGold,
+    spendMaxHealth,
+    setReelSymbol,
+    removeReelSymbol,
+    killPlayer,
+    takeDamage,
+  } = usePersistentActions();
+
   const navigate = useNavigate();
   const isLeaving = useRef(false);
   const concludeDeal = useRef<() => void | null>(null);
   const isShopInitialized = useRef(false);
   const { playSound } = useSounds();
+  const hasUnlockedPermanentDeal = useHasUnlockedPermanentDeal();
 
   const forcedMalusTotalRef = useRef(0);
   const [forcedMalusCount, setForcedMalusCount] = useState(0);
@@ -71,10 +79,14 @@ export default function DevilDeal() {
     setSelectedSymbolForReplacementBonus,
   ] = useState<ReelSymbol | null>(null);
 
-  const storedDeals = (state.currentRun?.randomChoices ??
-    []) as BuyableDevilDeal[];
+  const storedDeals = useRandomChoices() as BuyableDevilDeal[];
+  const reels = useCurrentRunReels();
+  const gold = useGold();
+  const health = useHealth();
 
   const phrase = useRef(DEAL_PHRASES[random(0, DEAL_PHRASES.length - 1)]);
+  const getRandomDevilDeals = useGetRandomDevilDeals();
+  const getRandomBonusSymbols = useGetRandomBonusSymbols();
 
   useEffect(() => {
     if (isShopInitialized.current) {
@@ -85,7 +97,7 @@ export default function DevilDeal() {
       const newDeals = getRandomDevilDeals();
       setRandomChoices(newDeals);
     }
-  }, [storedDeals]);
+  }, [storedDeals, getRandomDevilDeals, setRandomChoices]);
 
   const leave = useCallback(() => {
     if (isLeaving.current) {
@@ -95,7 +107,7 @@ export default function DevilDeal() {
 
     setRandomChoices();
     navigate("/bonus-upgrade");
-  }, []);
+  }, [setRandomChoices, navigate]);
 
   const permanentDeals = storedDeals.filter((deal) => deal.permanent);
   const runOnlyDeals = storedDeals.filter((deal) => !deal.permanent);
@@ -167,7 +179,7 @@ export default function DevilDeal() {
           break;
 
         case "reel": {
-          const allSymbols = (state.currentRun?.reels ?? []).flat();
+          const allSymbols = reels.flat();
           const allAreMalus =
             allSymbols.length === 0 || allSymbols.every(isMalusSymbol);
 
@@ -184,7 +196,19 @@ export default function DevilDeal() {
 
       concludeDeal.current();
     },
-    [storedDeals, leave],
+    [
+      storedDeals,
+      leave,
+      reels,
+      playSound,
+      addPermanentBonus,
+      addPassiveEffect,
+      killPlayer,
+      setRandomChoices,
+      getRandomDevilDeals,
+      getRandomBonusSymbols,
+      setRandomChoices,
+    ],
   );
 
   return (
@@ -213,9 +237,7 @@ export default function DevilDeal() {
           title="Temporary Deals"
           subtitle="Benefits from these deals won't follow you after this life."
           deals={runOnlyDeals}
-          canRerollDeals={state.unlockedPermanentDeals.includes(
-            "unlockRerollDeals",
-          )}
+          canRerollDeals={hasUnlockedPermanentDeal("unlockRerollDeals")}
           onBuyDeal={onBuyDeal}
         />
       </div>
@@ -226,13 +248,9 @@ export default function DevilDeal() {
         </Button>
       </div>
 
-      <HealthBar
-        variant="hero"
-        value={state.currentRun?.health.value ?? 0}
-        maxValue={state.currentRun?.health.max ?? 0}
-      />
+      <HealthBar variant="hero" value={health.value} maxValue={health.max} />
 
-      <GoldCounter value={state.gold} />
+      <GoldCounter value={gold} />
 
       {currentForcedMalusSymbol && (
         <MachineUpdate

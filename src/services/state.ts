@@ -1,0 +1,83 @@
+import { createStateContext, defineState } from "wavedash-react";
+
+import type { PersistentGameState } from "@/types/game";
+
+import {
+  startRun,
+  endRun,
+  setCurrentPathname,
+  setReelSymbol,
+  removeReelSymbol,
+  addSymbolTooReel,
+  glueSymbol,
+  unglueSymbol,
+  addPassiveEffect,
+  addPermanentBonus,
+  takeDamage,
+  healPlayer,
+  addGold,
+  spendGold,
+  spendMaxHealth,
+  killPlayer,
+  startNewBattle,
+  endBattle,
+  setBetCost,
+  setHasUsedLockedReel,
+  addPlayerNextActions,
+  resetPlayerNextActions,
+  resetEnemyNextActions,
+  makeCharacterAttack,
+  healEnemy,
+  setEnemyNextActions,
+  addEnemyNextActions,
+  setRandomChoices,
+} from "./actions";
+
+const persistentState = defineState({
+  initialState: {
+    gold: 0,
+    unlockedPermanentDeals: [],
+    currentPathname: "/",
+    currentRun: null,
+  } as PersistentGameState,
+  actions: {
+    startRun,
+    endRun,
+    setCurrentPathname,
+    setReelSymbol,
+    removeReelSymbol,
+    addSymbolTooReel,
+    glueSymbol,
+    unglueSymbol,
+    addPassiveEffect,
+    addPermanentBonus,
+    takeDamage,
+    healPlayer,
+    addGold,
+    spendGold,
+    spendMaxHealth,
+    killPlayer,
+    startNewBattle,
+    endBattle,
+    setBetCost,
+    setHasUsedLockedReel,
+    addPlayerNextActions,
+    resetPlayerNextActions,
+    resetEnemyNextActions,
+    makeCharacterAttack,
+    healEnemy,
+    setEnemyNextActions,
+    addEnemyNextActions,
+    setRandomChoices,
+  },
+});
+
+export const {
+  StateProvider,
+  usePersistentSelector,
+  usePersistentActions,
+  usePersistentSelectorShallow,
+  usePersistentMeta,
+} = createStateContext({
+  persistent: persistentState,
+});

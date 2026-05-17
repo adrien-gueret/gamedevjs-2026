@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 
 import { WavedashProvider } from "wavedash-react";
 
+import { StateProvider } from "@/services/state";
+
 import "./index.css";
 import Router from "./Router";
 
@@ -90,7 +92,15 @@ createRoot(document.getElementById("root")!).render(
       defaultMusicVolume={0.5}
       defaultSoundsVolume={1}
     >
-      <Router />
+      <StateProvider
+        saveOptions={{
+          fileName: "THE_DEVILE_MACHINE_STORAGE_KEY",
+          autoSave: true,
+          autoLoad: true,
+        }}
+      >
+        <Router />
+      </StateProvider>
     </WavedashProvider>
   </StrictMode>,
 );

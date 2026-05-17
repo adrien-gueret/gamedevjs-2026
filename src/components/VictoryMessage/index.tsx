@@ -3,10 +3,8 @@ import { Link } from "react-router-dom";
 import { useSounds } from "wavedash-react";
 
 import Tooltip from "@/components/Tooltip";
-
-import { useGameState } from "@/services/gameStore";
-
-import { healPlayer } from "@/services/actions";
+import { useHealth } from "@/services/selector";
+import { usePersistentActions } from "@/services/state";
 
 import "./style.css";
 import DelayedRender from "../DelayedRender";
@@ -20,10 +18,10 @@ type Props = {
 
 export function VictoryMessage({ onHeal, onDevilDeal }: Props) {
   const hasClickedHealRef = useRef(false);
-  const state = useGameState();
   const { playSound } = useSounds();
+  const { max: maxHealth } = useHealth();
+  const { healPlayer } = usePersistentActions();
 
-  const maxHealth = state.currentRun?.health.max ?? 0;
   const healAmount = Math.ceil(maxHealth * healAmountPercentage);
 
   const heal = () => {
